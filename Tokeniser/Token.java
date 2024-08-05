@@ -14,26 +14,16 @@ public class Token
     };
     
     private TokenTypes type = TokenTypes.TUNDF;
-    private String tokenString = null;
+    private String tokenLexeme = null;
+    private final TokenLocation location;
 
-    //Strictly should probably use a hashmap instead of an enum but this is easier and won't matter
-    public Token(TokenTypes InputType, String inputString)
-    {
-        if (InputType == TokenTypes.TIDEN || InputType == TokenTypes.TUNDF)
-        {
-            type = InputType;
-            tokenString = inputString;
-        }
-        else
-        {
-            type = InputType;
-            tokenString = "";
-        }
-    }
+    //Public
 
-    private String getTypeString(TokenTypes type)
+    public Token(TokenTypes inputType, String inputString, int row, int column)
     {
-        return tokenOutputStrings[type.ordinal()];
+        location = new TokenLocation(row, column);
+        type = inputType;
+        tokenLexeme = inputString;
     }
 
     public TokenTypes getType()
@@ -41,20 +31,67 @@ public class Token
         return type;
     }
 
-    public String getString()
+    public String getLexeme()
     {
-        return tokenString;
+        return tokenLexeme;
     }
 
-    public String getFullIdenString()
+    public @Override String toString()
     {
-        if (type != TokenTypes.TIDEN || type != TokenTypes.TUNDF)
+        return switch (type) 
         {
-            return getTypeString(type);
-        }
-        String out = getTypeString(type) + tokenString; 
+            case TokenTypes.TIDEN -> getIDENString();
+            case TokenTypes.TUNDF -> getUNDFString();
+            default -> getTypeString(type);
+        };
+    }
+
+    public String toStringWithLocation()
+    {
+        return switch (type) 
+        {
+            case TokenTypes.TIDEN -> getIDENString() + location.getLocationString();
+            case TokenTypes.TUNDF -> getUNDFString();
+            default -> getTypeString(type) + location.getLocationString();
+        };
+    }
+
+    //Private
+
+    private String getTypeString(TokenTypes type)
+    {
+        return tokenOutputStrings[type.ordinal()];
+    }
+
+    private String getIDENString()
+    {
+        String out = getTypeString(type) + tokenLexeme; 
         return out;
     }
-    
 
+    private String getUNDFString()
+    {
+        //TODO: Reformat this to be correct
+        String out = getIDENString() + location.getLocationString();
+
+        return out;
+    }    
+
+    private class TokenLocation
+    {
+        int row;
+        int column;
+
+        public TokenLocation(int _row, int _column)
+        {
+            row = _row;
+            column = _column;
+        }
+
+        public String getLocationString()
+        {
+            //TODO: reformat this to be correct
+            return ": At Row: "+row+", Column: "+column;
+        }
+    }
 }
