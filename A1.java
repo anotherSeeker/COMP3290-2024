@@ -12,14 +12,11 @@ public class A1
 
         if (args.length > 0)
         {
-            if (args[0].equals("a1Test.cd24"))
-            {
-                filePathString = args[0];
-            }
+            filePathString = args[0];
+            ArrayList<Token> tokenList = tokeniser.run(filePathString);
         }
         else
-            filePathString = "";
+            System.out.println("please provide filepath");
         
-        ArrayList<Token> tokenList = tokeniser.run(filePathString);
     }
 }
