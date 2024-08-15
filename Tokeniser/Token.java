@@ -14,16 +14,32 @@ public class Token
     };
     
     private TokenTypes type = TokenTypes.TUNDF;
+
+    //for idents and strings
     private String tokenLexeme = null;
-    private final TokenLocation location;
+
+    //for flit and ilit
+    private double tokenNumber = 0;
+
+    private int line;
+    private int column;
 
     //Public
 
-    public Token(TokenTypes inputType, String inputString, int row, int column)
+    public Token(TokenTypes inputType, String inputString, int _line, int _column)
     {
-        location = new TokenLocation(row, column);
+        line = _line;
+        column = _column;
         type = inputType;
         tokenLexeme = inputString;
+    }
+
+    public Token(TokenTypes inputType, double inputNumber, int _line, int _column)
+    {
+        line = _line;
+        column = _column;
+        type = inputType;
+        tokenNumber = inputNumber;
     }
 
     public TokenTypes getType()
@@ -40,8 +56,10 @@ public class Token
     {
         return switch (type) 
         {
-            case TokenTypes.TIDEN -> getIDENString();
-            case TokenTypes.TUNDF -> getUNDFString();
+            case TIDEN -> getIDENString();
+            case TFLIT -> getNumberString();
+            case TILIT -> getNumberString();
+            case TUNDF -> getIDENString();
             default -> getTypeString(type);
         };
     }
@@ -50,9 +68,11 @@ public class Token
     {
         return switch (type) 
         {
-            case TokenTypes.TIDEN -> getIDENString() + location.getLocationString();
-            case TokenTypes.TUNDF -> getUNDFString();
-            default -> getTypeString(type) + location.getLocationString();
+            case TIDEN -> getIDENString()   + getLocationString();
+            case TFLIT -> getNumberString() + getLocationString();
+            case TILIT -> getNumberString() + getLocationString();
+            case TUNDF -> getIDENString()   + getLocationString();
+            default -> getTypeString(type)  + getLocationString();
         };
     }
 
@@ -69,29 +89,14 @@ public class Token
         return out;
     }
 
-    private String getUNDFString()
+    private String getNumberString()
     {
-        //TODO: Reformat this to be correct
-        String out = getIDENString() + location.getLocationString();
+       String out = getTypeString(type) + tokenNumber;
+       return out;
+    }
 
-        return out;
-    }    
-
-    private class TokenLocation
+    public String getLocationString()
     {
-        int row;
-        int column;
-
-        public TokenLocation(int _row, int _column)
-        {
-            row = _row;
-            column = _column;
-        }
-
-        public String getLocationString()
-        {
-            //TODO: reformat this to be correct
-            return ": At Row: "+row+", Column: "+column;
-        }
+        return "(Line: "+line+", Column: "+column+")";
     }
 }

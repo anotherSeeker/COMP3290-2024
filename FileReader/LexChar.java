@@ -2,13 +2,13 @@ package FileReader;
 
 public class LexChar 
 {
-    int row;
+    int line;
     int col;
     String character = "";   
     
-    public LexChar(int _row, int _col, String _character)
+    public LexChar(int _line, int _col, String _character)
     {
-        row = _row;
+        line = _line;
         col = _col;
         character = _character;
     }
@@ -21,7 +21,7 @@ public class LexChar
         return col;
     }
 
-    public int getRow() {
-        return row;
+    public int getLine() {
+        return line;
     }
 }

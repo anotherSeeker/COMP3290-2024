@@ -4,7 +4,8 @@ constants
 
 a = 12, 
 b = 13, 
-c = 5
+c = 5,
+d = 1.2345
 
 typedef
 
