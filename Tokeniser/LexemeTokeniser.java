@@ -13,7 +13,7 @@ public class LexemeTokeniser
     //private String lexemeBuffer = "";
     private ArrayList<LexChar> lexemeBuffer = new ArrayList<LexChar>();
     private cd24FileReader reader;
-    private String legalSymbols = ", [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
+    private String legalSymbols = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
     private String[] legalMultiCharSymbols = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
 
     private Dictionary<String, TokenTypes> symbolDict = new Hashtable<>();
@@ -37,6 +37,7 @@ public class LexemeTokeniser
     private tokeniserState state = tokeniserState.none;
     private String errorStateDesc = "N/A";
     private boolean bufferIsLegal = false;
+    private boolean keepBuffer = false;
 
     public ArrayList<ArrayList<Token>> run(String filePath)
     {
@@ -80,8 +81,15 @@ public class LexemeTokeniser
             if (shouldTokenise)
             {
                 tokeniseBuffer(lexemeBuffer);
-                wipeBuffer();
-                resetState();
+                if (!keepBuffer)
+                {
+                    wipeBuffer();
+                    resetState();
+                }
+                if (keepBuffer)
+                {
+                    keepBuffer = false;
+                }
             }
         }
     }
@@ -142,7 +150,7 @@ public class LexemeTokeniser
             }
             else
             {
-                tokeniseIllegalBuffer(lexBuffer);
+                lexBuffer = tokeniseIllegalBuffer(lexBuffer);
             }
         }
     }
@@ -264,10 +272,9 @@ public class LexemeTokeniser
             state = tokeniserState.string;
             bufferIsLegal = false;    
         }
-        else if(isSymbolLegal(buffer))
+        else if(isSymbolLegal(newChar, buffer))
         {
             state = tokeniserState.symbol;
-            
         }
 
         return shouldTokenise;
@@ -390,8 +397,9 @@ public class LexemeTokeniser
         return shouldTokenise;
     }
 
-    private void tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
+    private ArrayList<LexChar> tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
     {
+        String str;
         boolean shouldTokenise = true;
         ArrayList<LexChar> subBuffer = new ArrayList<LexChar>();
 
@@ -415,25 +423,37 @@ public class LexemeTokeniser
             }
             else
             {
+                ArrayList<LexChar> savedSubBuffer =  new ArrayList<>(subBuffer);
+                subBuffer.add(newChar);
+
+                str = getBufferString(subBuffer);
                 shouldTokenise = handleValidationState(newChar, subBuffer);
                 if (shouldTokenise)
                 {
+                    subBuffer = new ArrayList<>(savedSubBuffer);
                     bufferIsLegal = true;
-                    tokeniseBuffer(subBuffer);
+                    tokeniseBuffer(savedSubBuffer);
                     subBuffer = new ArrayList<LexChar>();
                     resetState();
 
-                    subBuffer.add(newChar);
                     shouldTokenise = handleValidationState(newChar, subBuffer);
+                    subBuffer.add(newChar);
+
+                    str = state.toString();
                 }
                 else
                 {
-                    subBuffer.add(newChar);
+                    //subBuffer.add(newChar);
                 }
             }
         }
 
         lexemeBuffer = subBuffer;
+        if (lexemeBuffer.size() > 0)
+        {
+            keepBuffer = true;
+        }
+        return lexemeBuffer;
     }    
 
     private boolean endMultiLineComment(ArrayList<LexChar> buffer)
@@ -453,12 +473,12 @@ public class LexemeTokeniser
     {
         boolean shouldTokenise = false;
 
-        if (isSymbolBuildingComment(buffer))
+        if (isSymbolBuildingComment(newChar, buffer))
         {
             return shouldTokenise;
         }
 
-        boolean isLegal = isSymbolLegal(buffer);
+        boolean isLegal = isSymbolLegal(newChar, buffer);
 
         if (!isLegal)
         {
@@ -469,12 +489,14 @@ public class LexemeTokeniser
         return shouldTokenise;
     }
 
-    private boolean isSymbolLegal(ArrayList<LexChar> buffer)
+    private boolean isSymbolLegal(LexChar newChar, ArrayList<LexChar> buffer)
     {
+        
         boolean symbolIsLegal = false;
 
         String bufferString = getBufferString(buffer);
-        boolean isInLegalSymbols = legalSymbols.contains(bufferString);
+        String currChar = newChar.getCharacter();
+        boolean isInLegalSymbols = legalSymbols.contains(currChar);
         boolean isLegalMultiCharSymbol;
 
         if (buffer.size() > 1)
@@ -489,6 +511,9 @@ public class LexemeTokeniser
                     return symbolIsLegal;
                 }
             }
+            bufferIsLegal = false;
+            symbolIsLegal = false;
+            return symbolIsLegal;
         }
         else if (isInLegalSymbols)
         {
@@ -527,10 +552,10 @@ public class LexemeTokeniser
         return isComment;
     }
     
-    private boolean isSymbolBuildingComment(ArrayList<LexChar> buffer)
+    private boolean isSymbolBuildingComment(LexChar newChar, ArrayList<LexChar> buffer)
     {
         boolean isBuildingComment = false;
-        String bufferString = getBufferString(buffer);
+        String bufferString = getBufferString(buffer)+newChar.getCharacter();
 
         if (bufferString.equals("/--"))
         {
@@ -570,6 +595,11 @@ public class LexemeTokeniser
             type = symbolDict.get(bufferString);
         } catch (Exception e) {
             System.err.println(e);
+        }
+
+        if (type == null)
+        {
+            type = TokenTypes.TIDEN;
         }
 
         return type;

@@ -1,5 +1,4 @@
-import Tokeniser.LexemeTokeniser;
-import Tokeniser.Token;
+import Tokeniser.*;
 import java.util.ArrayList;
 
 public class A1
@@ -21,7 +20,9 @@ public class A1
             errorList = lists.get(1);
             
             printTokens();
-            printErrors();
+
+            String listing = listingGenerator.generateListing(tokenList, errorList);
+            //System.out.println(listing);
         }
         else
             System.out.println("please provide filepath");
@@ -30,10 +31,15 @@ public class A1
     private static void printTokens()
     {
         int currentLineLength = 0;
-
+        String out = "";
         for (Token tok : tokenList)
         {
-            String out = padString(tok.toString());
+            try {
+                out = padString(tok.toString());
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+            
 
             currentLineLength += out.length();
 

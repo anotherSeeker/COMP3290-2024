@@ -132,6 +132,11 @@ public class Token
        return out;
     }
 
+    public int getLine()
+    {
+        return line;
+    }
+
     public String getLocationString()
     {
         return "(Line: "+line+", Column: "+column+")";
