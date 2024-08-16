@@ -211,10 +211,10 @@ public class LexemeTokeniser
                 shouldTokenise = identifierValidate(strChar);
                 break;
             case number:
-                shouldTokenise = numberValidate(strChar);
+                shouldTokenise = numberValidate(strChar, buffer);
                 break;
             case floatlit:
-                shouldTokenise = flitValidate(strChar);
+                shouldTokenise = flitValidate(strChar, buffer);
                 break;
             case comment:
                 shouldTokenise = commentValidate(strChar);
@@ -305,7 +305,7 @@ public class LexemeTokeniser
         return shouldTokenise;
     }
 
-    private boolean numberValidate(String currChar)
+    private boolean numberValidate(String currChar, ArrayList<LexChar> buffer)
     {
         boolean shouldTokenise = false;
 
@@ -324,10 +324,23 @@ public class LexemeTokeniser
             shouldTokenise = true;
         }
 
+        try {
+            double number = Double.parseDouble(getBufferString(buffer));
+            if (!(number <= Integer.MAX_VALUE && number >= 0))
+            {
+                bufferIsLegal = true;
+                shouldTokenise = true;
+                state = tokeniserState.undefined;
+                errorStateDesc = "Integer is too large";
+            }
+        } catch (Exception e) {
+            //System.err.println(e);
+        }
+
         return shouldTokenise;
     }
 
-    private boolean flitValidate(String currChar)
+    private boolean flitValidate(String currChar, ArrayList<LexChar> buffer)
     {
         boolean shouldTokenise;
 
@@ -340,6 +353,20 @@ public class LexemeTokeniser
         {
             shouldTokenise = true;
             bufferIsLegal = false;
+            return shouldTokenise;
+        }
+
+        try {
+            double number = Double.parseDouble(getBufferString(buffer));
+            if (!(number <= Double.MAX_VALUE && number >= 0))
+            {
+                bufferIsLegal = false;
+                shouldTokenise = true;
+                state = tokeniserState.undefined;
+                errorStateDesc = "float is too large";
+            }
+        } catch (Exception e) {
+            //System.err.println(e);
         }
 
         return shouldTokenise;
@@ -399,7 +426,6 @@ public class LexemeTokeniser
 
     private ArrayList<LexChar> tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
     {
-        String str;
         boolean shouldTokenise = true;
         ArrayList<LexChar> subBuffer = new ArrayList<LexChar>();
 
@@ -426,7 +452,6 @@ public class LexemeTokeniser
                 ArrayList<LexChar> savedSubBuffer =  new ArrayList<>(subBuffer);
                 subBuffer.add(newChar);
 
-                str = getBufferString(subBuffer);
                 shouldTokenise = handleValidationState(newChar, subBuffer);
                 if (shouldTokenise)
                 {
@@ -438,12 +463,6 @@ public class LexemeTokeniser
 
                     shouldTokenise = handleValidationState(newChar, subBuffer);
                     subBuffer.add(newChar);
-
-                    str = state.toString();
-                }
-                else
-                {
-                    //subBuffer.add(newChar);
                 }
             }
         }

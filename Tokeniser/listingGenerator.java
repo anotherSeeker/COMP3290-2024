@@ -5,9 +5,9 @@ import java.io.*;
 public class listingGenerator 
 {
     
-   public static String generateListing(ArrayList<Token> tokenList, ArrayList<Token> errorList)
+   public static String generateListing(ArrayList<Token> tokenList, ArrayList<Token> errorList, String path)
    {
-        String outString = "";
+        String outString = path;
 
         int currLine = 0;
         boolean lineHasError = false;
@@ -18,7 +18,7 @@ public class listingGenerator
             {
                 if (lineHasError)
                 {
-                    addErrors(currLine, errorList);
+                    outString += addErrors(currLine, errorList);
                     lineHasError = false;
                 }
 
@@ -30,11 +30,11 @@ public class listingGenerator
                 lineHasError = true;
             }
 
-            outString += tok.toString();
+            outString += padString(tok.toString());
         }
         if (lineHasError)
         {
-            addErrors(currLine, errorList);
+            outString += addErrors(currLine, errorList);
             lineHasError = false;
         }
 
@@ -45,12 +45,12 @@ public class listingGenerator
 
    private static String addErrors(int line, ArrayList<Token> errorList)
    {
-        String outString = "";
+        String outString = "\n";
         for (Token tok : errorList)
         {
             if (line == tok.getLine())
             {
-                outString += tok.toStringError() + "\n";
+                outString += padString(tok.toStringError()) + "\n";
             }
         }
 
@@ -63,10 +63,26 @@ public class listingGenerator
             FileWriter writer = new FileWriter("output/listingFile.txt");
 
             writer.write(fileStr);
+
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
    }
+
+   private static String padString(String str)
+    {
+        int padding = str.length()%6;
+
+        if (padding != 0)
+        {
+            for (int i = 0; i < (6-padding); i++)
+            {
+                str = str + " ";
+            }
+        }
+
+        return str;
+    }
 
 }

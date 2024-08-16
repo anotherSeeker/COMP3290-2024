@@ -21,7 +21,7 @@ public class A1
             
             printTokens();
 
-            String listing = listingGenerator.generateListing(tokenList, errorList);
+            String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
         }
         else
