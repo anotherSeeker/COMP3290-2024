@@ -10,7 +10,7 @@ public class FileReader
     private Scanner FileScanner;
 
     //location in the file
-    private int row = 0;
+    private int line = 1;
     private int column = 0;
     private String fileString = "";
 
@@ -35,7 +35,7 @@ public class FileReader
         String temp;
 
         temp = nextCharacter();
-        out = new LexChar(row, column, temp);
+        out = new LexChar(line, column, temp);
 
         return out;
     }
@@ -56,9 +56,9 @@ public class FileReader
         {
             column+=4;
         }
-        if (inputChar.equals("\\r?\\n|\\r"))
+        if (inputChar.equals("\n"))
         {
-            row++; column = 0;
+            line++; column = 0;
         }
         else
         {

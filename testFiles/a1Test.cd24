@@ -5,13 +5,13 @@ constants
 a = 12, 
 b = 13, 
 c = 5,
-d = 1.2345
+d = 1.2345a
 
 typedef
 
     /--struct def
     location def 
-    visited : bool, x : int, y : int
+    visited : bool, x:int, y : int
 
     /--arraytype def
 

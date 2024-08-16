@@ -12,6 +12,15 @@ public class Token
         "TMNEQ ", "TSTEQ ", "TDVEQ ", "TIDEN ", "TILIT ", "TFLIT ", "TSTRG ", 
         "TUNDF "
     };
+    public static final String[] tokenInputStrings = {
+        "\u001a", 
+        "CD24", "constants", "typedef", "def", "arraydef", "main", "begin", "end", "array", "of", "func", "void",
+        "const", "int", "float", "bool", "for", "repeat", "until", "do", "while", "if", "else" , "elif",
+        "switch", "case", "default", "break", "input", "print", "printline", "return", "not", "and", "or", "xor",
+        "true", "false", ",", "[", "]", "(", ")", "=", "+", "-", "*", "/",
+        "%", "^", "<", ">", ":", ";", ".", "<=", ">=", "!=", "==", "+=", 
+        "-=", "*=", "/=", "", "", "", "", ""     
+    };
     
     private TokenTypes type = TokenTypes.TUNDF;
 
@@ -21,6 +30,9 @@ public class Token
     //for flit and ilit
     private double tokenNumber = 0;
 
+    //short description for undefined tokens
+    private String tokenError = "N/A";
+
     private int line;
     private int column;
 
@@ -28,18 +40,27 @@ public class Token
 
     public Token(TokenTypes inputType, String inputString, int _line, int _column)
     {
-        line = _line;
-        column = _column;
         type = inputType;
         tokenLexeme = inputString;
+        line = _line;
+        column = _column;
     }
 
     public Token(TokenTypes inputType, double inputNumber, int _line, int _column)
     {
-        line = _line;
-        column = _column;
         type = inputType;
         tokenNumber = inputNumber;
+        line = _line;
+        column = _column;
+    }
+
+    public Token(String errorDescription, String inputString, int _line, int _column)
+    {
+        type = TokenTypes.TUNDF;
+        tokenLexeme = inputString;
+        tokenError = errorDescription;
+        line = _line;
+        column = _column;
     }
 
     public TokenTypes getType()
@@ -52,11 +73,17 @@ public class Token
         return tokenLexeme;
     }
 
+    public String getError()
+    {
+        return tokenError;
+    }
+
     public @Override String toString()
     {
         return switch (type) 
         {
             case TIDEN -> getIDENString();
+            case TSTRG -> getIDENString();
             case TFLIT -> getNumberString();
             case TILIT -> getNumberString();
             case TUNDF -> getIDENString();
@@ -69,10 +96,20 @@ public class Token
         return switch (type) 
         {
             case TIDEN -> getIDENString()   + getLocationString();
+            case TSTRG -> getIDENString()   + getLocationString();
             case TFLIT -> getNumberString() + getLocationString();
             case TILIT -> getNumberString() + getLocationString();
             case TUNDF -> getIDENString()   + getLocationString();
             default -> getTypeString(type)  + getLocationString();
+        };
+    }
+
+    public String toStringError()
+    {
+        return switch (type) 
+        {
+            case TUNDF -> getIDENString()   + getLocationString() + "\n : " + getError();
+            default -> "There is no error you shouldn't see this";
         };
     }
 

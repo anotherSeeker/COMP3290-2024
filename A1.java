@@ -42,7 +42,6 @@ public class A1
         }
     }
 
-
     private static String padString(String str)
     {
         int padding = str.length()%6;
@@ -55,7 +54,6 @@ public class A1
             }
         }
 
-        System.out.println(str);
         return str;
     }
 }
