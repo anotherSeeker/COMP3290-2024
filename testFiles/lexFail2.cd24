@@ -1,0 +1,24 @@
+/**comment before CD24
+
+
+**/
+/--other comment before CD24
+/**onemoreforgoodmeasure**/
+@CD24 lexFail2
+
+constants 
+
+on##eConstant = 2.2225,
+##
+
+typedef
+    /--struct def
+    location def 
+    visited : bool, x:int, y : int
+
+main
+    a : int
+begin
+    print("helloWorld");
+
+end CD24 lexFail2

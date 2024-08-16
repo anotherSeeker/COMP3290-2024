@@ -20,7 +20,7 @@ public class Token
         "true", "false", ",", "[", "]", "(", ")", "=", "+", "-", "*", "/",
         "%", "^", "<", ">", ":", ";", ".", "<=", ">=", "!=", "==", "+=", 
         "-=", "*=", "/=", "", "", "", "", ""     
-    };
+    }; 
     
     private TokenTypes type = TokenTypes.TUNDF;
 
@@ -104,7 +104,7 @@ public class Token
         };
     }
 
-    public String toStringError()
+    public String toStringError() 
     {
         return switch (type) 
         {

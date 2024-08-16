@@ -1,0 +1,45 @@
+/**comment before CD24
+
+
+**/
+/--other comment before CD24
+/**onemoreforgoodmeasure**/
+CD24 biggerSimple
+
+constants
+    a = 12,  
+    b = 13, 
+    c = 5,
+    d = 1.2345a
+
+typedef
+
+    location def 
+        visited : bool, x:int, y : int
+
+
+func chekcVisited(place : location) : void
+begin
+    if (place.visited == false)
+        print "get walking you ahven't visited this yet";
+    end
+end
+
+main
+    a : int,
+    b : int,
+    vis : bool,
+    place : location
+begin
+    
+    a = 2;
+    b = 3;
+    vis = false;
+
+    place.visited = vis;
+    place.x = a;
+    place.y = b;
+
+    checkVisited(place);
+
+end CD24 biggerSimple

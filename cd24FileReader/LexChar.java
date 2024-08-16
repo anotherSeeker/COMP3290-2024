@@ -1,4 +1,4 @@
-package FileReader;
+package cd24FileReader;
 
 public class LexChar 
 {

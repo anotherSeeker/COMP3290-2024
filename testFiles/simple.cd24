@@ -1,0 +1,12 @@
+/**comment before CD24
+
+
+**/
+/--other comment before CD24
+/**onemoreforgoodmeasure**/
+CD24 simple
+main
+    a : int
+begin
+    print"helloWorld";/**commentinthemiddle**/print"goodbyeWorld";
+end CD24 simple

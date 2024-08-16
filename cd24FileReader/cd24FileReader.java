@@ -1,13 +1,12 @@
-package FileReader;
+package cd24FileReader;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileNotFoundException;
-import java.util.Scanner; 
 
-
-public class FileReader 
+public class cd24FileReader 
 {
-    private Scanner FileScanner;
+    private FileReader reader;
 
     //location in the file
     private int line = 1;
@@ -15,12 +14,29 @@ public class FileReader
     private String fileString = "";
 
 
-    public FileReader(File filePath)
+    public cd24FileReader(File filePath)
     { 
         try {
-            FileScanner = new Scanner(filePath).useDelimiter("\\Z");
-            fileString = FileScanner.next();
-            FileScanner.close();
+            reader = new FileReader(filePath);
+            try {
+                boolean run = true;
+                while (run)
+                {
+                    int raw = reader.read();
+                    char newChar = (char) raw;
+                    if (raw == -1)
+                    {
+                        run = false;
+                        fileString = fileString + "\u001a";
+                    }
+                    else
+                    {
+                        fileString = fileString + newChar;
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println(e);
+            }
         }
         catch (FileNotFoundException e)
         {

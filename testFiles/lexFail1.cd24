@@ -1,11 +1,13 @@
-CD24 a1Test
+@CD24 lexFail1
 
 constants 
 
-a = 12,  
-b = 13, 
+@
+
+a = 12, 
+b = 13@,@ 
 c = 5,
-d = 1.2345a
+d = 1.2345a@
 
 typedef
 
@@ -22,9 +24,9 @@ arraydef /**bibidi bobidi boo
 aaaa
 arraydef
 **/
-    locationArray : locationArr
+    locationArray : locationArr#
 
-func add(x : int, y : int) : int
+func add(x : int, y : int) : int$
     a : int
 begin
     a = x + y;
@@ -37,10 +39,10 @@ main
 begin
     u = 6;
     k = 15
-    add(u, a);
+    add(u, a);|| &&
 
     if (a<u)
         print "a is less than u";
     end;
 
-end CD24 a1Test
+end CD24 lexFail1

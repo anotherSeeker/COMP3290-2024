@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 public class A1
 {
+    private static ArrayList<ArrayList<Token>> lists;
     private static ArrayList<Token> tokenList;
+    private static ArrayList<Token> errorList;
 
     public static void main(String[] args)
     {
@@ -14,9 +16,12 @@ public class A1
         if (args.length > 0)
         {
             filePathString = args[0];
-            tokenList = tokeniser.run(filePathString);
+            lists = tokeniser.run(filePathString);
+            tokenList = lists.get(0);
+            errorList = lists.get(1);
             
             printTokens();
+            printErrors();
         }
         else
             System.out.println("please provide filepath");
@@ -39,6 +44,33 @@ public class A1
             }
 
             System.out.print(out);
+        }
+    }
+
+    private static void printErrors()
+    {
+        int currentLineLength = 0;
+        if (errorList.size() < 1)
+        {
+            System.out.println("\n\nNo Lexical errors found");
+        }
+        else
+        {
+            System.out.println("\n\n" + errorList.size() + "Errors found");
+        }
+        for (Token tok : errorList)
+        {
+            String out = padString(tok.toStringError());
+
+            currentLineLength += out.length();
+
+            if (currentLineLength > 60)
+            {
+                currentLineLength = 0;
+                out = out + "\n";
+            }
+
+            System.out.println(out);
         }
     }
 

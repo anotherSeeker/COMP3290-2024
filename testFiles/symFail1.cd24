@@ -1,0 +1,15 @@
+k = 10002 CD24 symFail1
+
+constants
+
+a = "abcdefg", /-- can't assign string to variable
+a = 1.1
+
+main
+    a = 1.2 /--not an assignment but a definiton like a : int, also we've used a 3 times
+    x : bool
+begin
+    x = 1;
+    print a + x;
+
+end CD24 symFail1
