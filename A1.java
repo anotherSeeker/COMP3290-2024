@@ -1,3 +1,4 @@
+import Parser.*;
 import Tokeniser.*;
 import java.util.ArrayList;
 
@@ -10,11 +11,10 @@ public class A1
     public static void main(String[] args)
     {
         LexemeTokeniser tokeniser = new LexemeTokeniser();
-        String filePathString = "";
+        String filePathString = args[0];
 
         if (args.length > 0)
         {
-            filePathString = args[0];
             lists = tokeniser.run(filePathString);
             tokenList = lists.get(0);
             errorList = lists.get(1);
@@ -23,6 +23,12 @@ public class A1
 
             String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
+
+            TokenParsers.run(tokenList);
+
+            
+
+
         }
         else
             System.out.println("please provide filepath");

@@ -14,7 +14,7 @@ public class Token
     };
     public static final String[] tokenInputStrings = {
         "\u001a", 
-        "CD24", "constants", "typedef", "def", "arraydef", "main", "begin", "end", "array", "of", "func", "void",
+        "cd24", "constants", "typedef", "def", "arraydef", "main", "begin", "end", "array", "of", "func", "void",
         "const", "int", "float", "bool", "for", "repeat", "until", "do", "while", "if", "else" , "elif",
         "switch", "case", "default", "break", "input", "print", "printline", "return", "not", "and", "or", "xor",
         "true", "false", ",", "[", "]", "(", ")", "=", "+", "-", "*", "/",
@@ -108,7 +108,7 @@ public class Token
     {
         return switch (type) 
         {
-            case TUNDF -> getIDENString()   + getLocationString() + "\n : " + getError();
+            case TUNDF -> getIDENString()   + getLocationString() + "\n\t: " + getError();
             default -> "There is no error you shouldn't see this";
         };
     }
@@ -128,8 +128,14 @@ public class Token
 
     private String getNumberString()
     {
-       String out = getTypeString(type) + tokenNumber;
-       return out;
+        String num;
+        if (type == TokenTypes.TILIT)
+            num = ""+(int)tokenNumber;
+        else
+            num = ""+tokenNumber;
+
+        String out = getTypeString(type) + num;
+        return out;
     }
 
     public int getLine()

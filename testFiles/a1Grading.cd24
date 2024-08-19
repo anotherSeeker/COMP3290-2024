@@ -20,7 +20,7 @@ arraydef /**beep
         i : int
     begin
         for (i = 0; i < numStudents)
-            total = scores[i].score
+            total = scores[i].score;
             i++;
         end
     end
@@ -32,7 +32,7 @@ arraydef /**beep
         score = 0;
         for (i = 0; i < numStudents)
             if (scores[i].id == ID)
-                score = scores[i].score
+                score = scores[i].score;
             end
         end
 
@@ -52,7 +52,7 @@ arraydef /**beep
             end
         end
 
-        return highestID
+        return highestID;
     end
 
     func assignScore(score : float, studentID : int, arrayIndex : int, scores : studentScores) : studentScores
@@ -69,7 +69,7 @@ arraydef /**beep
     begin
         for (i = 0; i < numStudents)
             print scores[i].id;
-            print " : "
+            print " : ";
             printline scores[i].score;
         end
     end
@@ -81,7 +81,7 @@ main
     index : int,
     newScore : float
 begin
-    print "Input the number of students"
+    print "Input the number of students";
     input numStudents;
 
     for (index = 0; index < numStudents)

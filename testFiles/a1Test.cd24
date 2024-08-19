@@ -5,7 +5,11 @@ constants
 a = 12,  
 b = 13, 
 c = 5,
-d = 1.2345a
+d = 1.2345a,
+e = 2147483648,
+f = 1.,
+g = 123.,
+h = !!!!=
 
 typedef
 
@@ -22,7 +26,7 @@ arraydef /**bibidi bobidi boo
 aaaa
 arraydef
 **/
-    locationArray : locationArr
+    locationArray : locationArr 
 
 func add(x : int, y : int) : int
     a : int
@@ -41,6 +45,6 @@ begin
 
     if (a<u)
         print "a is less than u";
-    end;
+    end
 
 end CD24 a1Test

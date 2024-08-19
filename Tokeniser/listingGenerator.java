@@ -1,6 +1,6 @@
 package Tokeniser;
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class listingGenerator 
 {
@@ -45,12 +45,12 @@ public class listingGenerator
 
    private static String addErrors(int line, ArrayList<Token> errorList)
    {
-        String outString = "\n";
+        String outString = "\n\t";
         for (Token tok : errorList)
         {
             if (line == tok.getLine())
             {
-                outString += padString(tok.toStringError()) + "\n";
+                outString += padString(tok.toStringError()) + "\n\t";
             }
         }
 

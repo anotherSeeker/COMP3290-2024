@@ -1,36 +1,35 @@
 package Tokeniser;
+import cd24FileReader.*;
 import java.io.File;
 import java.util.*;
-
-import cd24FileReader.*;
 
 
 public class LexemeTokeniser 
 {
-    private ArrayList<Token> tokenList = new ArrayList<>();
-    private ArrayList<Token> errorList = new ArrayList<>();
+    private final ArrayList<Token> TOKEN_LIST = new ArrayList<>();
+    private final ArrayList<Token> ERROR_LIST = new ArrayList<>();
 
     //private String lexemeBuffer = "";
     private ArrayList<LexChar> lexemeBuffer = new ArrayList<>();
     private cd24FileReader reader;
-    private final String legalSymbols = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
-    private final String[] legalMultiCharSymbols = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
+    private final String LEGAL_SYMBOLS = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
+    private final String[] LEGAL_MULTI_CHAR_SYMBOLS = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
 
-    private Dictionary<String, TokenTypes> symbolDict = new Hashtable<>();
+    private final Dictionary<String, TokenTypes> SYMBOL_DICT = new Hashtable<>();
 
     private enum tokeniserState
     {
-        none,
+        none, //the reset state for the system, will figure out what state it should be in after
         identifier, //not confirmed as keyword but legal as ident
         keyword, //confirmed keyword
         number, //not confirmed as int or float
-        floatlit,
-        ilit,
+        floatlit, //confirmed as float
+        ilit, //irrelevant state, cannot confirm as int lit unless we're already tokenising
         symbol, //single or multi character symbol
         string, //" ... "
         comment, // /--
         multicomment, // /**     **/ can go across lines unlike string
-        eof,
+        eof, //end of file char
         undefined //illegal input, tokenise the largest legal thing in the buffer and repeat erroring if it's not legal
     }
 
@@ -47,9 +46,9 @@ public class LexemeTokeniser
         setupDictionary();
 
         runTokenise();
-        ArrayList<ArrayList<Token>> lists = new ArrayList<ArrayList<Token>>();
-        lists.add(tokenList);
-        lists.add(errorList);
+        ArrayList<ArrayList<Token>> lists = new ArrayList<>();
+        lists.add(TOKEN_LIST);
+        lists.add(ERROR_LIST);
 
         return lists;
     }
@@ -81,14 +80,14 @@ public class LexemeTokeniser
             if (shouldTokenise)
             {
                 tokeniseBuffer(lexemeBuffer);
-                if (!keepBuffer)
-                {
-                    wipeBuffer();
-                    resetState();
-                }
                 if (keepBuffer)
                 {
                     keepBuffer = false;
+                }
+                else
+                {
+                    wipeBuffer();
+                    resetState();
                 }
             }
         }
@@ -106,7 +105,8 @@ public class LexemeTokeniser
             {
                 switch (state) 
                 {
-                    case identifier:
+                    case identifier -> 
+                    {
                         key = checkForKeyToken(lexBuffer);
                         if (key == null)
                         {
@@ -114,43 +114,41 @@ public class LexemeTokeniser
                         }
                        
                         buildAndPutTokenInList(key, lexBuffer, line, column);
-                        break;
-                    case number:
+                    }
+                    case number -> 
+                    {
                         double number = Double.parseDouble(getBufferString(lexBuffer));
                         buildAndPutTokenInList(TokenTypes.TILIT, number, line, column);
-                        break;
-                    case floatlit:
-                        buildAndPutTokenInList(TokenTypes.TFLIT, Double.parseDouble(getBufferString(lexBuffer)), line, column);
-                        break;
-                    case string:
-                        buildAndPutTokenInList(TokenTypes.TSTRG, lexBuffer, line, column);
-                        break;
-                    case comment:
-                        //do nothing
-                        break;
-                    case multicomment:
-                        //do nothing
-                        break;
-                    case symbol:
+                    }
+                    case floatlit -> buildAndPutTokenInList(TokenTypes.TFLIT, Double.parseDouble(getBufferString(lexBuffer)), line, column);
+                    case string -> buildAndPutTokenInList(TokenTypes.TSTRG, lexBuffer, line, column);
+                    case comment -> {/*Do nothing*/}
+                    case multicomment -> {/*Do nothing*/}
+                    case symbol -> 
+                    {
+                        key = checkForKeyToken(lexBuffer);
+                        if (key == null)
+                        {
+                            //key = TokenTypes.TUNDF;
+                            errorStateDesc = "Illegal symbol: "+getBufferString(lexBuffer);
+                            buildAndPutTokenInList(errorStateDesc, lexBuffer, line, column);
+                        }
+                        else
+                            buildAndPutTokenInList(key, lexBuffer, line, column);
+                    }
+                    case undefined -> buildAndPutTokenInList(errorStateDesc, lexBuffer, line, column);
+                    case eof -> 
+                    {
                         key = checkForKeyToken(lexBuffer);
                         buildAndPutTokenInList(key, lexBuffer, line, column);
-                        break;
-                    case undefined:
-                        buildAndPutTokenInList(errorStateDesc, lexBuffer, line, column);
-                        break;
-                    case eof:
-                        key = checkForKeyToken(lexBuffer);
-                        buildAndPutTokenInList(key, lexBuffer, line, column);
-                        break;
-                    default:
-                        //we shouldn't be here we're gonna handle it like an undefined for now
-                        buildAndPutTokenInList("Unhandled State", lexBuffer, line, column);
-                        break;
+                    }
+                    default -> throw new AssertionError();//we shouldn't be here
                 }
+                //do nothing
             }
             else
             {
-                lexBuffer = tokeniseIllegalBuffer(lexBuffer);
+                tokeniseIllegalBuffer(lexBuffer);
             }
         }
     }
@@ -204,32 +202,15 @@ public class LexemeTokeniser
 
         switch (state) 
         {
-            case none:
-                shouldTokenise = statelessValidate(lexChar, buffer);
-                break;
-            case identifier:
-                shouldTokenise = identifierValidate(strChar);
-                break;
-            case number:
-                shouldTokenise = numberValidate(strChar, buffer);
-                break;
-            case floatlit:
-                shouldTokenise = flitValidate(strChar, buffer);
-                break;
-            case comment:
-                shouldTokenise = commentValidate(strChar);
-                break;
-            case multicomment:
-                shouldTokenise = multiCommentValidate(strChar, buffer);
-                break;
-            case string:
-                shouldTokenise = stringValidate(lexChar, buffer);
-                break;
-            case symbol:
-                shouldTokenise = validateSymbol(lexChar, buffer);
-                break;
-            default:
-                throw new AssertionError();
+            case none -> shouldTokenise = statelessValidate(lexChar, buffer);
+            case identifier -> shouldTokenise = identifierValidate(strChar);
+            case number -> shouldTokenise = numberValidate(strChar, buffer);
+            case floatlit -> shouldTokenise = flitValidate(strChar, buffer);
+            case comment -> shouldTokenise = commentValidate(strChar);
+            case multicomment -> shouldTokenise = multiCommentValidate(strChar, buffer);
+            case string -> shouldTokenise = stringValidate(lexChar, buffer);
+            case symbol -> shouldTokenise = validateSymbol(lexChar, buffer);
+            default -> throw new AssertionError();
         }
 
         return shouldTokenise;
@@ -247,7 +228,7 @@ public class LexemeTokeniser
             return isIllegal;
         }
 
-        isIllegal = !(legalSymbols.contains(currChar));
+        isIllegal = !(LEGAL_SYMBOLS.contains(currChar));
         return isIllegal;
     }
 
@@ -284,7 +265,7 @@ public class LexemeTokeniser
     {
         //some of our symbols count as letters/numbers for some reason,
         boolean shouldTokenise;
-        boolean isSymbol = legalSymbols.contains(currChar);
+        boolean isSymbol = LEGAL_SYMBOLS.contains(currChar);
         if (isSymbol)
         {
             shouldTokenise = true;
@@ -317,11 +298,14 @@ public class LexemeTokeniser
         {
             state = tokeniserState.floatlit;
             bufferIsLegal = false;
+            shouldTokenise = false;
+            return shouldTokenise;
         }
         else
         {
             bufferIsLegal = false;
             shouldTokenise = true;
+            return shouldTokenise;
         }
 
         try {
@@ -334,7 +318,7 @@ public class LexemeTokeniser
                 errorStateDesc = "Integer is too large";
             }
         } catch (Exception e) {
-            //System.err.println(e);
+            System.err.println(e);
         }
 
         return shouldTokenise;
@@ -363,10 +347,10 @@ public class LexemeTokeniser
                 bufferIsLegal = false;
                 shouldTokenise = true;
                 state = tokeniserState.undefined;
-                errorStateDesc = "float is too large";
+                errorStateDesc = "Float is too large";
             }
         } catch (Exception e) {
-            //System.err.println(e);
+            System.err.println(e);
         }
 
         return shouldTokenise;
@@ -424,7 +408,7 @@ public class LexemeTokeniser
         return shouldTokenise;
     }
 
-    private ArrayList<LexChar> tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
+    private boolean tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
     {
         boolean shouldTokenise = true;
         ArrayList<LexChar> subBuffer = new ArrayList<>();
@@ -456,7 +440,25 @@ public class LexemeTokeniser
                 if (shouldTokenise)
                 {
                     bufferIsLegal = true;
-                    tokeniseBuffer(savedSubBuffer);
+                    if (state == tokeniserState.floatlit && savedSubBuffer.getLast().getCharacter().equals("."))
+                    {
+                        ArrayList<LexChar> subSubBuffer = new ArrayList<>();
+                        for (int k = 0; k < savedSubBuffer.size()-1; k++)
+                        {
+                            subSubBuffer.add(savedSubBuffer.get(k));
+                        }
+                        state = tokeniserState.number;
+                        tokeniseBuffer(subSubBuffer);
+
+                        subSubBuffer = new ArrayList<>();
+                        subSubBuffer.add(savedSubBuffer.getLast());
+                        state = tokeniserState.symbol;
+                        tokeniseBuffer(subSubBuffer);
+                    }
+                    else 
+                    {
+                        tokeniseBuffer(savedSubBuffer);                        
+                    }
                     subBuffer = new ArrayList<>();
                     resetState();
 
@@ -466,12 +468,12 @@ public class LexemeTokeniser
             }
         }
 
-        lexemeBuffer = subBuffer;
         if (!lexemeBuffer.isEmpty())
         {
             keepBuffer = true;
+            lexemeBuffer = new ArrayList<>(subBuffer);
         }
-        return lexemeBuffer;
+        return shouldTokenise;
     }    
 
     private boolean endMultiLineComment(ArrayList<LexChar> buffer)
@@ -514,12 +516,12 @@ public class LexemeTokeniser
 
         String bufferString = getBufferString(buffer);
         String currChar = newChar.getCharacter();
-        boolean isInLegalSymbols = legalSymbols.contains(currChar);
+        boolean isInLegalSymbols = LEGAL_SYMBOLS.contains(currChar);
         boolean isLegalMultiCharSymbol;
 
         if (buffer.size() > 1)
         {
-            for (String symbol : legalMultiCharSymbols)
+            for (String symbol : LEGAL_MULTI_CHAR_SYMBOLS)
             {
                 isLegalMultiCharSymbol = symbol.contains(bufferString);
                 if (isLegalMultiCharSymbol)
@@ -606,18 +608,15 @@ public class LexemeTokeniser
     private TokenTypes checkForKeyToken(ArrayList<LexChar> buffer)
     {
         TokenTypes type = null;
-        String bufferString = getBufferString(buffer);
+        String bufferString = getBufferString(buffer).toLowerCase();
 
         try 
         {
-            type = symbolDict.get(bufferString);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-
-        if (type == null)
+            type = SYMBOL_DICT.get(bufferString);
+        } 
+        catch (Exception e) 
         {
-            type = TokenTypes.TIDEN;
+            System.err.println(e);
         }
 
         return type;
@@ -627,21 +626,21 @@ public class LexemeTokeniser
     {
         String bufferString = getBufferString(buffer);
         Token outToken = new Token(type, bufferString, line, column);
-        tokenList.add(outToken);
+        TOKEN_LIST.add(outToken);
     }
 
     private void buildAndPutTokenInList(TokenTypes type, double number, int line, int column)
     {
         Token outToken = new Token(type, number, line, column);
-        tokenList.add(outToken);
+        TOKEN_LIST.add(outToken);
     }
 
     private void buildAndPutTokenInList(String errorDescription, ArrayList<LexChar> buffer, int line, int column)
     {
         String bufferString = getBufferString(buffer);
         Token outToken = new Token(errorDescription, bufferString, line, column);
-        tokenList.add(outToken);
-        errorList.add(outToken);
+        TOKEN_LIST.add(outToken);
+        ERROR_LIST.add(outToken);
     }
 
     private void setupDictionary()
@@ -653,7 +652,7 @@ public class LexemeTokeniser
             //"TIDEN ", "TILIT ", "TFLIT ", "TSTRG ", "TUNDF " are all marked with an empty string "" so we skip those here
             if (!key.equals(""))
             {
-                symbolDict.put(key, typeList[i]);
+                SYMBOL_DICT.put(key, typeList[i]);
             }
         }
     }

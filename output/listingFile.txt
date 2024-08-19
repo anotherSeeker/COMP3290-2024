@@ -1,36 +1,31 @@
-testFiles/lexFail1.cd24
-1: TILIT 1.0   TIDEN a     
-3: TLPAR TIDEN a     TRPAR TLPAR TIDEN a     TRPAR TLPAR TIDEN a     TRPAR TLPAR TRPAR TCD24 TIDEN lexFail1    
-5: TIDEN coNsTants   
-7: TUNDF @     
-TUNDF @(Line: 7, Column: 1)
- : Illegal Character
-
-9: TIDEN a     TEQUL TILIT 12.0  TCOMA 
-10: TIDEN b     TEQUL TILIT 13.0  TUNDF @     TCOMA TUNDF @     
-TUNDF @(Line: 10, Column: 7)
- : Illegal Character     
-TUNDF @(Line: 10, Column: 9)
- : Illegal Character     
-
-11: TIDEN c     TEQUL TILIT 5.0   TCOMA 
-12: TIDEN d     TEQUL TFLIT 1.2345TIDEN a     TUNDF @     
-TUNDF @(Line: 12, Column: 12)
- : Illegal Character    
-
+testFiles/a1Test.cd24
+1: TCD24 TIDEN a1Test
+3: TCONS 
+5: TIDEN a     TEQUL TILIT 12    TCOMA 
+6: TIDEN b     TEQUL TILIT 13    TCOMA 
+7: TIDEN c     TEQUL TILIT 5     TCOMA 
+8: TIDEN d     TEQUL TFLIT 1.2345TIDEN a     TCOMA 
+9: TIDEN e     TEQUL TUNDF 2147483648  TCOMA 
+	TUNDF 2147483648(Line: 9, Column: 5)
+	: Integer is too large
+	
+10: TIDEN f     TEQUL TILIT 1     TDOTT TCOMA 
+11: TIDEN g     TEQUL TILIT 123   TDOTT TCOMA 
+12: TIDEN h     TEQUL TUNDF !     TUNDF !     TUNDF !     TNEQL 
+	TUNDF !(Line: 12, Column: 5)
+	: Illegal symbol: !     
+	TUNDF !(Line: 12, Column: 6)
+	: Illegal symbol: !     
+	TUNDF !(Line: 12, Column: 7)
+	: Illegal symbol: !     
+	
 14: TTYPD 
 17: TIDEN location    TTDEF 
 18: TIDEN visited     TCOLN TBOOL TCOMA TIDEN x     TCOLN TINTG TCOMA TIDEN y     TCOLN TINTG 
-22: TIDEN locationArr TTDEF TARAY TLBRK TILIT 10.0  TRBRK TTTOF TIDEN location    TTEND 
+22: TIDEN locationArr TTDEF TARAY TLBRK TILIT 10    TRBRK TTTOF TIDEN location    TTEND 
 24: TARRD 
-29: TIDEN locationArray     TCOLN TIDEN locationArr TUNDF #     
-TUNDF #(Line: 29, Column: 32)
- : Illegal Character    
-
-31: TFUNC TIDEN add   TLPAR TIDEN x     TCOLN TINTG TCOMA TIDEN y     TCOLN TINTG TRPAR TCOLN TINTG TUNDF $     
-TUNDF $(Line: 31, Column: 33)
- : Illegal Character    
-
+29: TIDEN locationArray     TCOLN TIDEN locationArr 
+31: TFUNC TIDEN add   TLPAR TIDEN x     TCOLN TINTG TCOMA TIDEN y     TCOLN TINTG TRPAR TCOLN TINTG 
 32: TIDEN a     TCOLN TINTG 
 33: TBEGN 
 34: TIDEN a     TEQUL TIDEN x     TPLUS TIDEN y     TSEMI 
@@ -40,19 +35,10 @@ TUNDF $(Line: 31, Column: 33)
 39: TIDEN u     TCOLN TINTG 
 40: TIDEN k     TCOLN TINTG 
 41: TBEGN 
-42: TIDEN u     TEQUL TILIT 6.0   TSEMI 
-43: TIDEN k     TEQUL TILIT 15.0  
-44: TIDEN add   TLPAR TIDEN u     TCOMA TIDEN a     TRPAR TSEMI TUNDF |     TUNDF |     TUNDF &     TUNDF &     
-TUNDF |(Line: 44, Column: 15)
- : Illegal Character    
-TUNDF |(Line: 44, Column: 16)
- : Illegal Character    
-TUNDF &(Line: 44, Column: 18)
- : Illegal Character    
-TUNDF &(Line: 44, Column: 19)
- : Illegal Character    
-
+42: TIDEN u     TEQUL TILIT 6     TSEMI 
+43: TIDEN k     TEQUL TILIT 15    
+44: TIDEN add   TLPAR TIDEN u     TCOMA TIDEN a     TRPAR TSEMI 
 46: TIFTH TLPAR TIDEN a     TLESS TIDEN u     TRPAR 
 47: TPRNT TSTRG "a is less than u"TSEMI 
-48: TTEND TSEMI 
-50: TTEND TCD24 TIDEN lexFail1    TTEOF 
+48: TTEND 
+50: TTEND TCD24 TIDEN a1TestTTEOF 
