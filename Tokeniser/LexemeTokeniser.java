@@ -7,14 +7,14 @@ import cd24FileReader.*;
 
 public class LexemeTokeniser 
 {
-    private ArrayList<Token> tokenList = new ArrayList<Token>();
-    private ArrayList<Token> errorList = new ArrayList<Token>();
+    private ArrayList<Token> tokenList = new ArrayList<>();
+    private ArrayList<Token> errorList = new ArrayList<>();
 
     //private String lexemeBuffer = "";
-    private ArrayList<LexChar> lexemeBuffer = new ArrayList<LexChar>();
+    private ArrayList<LexChar> lexemeBuffer = new ArrayList<>();
     private cd24FileReader reader;
-    private String legalSymbols = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
-    private String[] legalMultiCharSymbols = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
+    private final String legalSymbols = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
+    private final String[] legalMultiCharSymbols = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
 
     private Dictionary<String, TokenTypes> symbolDict = new Hashtable<>();
 
@@ -427,7 +427,7 @@ public class LexemeTokeniser
     private ArrayList<LexChar> tokeniseIllegalBuffer(ArrayList<LexChar> buffer)
     {
         boolean shouldTokenise = true;
-        ArrayList<LexChar> subBuffer = new ArrayList<LexChar>();
+        ArrayList<LexChar> subBuffer = new ArrayList<>();
 
         state = tokeniserState.none;
 
@@ -438,13 +438,13 @@ public class LexemeTokeniser
             {
                 bufferIsLegal = true;
                 tokeniseBuffer(subBuffer);
-                subBuffer = new ArrayList<LexChar>();
+                subBuffer = new ArrayList<>();
                 subBuffer.add(newChar);
 
                 state = tokeniserState.undefined;
                 errorStateDesc = "Illegal Character";
                 tokeniseBuffer(subBuffer);
-                subBuffer = new ArrayList<LexChar>();
+                subBuffer = new ArrayList<>();
                 resetState();
             }
             else
@@ -455,10 +455,9 @@ public class LexemeTokeniser
                 shouldTokenise = handleValidationState(newChar, subBuffer);
                 if (shouldTokenise)
                 {
-                    subBuffer = new ArrayList<>(savedSubBuffer);
                     bufferIsLegal = true;
                     tokeniseBuffer(savedSubBuffer);
-                    subBuffer = new ArrayList<LexChar>();
+                    subBuffer = new ArrayList<>();
                     resetState();
 
                     shouldTokenise = handleValidationState(newChar, subBuffer);
@@ -468,7 +467,7 @@ public class LexemeTokeniser
         }
 
         lexemeBuffer = subBuffer;
-        if (lexemeBuffer.size() > 0)
+        if (!lexemeBuffer.isEmpty())
         {
             keepBuffer = true;
         }
@@ -545,7 +544,7 @@ public class LexemeTokeniser
 
     private void wipeBuffer()
     {
-        lexemeBuffer = new ArrayList<LexChar>();
+        lexemeBuffer = new ArrayList<>();
     }
 
     private void resetState()
