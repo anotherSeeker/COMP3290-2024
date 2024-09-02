@@ -1,8 +1,11 @@
 package Tokeniser;
 
+import cd24FileReader.LexChar;
+import java.util.ArrayList;
+
 public class Token
 {
-    private final String[] tokenOutputStrings = {
+    public final String[] tokenOutputStrings = {
         "TTEOF ", 
         "TCD24 ", "TCONS ", "TTYPD ", "TTDEF ", "TARRD ", "TMAIN ", "TBEGN ", "TTEND ", "TARAY ", "TTTOF ", "TFUNC ", "TVOID ", 
         "TCNST ", "TINTG ", "TFLOT ", "TBOOL ", "TTFOR ", "TREPT ", "TUNTL ", "TTTDO ", "TWHIL ", "TIFTH ", "TELSE ", "TELIF ",
@@ -12,20 +15,20 @@ public class Token
         "TMNEQ ", "TSTEQ ", "TDVEQ ", "TIDEN ", "TILIT ", "TFLIT ", "TSTRG ", 
         "TUNDF "
     };
-    public static final String[] tokenInputStrings = {
+    public static final String[] keyTokenStrings = {
         "\u001a", 
         "cd24", "constants", "typedef", "def", "arraydef", "main", "begin", "end", "array", "of", "func", "void",
         "const", "int", "float", "bool", "for", "repeat", "until", "do", "while", "if", "else" , "elif",
         "switch", "case", "default", "break", "input", "print", "printline", "return", "not", "and", "or", "xor",
         "true", "false", ",", "[", "]", "(", ")", "=", "+", "-", "*", "/",
         "%", "^", "<", ">", ":", ";", ".", "<=", ">=", "!=", "==", "+=", 
-        "-=", "*=", "/=", "", "", "", "", ""     
+        "-=", "*=", "/="    
     }; 
     
     private TokenTypes type = TokenTypes.TUNDF;
 
-    //for idents and strings
-    private String tokenLexeme = null;
+    //for idents, strings, keys and operators
+    private ArrayList<LexChar> lexBuffer = null;
 
     //for flit and ilit
     private double tokenNumber = 0;
@@ -33,31 +36,32 @@ public class Token
     //short description for undefined tokens
     private String tokenError = "N/A";
 
-    private int line;
-    private int column;
+    private final int line;
+    private final int column;
 
     //Public
 
-    public Token(TokenTypes inputType, String inputString, int _line, int _column)
+    public Token(TokenTypes inputType, ArrayList<LexChar> _lexBuffer, int _line, int _column)
     {
         type = inputType;
-        tokenLexeme = inputString;
+        lexBuffer = _lexBuffer;
         line = _line;
         column = _column;
     }
 
-    public Token(TokenTypes inputType, double inputNumber, int _line, int _column)
+    public Token(TokenTypes inputType, ArrayList<LexChar> _lexBuffer, double inputNumber, int _line, int _column)
     {
         type = inputType;
         tokenNumber = inputNumber;
+        lexBuffer = _lexBuffer;
         line = _line;
         column = _column;
     }
 
-    public Token(String errorDescription, String inputString, int _line, int _column)
+    public Token(String errorDescription, ArrayList<LexChar> _lexBuffer, int _line, int _column)
     {
         type = TokenTypes.TUNDF;
-        tokenLexeme = inputString;
+        lexBuffer = _lexBuffer;
         tokenError = errorDescription;
         line = _line;
         column = _column;
@@ -70,7 +74,7 @@ public class Token
 
     public String getLexeme()
     {
-        return tokenLexeme;
+        return getBufferString(lexBuffer);
     }
 
     public String getError()
@@ -122,7 +126,7 @@ public class Token
 
     private String getIDENString()
     {
-        String out = getTypeString(type) + tokenLexeme; 
+        String out = getTypeString(type) + getLexeme(); 
         return out;
     }
 
@@ -146,5 +150,16 @@ public class Token
     public String getLocationString()
     {
         return "(Line: "+line+", Column: "+column+")";
+    }
+
+    private String getBufferString(ArrayList<LexChar> lexBuffer)
+    {
+        String out = "";
+        for (LexChar lexChar : lexBuffer) 
+        {
+            out += lexChar.getCharacter();
+        }
+
+        return out;
     }
 }

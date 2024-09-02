@@ -2,14 +2,14 @@ import Parser.*;
 import Tokeniser.*;
 import java.util.ArrayList;
 
-public class A1
+public class A2
 {
     private static ArrayList<ArrayList<Token>> lists;
     private static ArrayList<Token> tokenList;
     private static ArrayList<Token> errorList;
 
     public static void main(String[] args)
-    {
+    {      
         LexemeTokeniser tokeniser = new LexemeTokeniser();
         String filePathString = args[0];
 
@@ -19,12 +19,12 @@ public class A1
             tokenList = lists.get(0);
             errorList = lists.get(1);
             
-            printTokens();
+            //printTokens();
 
             String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            TokenParsers.run(tokenList);
+            TokenParser.run(tokenList);
 
             
 
@@ -38,6 +38,7 @@ public class A1
     {
         int currentLineLength = 0;
         String out = "";
+        
         for (Token tok : tokenList)
         {
             try {

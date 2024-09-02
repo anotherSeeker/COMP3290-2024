@@ -3,7 +3,6 @@ import cd24FileReader.*;
 import java.io.File;
 import java.util.*;
 
-
 public class LexemeTokeniser 
 {
     private final ArrayList<Token> TOKEN_LIST = new ArrayList<>();
@@ -118,9 +117,9 @@ public class LexemeTokeniser
                     case number -> 
                     {
                         double number = Double.parseDouble(getBufferString(lexBuffer));
-                        buildAndPutTokenInList(TokenTypes.TILIT, number, line, column);
+                        buildAndPutTokenInList(TokenTypes.TILIT, lexBuffer, number, line, column);
                     }
-                    case floatlit -> buildAndPutTokenInList(TokenTypes.TFLIT, Double.parseDouble(getBufferString(lexBuffer)), line, column);
+                    case floatlit -> buildAndPutTokenInList(TokenTypes.TFLIT, lexBuffer, Double.parseDouble(getBufferString(lexBuffer)), line, column);
                     case string -> buildAndPutTokenInList(TokenTypes.TSTRG, lexBuffer, line, column);
                     case comment -> {/*Do nothing*/}
                     case multicomment -> {/*Do nothing*/}
@@ -144,7 +143,6 @@ public class LexemeTokeniser
                     }
                     default -> throw new AssertionError();//we shouldn't be here
                 }
-                //do nothing
             }
             else
             {
@@ -624,21 +622,19 @@ public class LexemeTokeniser
 
     private void buildAndPutTokenInList(TokenTypes type, ArrayList<LexChar> buffer, int line, int column)
     {
-        String bufferString = getBufferString(buffer);
-        Token outToken = new Token(type, bufferString, line, column);
+        Token outToken = new Token(type, buffer, line, column);
         TOKEN_LIST.add(outToken);
     }
 
-    private void buildAndPutTokenInList(TokenTypes type, double number, int line, int column)
+    private void buildAndPutTokenInList(TokenTypes type, ArrayList<LexChar> buffer, double number, int line, int column)
     {
-        Token outToken = new Token(type, number, line, column);
+        Token outToken = new Token(type, buffer, number, line, column);
         TOKEN_LIST.add(outToken);
     }
 
     private void buildAndPutTokenInList(String errorDescription, ArrayList<LexChar> buffer, int line, int column)
     {
-        String bufferString = getBufferString(buffer);
-        Token outToken = new Token(errorDescription, bufferString, line, column);
+        Token outToken = new Token(errorDescription, buffer, line, column);
         TOKEN_LIST.add(outToken);
         ERROR_LIST.add(outToken);
     }
@@ -646,9 +642,9 @@ public class LexemeTokeniser
     private void setupDictionary()
     {
         TokenTypes[] typeList = TokenTypes.values();
-        for (int i = 0; i < typeList.length; i++)
+        for (int i = 0; i < Token.keyTokenStrings.length; i++)
         {
-            String key = Token.tokenInputStrings[i];
+            String key = Token.keyTokenStrings[i];
             //"TIDEN ", "TILIT ", "TFLIT ", "TSTRG ", "TUNDF " are all marked with an empty string "" so we skip those here
             if (!key.equals(""))
             {

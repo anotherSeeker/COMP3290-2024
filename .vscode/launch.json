@@ -13,9 +13,9 @@
         },
         {
             "type": "java",
-            "name": "A1",
+            "name": "A2",
             "request": "launch",
-            "mainClass": "A1",
+            "mainClass": "A2",
             "projectName": "COMP3290-2024_740664f6"
         }
     ]
