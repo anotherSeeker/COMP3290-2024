@@ -1,4 +1,4 @@
-CD24 a1Test
+cD24 a1Test
 
 constants 
 
@@ -12,7 +12,6 @@ g = 123.,
 h = !!!!=
 
 typedef
-
     /--struct def
     location def 
     visited : bool, x:int, y : int

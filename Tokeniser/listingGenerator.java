@@ -74,7 +74,7 @@ public class listingGenerator
     {
         int padding = str.length()%6;
 
-        if (padding != 0)
+        if (str.length() != 6)
         {
             for (int i = 0; i < (6-padding); i++)
             {

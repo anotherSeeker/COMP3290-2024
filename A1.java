@@ -1,6 +1,6 @@
 import Parser.*;
 import Tokeniser.*;
-import java.util.ArrayList;
+import java.util.ArrayList; 
 
 public class A1
 {
@@ -90,7 +90,7 @@ public class A1
     {
         int padding = str.length()%6;
 
-        if (padding != 0)
+        if (str.length() != 6)
         {
             for (int i = 0; i < (6-padding); i++)
             {

@@ -9,7 +9,7 @@
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "args"  : "testFiles/a1Test.cd24"
+            "args"  : "cd24Source/a1Test.cd24"
         },
         {
             "type": "java",
