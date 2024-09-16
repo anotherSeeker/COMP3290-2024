@@ -1,12 +1,32 @@
 package Parser;
+import Tokeniser.Token;
 
 public class PNodeTree 
 {
-    private ParserNode treeRoot;
+    private ParserNode treeRoot = null;
 
-    public PNodeTree() 
+    public PNodeTree(ParserNode root) 
     {
-        
+        treeRoot = root;
+    }
+
+    public ParserNode getRoot()
+    {
+        if (treeRoot == null)
+        {
+            System.out.println("Warning root is null");
+        }
+        return treeRoot;
+    }
+
+    public void printTree()
+    {
+        printNodeAndChildren(treeRoot);
+    }
+
+    private void printNodeAndChildren(ParserNode root)
+    {
+        System.out.print("TODO");
     }
 
     

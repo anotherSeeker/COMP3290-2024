@@ -6,7 +6,8 @@ public class ParserNode
 {
     //node type, if terminal [token], [Child Nodes]
     private Token token = null;
-    private String nodeName = "Uninitialised";
+    private String nodeName = "Uninit";
+    private String type = "Uninit";
     private String errorDesc;
     private ParserNode parent;
     private final ArrayList<ParserNode> children = new ArrayList<>();

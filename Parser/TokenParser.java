@@ -4,11 +4,12 @@ import java.util.*;
 
 public class TokenParser 
 {
-    private final static PNodeTree nodeTree = new PNodeTree();
+    private final static PNodeTree nodeTree;
     private static ArrayList<Rule> ruleList;
     private static ArrayList<Token> tokenList;
     private static int currentTokenIndex = 0;
     private static Token currentToken;
+    private static boolean isFirstNode = true;
 
     public TokenParser(ArrayList<Token> tokList)
     {
@@ -102,7 +103,16 @@ public class TokenParser
     {
         String errorDesc = "Received Token: "+token.toString()+"Expected token of types: "+rule.firstSetToString();
         ParserNode newNode = new ParserNode(token, "ERROR: "+rule.getName(), errorDesc, parentNode);
+        parentNode.addChild(newNode);
+    }
 
+    private void addNode(Token token, Rule rule, ParserNode parentNode)
+    {
+        if (isFirstNode) {
+         isFirstNode = false;
+         nodeTree = new PNodeTree(newNode);   
+        }
+        ParserNode newNode = new ParserNode(token, rule.getName(), parentNode);
         parentNode.addChild(newNode);
     }
 
