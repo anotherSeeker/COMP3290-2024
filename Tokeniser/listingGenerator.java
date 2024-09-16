@@ -70,11 +70,11 @@ public class listingGenerator
         }
    }
 
-   private static String padString(String str)
+    private static String padString(String str)
     {
         int padding = str.length()%6;
 
-        if (padding != 0)
+        if (str.length() != 6)
         {
             for (int i = 0; i < (6-padding); i++)
             {

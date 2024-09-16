@@ -8,20 +8,32 @@ public class ParserRules
     //getRule(Name)
     private String[] names = {
         "NPROG",
-        "NGLOB"
+        "NGLOB",
+        "NCONST"
     };
 
+    //"NEPS" meaning epsiolon or empty
+    //if first entry in first table is "NEPS" we can ignore this node if we do not meet any other firsts
+        //if first entry is neps we have to receive match sets offset by 1 for each input, can handle this fine
     private String[][] first = {
         {"TCD24"},
-        {"TCNST", "TTYPD", "TARRD"}
+        {"TCNST", "TTYPD", "TARRD"},
+        {"NEPS", "TCNST"}
     };
 
     private String[][] follow = {
-        {"TTEOF"}
+        {"TTEOF"},
+        {},
+        {}
     };
 
-    private String[][] matchSets = {
-        {"TCD24", "TIDEN", "NGLOB", "NMAIN", "TTEOF"}
+    private String[][][] matchSets = {
+        {{"TCD24", "TIDEN", "NGLOB", "NMAIN", "TTEOF"}
+        },
+        {{"NCONSTS", "NTYPES", "NARRAYS"}
+        },
+        {{"TCNST", "NINITLIST"}
+        }
     };
 
     private ArrayList<Rule> rules = new ArrayList<>();   
