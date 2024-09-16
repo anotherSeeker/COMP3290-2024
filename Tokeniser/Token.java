@@ -72,6 +72,11 @@ public class Token
         return type;
     }
 
+    public String getTypeString()
+    {
+        return type.toString();
+    }
+
     public String getLexeme()
     {
         return getBufferString(lexBuffer);

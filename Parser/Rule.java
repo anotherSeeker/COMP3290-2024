@@ -2,17 +2,21 @@ package Parser;
 
 public class Rule 
 {
-    private String Name = null;
-    private String[] FirstSet;
-    private String[] FollowSet;
-    private String[][] MatchSets;
+    private final String Name;
+    private final String[] FirstSet;
+    private final String[] FollowSet;
+    private final String[][] MatchSets;
+    private final boolean isTailRule;
+    private final boolean isRecoveryRule;
 
-    public Rule(String _Name, String[] _FirstSet, String[] _FollowSet, String[][] _MatchSets)
+    public Rule(String _Name, String[] _FirstSet, String[] _FollowSet, String[][] _MatchSets, boolean _isTailRule, boolean _isRecoveryRule)
     {
         Name = _Name;
         FirstSet = _FirstSet;
         FollowSet = _FollowSet;
         MatchSets = _MatchSets;
+        isTailRule = _isTailRule;
+        isRecoveryRule = _isRecoveryRule;
     }
 
     public String[] getFirstSet() {
@@ -26,5 +30,34 @@ public class Rule
     }
     public String getName() {
         return Name;
+    }
+    public boolean getIsTailRule(){
+        return isTailRule;
+    }
+    public boolean getIsRecoveryRule() {
+        return isRecoveryRule;
+    }
+    
+
+
+
+    public boolean isEpsilonRule()
+    {
+        return FirstSet[0].equals("NEPS");
+    }
+
+    public boolean hasMultipleMatchSets()
+    {
+        return (MatchSets.length == 1);
+    }
+    public String firstSetToString()
+    {
+        String out = "";
+        for (String fSet : FirstSet)
+        {
+            out = out + fSet + " ";
+        }
+
+        return out;
     }
 }
