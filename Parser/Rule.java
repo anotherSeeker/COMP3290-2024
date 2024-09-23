@@ -28,6 +28,10 @@ public class Rule
     public String[][] getMatchSets() {
         return MatchSets;
     }
+    public String[] getMatchSet(int address)
+    {
+        return MatchSets[address];
+    }
     public String getName() {
         return Name;
     }
@@ -48,7 +52,7 @@ public class Rule
 
     public boolean hasMultipleMatchSets()
     {
-        return (MatchSets.length == 1);
+        return (MatchSets.length > 1);
     }
     public String firstSetToString()
     {

@@ -167,4 +167,9 @@ public class Token
 
         return out;
     }
+
+    public static boolean compareTypeAsString(Token tok, String strTok)
+    {
+        return tok.getType().toString().equalsIgnoreCase(strTok);
+    }
 }

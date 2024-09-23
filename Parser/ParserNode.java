@@ -6,23 +6,22 @@ public class ParserNode
 {
     //node type, if terminal [token], [Child Nodes]
     private Token token = null;
-    private String nodeName = "Uninit";
     private String type = "Uninit";
-    private String errorDesc;
+    private String errorDesc; 
     private ParserNode parent;
     private final ArrayList<ParserNode> children = new ArrayList<>();
 
-    public ParserNode(Token _token, String _nodeName, ParserNode _parentNode)
+    public ParserNode(Token _token, String _type, ParserNode _parentNode)
     {
         token = _token;
-        nodeName = _nodeName;
+        type = _type;
         parent = _parentNode;
     }
 
-    public ParserNode(Token _token, String _nodeName, String _errorDesc, ParserNode _parentNode)
+    public ParserNode(Token _token, String _type, String _errorDesc, ParserNode _parentNode)
     {
         token = _token;
-        nodeName = _nodeName;
+        type = "err";
         errorDesc = _errorDesc;
         parent = _parentNode;
     }
@@ -37,8 +36,16 @@ public class ParserNode
         children.add(childNode);
     }
 
+    public void printSelf()
+    {
+        System.out.println("TODO: flesh this out, type is: "+type);   
+    }
+
     public void printChildren()
     {
-        System.out.println("TODO");
+        for (ParserNode child : children)
+        {
+            child.printSelf();
+        }
     }
 }

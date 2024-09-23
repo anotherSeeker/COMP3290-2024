@@ -1,9 +1,8 @@
 package Parser;
-import Tokeniser.Token;
 
 public class PNodeTree 
 {
-    private ParserNode treeRoot = null;
+    private ParserNode treeRoot = null; 
 
     public PNodeTree(ParserNode root) 
     {

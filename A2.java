@@ -24,7 +24,8 @@ public class A2
             String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            TokenParser.run(tokenList);
+            TokenParser parser = new TokenParser(tokenList);
+            parser.run();
 
             
 
