@@ -152,6 +152,11 @@ public class Token
         return line;
     }
 
+    public int getColumn()
+    {
+        return column;
+    }
+
     public String getLocationString()
     {
         return "(Line: "+line+", Column: "+column+")";

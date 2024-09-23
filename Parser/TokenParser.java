@@ -1,4 +1,5 @@
 package Parser;
+import SymbolTable.SymbolTable;
 import Tokeniser.Token;
 import java.util.*;
 
@@ -7,13 +8,15 @@ public class TokenParser
     private static PNodeTree nodeTree;
     private static ArrayList<Rule> ruleList;
     private static ArrayList<Token> tokenList;
+    private static SymbolTable symbolTable;
     private static int currentTokenIndex = 0;
     private static Token currentToken;
     private static boolean isFirstNode = true;
 
-    public TokenParser(ArrayList<Token> tokList)
+    public TokenParser(ArrayList<Token> tokList, SymbolTable symt)
     {
         tokenList = tokList;
+        symbolTable = symt;
         currentToken = getNextToken();
 
         ruleList = ParserRules.initialiseRules();
@@ -142,9 +145,9 @@ public class TokenParser
                 {
                     ParentNode = addNode(inputToken, inputRule, ParentNode);
                 }
-                else
+                else if (symbolTable.symbolIsInTable(inputToken, inputRule.getName()))
                 {
-                    
+
                 }
 
             }
