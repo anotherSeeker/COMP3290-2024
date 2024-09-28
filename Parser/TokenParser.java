@@ -24,6 +24,8 @@ public class TokenParser
 
     public PNodeTree run()
     {
+        //we run with the first token from our lexical analysis, and the nProg rule no parent because this is the root
+        //because isFirstNode is true, this will instantiate new PNodeTree
         matchRule(currentToken, ruleList.get(0), null);
 
         return nodeTree;
@@ -38,6 +40,8 @@ public class TokenParser
 
         int matchSetAddress = compareFirstSet(inputToken, inputRule.getFirstSet(), hasMultipleMatchSets);
         boolean valid = matchSetExists(matchSetAddress, inputToken, inputRule, ParentNode);
+        //if matchset exists we'll execute the rules in that matchset, making children for each new rule that isn't a tail and for each token
+            //if it doesn't then matchSetExists has made an error node for us
         if (valid)
         {
             ParentNode = executeRules(inputToken, inputRule, ParentNode, matchSetAddress);
@@ -45,6 +49,61 @@ public class TokenParser
         }
 
         return null;
+    }
+
+    private ParserNode executeRules(Token inputToken, Rule inputRule, ParserNode ParentNode, int matchSetAddress)
+    {
+        String[] matchSet = inputRule.getMatchSet(matchSetAddress);
+        for (String rule : matchSet)
+        {
+            int isSubRule = 0;
+            int isTokenType = 1;
+            int isSymType = 2;
+
+            int ruleType = checkRuleType(rule);
+
+            if (isSubRule == ruleType)
+            {
+                Rule subRule = getRule(rule);
+                ParserNode oldParent = ParentNode;
+
+                //if not a tail rule we add to the parse tree
+                if (!subRule.getIsTailRule())
+                {
+                    ParentNode = addNode(inputToken, inputRule, oldParent);
+                    //TODO: remove test prints
+                    oldParent.printSelf();
+                    ParentNode.printSelf();
+                }
+
+                matchRule(inputToken, subRule, ParentNode);
+
+                ParentNode = oldParent;
+            }
+
+            else if (isTokenType == ruleType)
+            {
+                //we consume the token at the end of this step
+                //we are matching a specific token type or entry in the symbol table
+                //if our inputtoken matches our rule we can add a Node
+                if (Token.compareTypeAsString(inputToken, rule))
+                {
+                    ParentNode = addNode(inputToken, inputRule, ParentNode);
+                }
+                else if (symbolTable.symbolIsInTable(inputToken, inputRule.getName()) != null)
+                {
+
+                }
+
+            }
+
+            else if (isSymType == ruleType)
+            {
+                //we consume the token at the end of this step
+            }
+        } //end for
+
+        return ParentNode;
     }
 
 
@@ -105,57 +164,21 @@ public class TokenParser
         return (matchSetAddress+1 <= inputRule.getMatchSets().length);
     }
 
-    private boolean checkIsSubRule(String input)
+    private int checkRuleType(String input)
     {
         //rule nodes are denoted as nRuleName
         //tokens are TTOKN as setup in A1
-        //symbols (specified id's) are symName
-        return input.charAt(0) == 'n';
+        //symbols (specified id's) are symNAME
+        if (input.startsWith("n"))
+            return 0;
+        if (input.startsWith("T"))
+            return 1;
+        if (input.startsWith("sym"))
+            return 2;
+
+        System.err.println("Invalid input rule: "+input);
+        return -1;
     }
-
-    private ParserNode executeRules(Token inputToken, Rule inputRule, ParserNode ParentNode, int matchSetAddress)
-    {
-        String[] matchSet = inputRule.getMatchSet(matchSetAddress);
-        for (String rule : matchSet)
-        {
-            boolean isSubRule = checkIsSubRule(rule);
-            if (isSubRule)
-            {
-                Rule subRule = getRule(rule);
-                ParserNode oldParent = ParentNode;
-
-                //if not a tail rule we add to the parse tree
-                if (!subRule.getIsTailRule())
-                {
-                    ParentNode = addNode(inputToken, inputRule, oldParent);
-                    //TODO: remove test prints
-                    oldParent.printSelf();
-                    ParentNode.printSelf();
-                }
-
-                matchRule(inputToken, subRule, ParentNode);
-
-                ParentNode = oldParent;
-            }
-            else
-            {
-                //we are matching a specific token type or entry in the symbol table
-                //if our inputtoken matches our rule we can add a Node
-                if (Token.compareTypeAsString(inputToken, rule))
-                {
-                    ParentNode = addNode(inputToken, inputRule, ParentNode);
-                }
-                else if (symbolTable.symbolIsInTable(inputToken, inputRule.getName()))
-                {
-
-                }
-
-            }
-        }
-
-        return ParentNode;
-    }
-
 
     private void addErrorNode(Token token, Rule rule, ParserNode parentNode)
     {
@@ -172,7 +195,7 @@ public class TokenParser
         if (isFirstNode) {
             isFirstNode = false;
             nodeTree = new PNodeTree(newNode);   
-           }
+        }
 
         parentNode.addChild(newNode);
         return newNode;

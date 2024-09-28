@@ -93,8 +93,7 @@ public class ParserRules
         "nFNCALLTAIL",
         "nPRLIST",
         "nPRLISTTAIL",
-        "nPRINTITEM"
-    };
+        "nPRINTITEM"};
 
     //"nEPS" meaning epsiolon or empty
     //if first entry in first table is "nEPS" we can ignore this node if we do not meet any other firsts
@@ -106,14 +105,87 @@ public class ParserRules
         {"TIDEN"},//initlist
         {"nEPS","TCOMA"},//initlistTail
         {"TIDEN"},//init
-        {"TTYPD"},//types
+        {"nEPS", "TTYPD"},//types
         {"symSTRUCTID", "symTYPEID"},//typelist
         {"nEPS", "symSTRUCTID", "symTYPEID"},//typelisttail
         {"symSTRUCTID", "symTYPEID"},//type
         {"TIDEN"},//fields
         {"nEPS", "TCOMA"},//fieldsTail
         {"nEPS", "TARRD"},//arrays
-        {""}
+        {"TIDEN"},//arrdecls
+        {"nEPS", "TCOMA"},//arrdeclstail
+        {"TIDEN"},//arrdecl
+        {"symTYPEID"},//arrdeclTail
+        {"nEPS", "TFUNC"},//funcs
+        {"nEPS", "TFUNC"},//funcstail
+        {"TFUNC"},//func
+        {"TINTG", "TFLOT", "TBOOL", "TVOID"},//rtype
+        {"NEPS", "TIDEN", "TCONST"},//plist
+        {"TIDEN", "TCONST"},//params
+        {"nEPS", "TCOMA"},//paramsTail
+        {"TIDEN", "TCONST"},//param
+        {"TIDEN"},//paramDecl
+        {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID", "symTYPEID"},//paramDeclTail
+        {"TIDEN", "TBEGIN"},//funcbody
+        {"nEPS", "TIDEN"},//locals
+        {"TIDEN"},//dlist
+        {},//dlisttail
+        {},//decl
+        {},//decltail
+        {},//mainbody
+        {},//slist
+        {},//slistTail
+        {},//sdecl
+        {},//sdecltail
+        {"TIDEN"},//initdecl
+        {"TINTG", "TFLOT", "TBOOL"},//stype
+        {},//stats
+        {},//statstail
+        {},//strstat
+        {},//stat
+        {},//forstat
+        {},//repstat
+        {},//dostat
+        {},//asgnlist
+        {},//asgnlisttail
+        {},//ifstat
+        {},//ifstattail
+        {},//switchstat
+        {},//caselist
+        {},//caselisttail
+        {},//asgnstat
+        {},//asgnop
+        {},//iostat
+        {},//callstat
+        {},//callstattail
+        {},//returnstat
+        {},//returnstattail
+        {},//vlist
+        {},//vlisttail
+        {},//var
+        {},//vartail
+        {},//elist
+        {},//elisttail
+        {},//bool
+        {},//booltail
+        {},//rel
+        {},//reltail
+        {},//logop
+        {},//relop
+        {},//expr
+        {},//exprTail
+        {},//term
+        {},//termtail
+        {},//fact
+        {},//facttail
+        {},//exponent
+        {},//varorfncall
+        {},//varorfncalltail
+        {},//fncall
+        {},//fncalltail
+        {},//prlist
+        {},//prlisttail
+        {}//printitem
     };
 
     private static final String[][] follow = {
@@ -122,7 +194,9 @@ public class ParserRules
         {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//consts
         {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//initlist
         {"TTYPD", "TARRD", "TFUNC", "TMAIN", "TCOMA"},//initlisttail
-        {""},//init
+        {"TCOMA", "TTYPD", "TARRD", "TFUNC", "TMAIN"},//init
+        {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//types
+        {},//typelist
         {}
     };
 
@@ -138,22 +212,190 @@ public class ParserRules
         {{"TCOMA", "nINITLIST"}//initlisttail
         },
         {{"TIDEN","TEQUL", "nEXPR"}//init
-        }
-
+        },
+        {{"TTYPD", "nTYPELIST"}//types
+        },
+        {{"nTYPE", "nTYPELISTTAIL"}
+        },//typelist
+        {{"nTYPELIST"}
+        },//typelisttail
+        {{"symSTRUCTID", "TTDEF", "nFIELDS", "TTEND"}, {"symTYPEID", "TTDEF", "TARAY", "TLBRK", "nEXPR", "TRBRK", "TTTOF", "symSTRUCTID", "TTEND"}
+        },//type
+        {{"nSDECL", "nFIELDSTAIL"}
+        },//fields
+        {{"TCOMA"}
+        },//fieldsTail
+        {{"TARRD", "nARRDECLS"}
+        },//arrays
+        {{"nARRDECL", "nARRDECLSTAIL"}
+        },//arrdecls
+        {{"TCOMA", "nARRDECLS"}
+        },//arrdeclstail
+        {{"TIDEN", "TCOLN", "nARRDECLTAIL"}
+        },//arrdecl
+        {{"symTYPEID"}
+        },//arrdeclTail
+        {{"nFUNC", "nFUNCSTAIL"}
+        },//funcs
+        {{"nFUNCS"}
+        },//funcstail
+        {{"TFUNC", }
+        },//func
+        {{"nSTYPE"}, {"nSTYPE"}, {"nSTYPE"}, {"TVOID"}
+        },//rtype
+        {{"nPARAMS"}
+        },//plist
+        {{"nPARAM", "NPARAMSTAIL"}
+        },//params
+        {{"TCOMA", "nPARAMS"}
+        },//paramstail
+        {{}
+        },//param
+        {{}
+        },//paramDecl
+        {{}
+        },//paramDeclTail
+        {{}
+        },//funcbody
+        {{}
+        },//locals
+        {{}
+        },//dlist
+        {{}
+        },//dlisttail
+        {{}
+        },//decl
+        {{}
+        },//decltail
+        {{}
+        },//mainbody
+        {{}
+        },//slist
+        {{}
+        },//slistTail
+        {{}
+        },//sdecl
+        {{}
+        },//sdecltail
+        {{"TIDEN", "TCOLN"}
+        },//initdecl
+        {{}
+        },//stype
+        {{}
+        },//stats
+        {{}
+        },//statstail
+        {{}
+        },//strstat
+        {{}
+        },//stat
+        {{}
+        },//forstat
+        {{}
+        },//repstat
+        {{}
+        },//dostat
+        {{}
+        },//asgnlist
+        {{}
+        },//asgnlisttail
+        {{}
+        },//ifstat
+        {{}
+        },//ifstattail
+        {{}
+        },//switchstat
+        {{}
+        },//caselist
+        {{}
+        },//caselisttail
+        {{}
+        },//asgnstat
+        {{}
+        },//asgnop
+        {{}
+        },//iostat
+        {{}
+        },//callstat
+        {{}
+        },//callstattail
+        {{}
+        },//returnstat
+        {{}
+        },//returnstattail
+        {{}
+        },//vlist
+        {{}
+        },//vlisttail
+        {{}
+        },//var
+        {{}
+        },//vartail
+        {{}
+        },//elist
+        {{}
+        },//elisttail
+        {{}
+        },//bool
+        {{}
+        },//booltail
+        {{}
+        },//rel
+        {{}
+        },//reltail
+        {{}
+        },//logop
+        {{}
+        },//relop
+        {{}
+        },//expr
+        {{}
+        },//exprTail
+        {{}
+        },//term
+        {{}
+        },//termtail
+        {{}
+        },//fact
+        {{}
+        },//facttail
+        {{}
+        },//exponent
+        {{}
+        },//varorfncall
+        {{}
+        },//varorfncalltail
+        {{}
+        },//fncall
+        {{}
+        },//fncalltail
+        {{}
+        },//prlist
+        {{}
+        },//prlisttail
+        {{}
+        }//printitem
     }; 
+
+    //----------------------------------------------
+    //----------------------------------------------
+    //----------------------------------------------
+    //----------------------------------------------
 
     private static final boolean[] isRecoveryRule = {
         true,
         true,
-        true
+        true,
+        false
     };
     
     public static ArrayList<Rule> initialiseRules()
     {
-        for (int i = 0; i < first.length; i++)
+        for (int i = 0; i < first.length; i++) 
         {
             boolean isTailRule = checkIsTailRule(names[i]);
-            rules.add(new Rule(names[i], first[i], follow[i], matchSets[i], isTailRule, isRecoveryRule[i]));
+            //TODO: fix recovery and follow
+            rules.add(new Rule(names[i], first[i], new String[0], matchSets[i], isTailRule, false));
         }
 
         return rules;
@@ -165,3 +407,9 @@ public class ParserRules
         return name.toUpperCase().endsWith("TAIL");   
     }
 }
+
+
+    //----------------------------------------------
+    //----------------------------------------------
+    //----------------------------------------------
+    //----------------------------------------------

@@ -1,6 +1,8 @@
 CD24 a1Grading
 
 constants 
+    constant = 22,
+    constant2 = 23
 
 typedef
     studentScore def 

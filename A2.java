@@ -1,4 +1,5 @@
 import Parser.*;
+import SymbolTable.SymbolTable;
 import Tokeniser.*;
 import java.util.ArrayList;
 
@@ -24,7 +25,9 @@ public class A2
             String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            TokenParser parser = new TokenParser(tokenList);
+            SymbolTable symTable = null;new SymbolTable(tokenList);
+
+            TokenParser parser = new TokenParser(tokenList, symTable);
             parser.run();
 
             

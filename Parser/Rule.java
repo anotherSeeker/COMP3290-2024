@@ -7,7 +7,7 @@ public class Rule
     private final String[] FollowSet;
     private final String[][] MatchSets;
     private final boolean isTailRule;
-    private final boolean isRecoveryRule;
+    private final boolean isRecoveryRule; 
 
     public Rule(String _Name, String[] _FirstSet, String[] _FollowSet, String[][] _MatchSets, boolean _isTailRule, boolean _isRecoveryRule)
     {

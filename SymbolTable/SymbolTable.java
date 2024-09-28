@@ -1,17 +1,15 @@
 package SymbolTable;
 import Tokeniser.Token;
 import Tokeniser.TokenTypes;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SymbolTable 
 {
-    private ArrayList<Token> tokenList;
+    private ArrayList<Token> tokenList; 
     private ArrayList<Symbol> table;
     private boolean symtError = false;
 
-    public SymbolTable(ArrayList<Token> _tokenList)
+    public SymbolTable(ArrayList<Token> _tokenList) 
     {
         tokenList = _tokenList;
 
@@ -20,29 +18,26 @@ public class SymbolTable
 
     private void populateTable()
     {
-        String state = "Neutral";
         Token currentToken = tokenList.get(0);
         String currentScope = findTokScope(currentToken);
-
-        boolean run = true;
         try
         {
             for (int i = 0; i<tokenList.size(); i++)
             {
                 currentToken = tokenList.get(i);
                 switch (currentToken.getType()) {
-                    case TokenTypes.TCD24 -> currentScope = "global";
-                    case TokenTypes.TCNST -> {
+                    case TCD24 -> currentScope = "global";
+                    case TCNST -> {
                         boolean runCnst = true;
                         while (runCnst)
                         {
-                            i++;
-                            Token SymbolToken = tokenList.get(i);
+                            i++; 
+                            Token SymbolToken = tokenList.get(i);   // Name = Value
                             i+=2;
                             ArrayList<Token> values = new ArrayList<>();
                             values.add(tokenList.get(i));
                             String type = "Constant";
-                            SymbolTable.add(SymbolToken, values, type, currentScope);
+                            add(SymbolToken, values, type, currentScope);
 
                             //we have made a const symbol, if we don't have a comma we're done with consts and so we should move on.
                             if (tokenList.get(i+1).getType() != TokenTypes.TCOMA)
@@ -53,8 +48,8 @@ public class SymbolTable
 
 
                     }
-                    case TokenTypes.TTYPD -> state = "TypeDef";
-                    case TokenTypes.TFUNC -> state = "Func";
+                    case TTYPD -> {return;}
+                    case TFUNC -> {return;}
                     default -> {}
                 }
             }
@@ -74,16 +69,10 @@ public class SymbolTable
             Token listToken = tokenList.get(i);
             switch(listToken.getType())
             {
-                case TokenTypes.TCD24:
-                     scope="Global";
-                     break;
-                case TokenTypes.TFUNC:
-                    scope=tokenList.get(i+1).getLexeme(); //get the name of the function as the scope
-                    break;
-                case TokenTypes.TMAIN:
-                    scope="Main";
-                    break;
-                case TokenTypes.TTEND:
+                case TCD24 -> scope="Global";
+                case TFUNC -> scope=tokenList.get(i+1).getLexeme(); //get the name of the function as the scope
+                case TMAIN -> scope="Main";
+                case TTEND -> {
                     if (scope.equalsIgnoreCase("Global") || scope.equalsIgnoreCase("Main"))
                     {
                         break;
@@ -91,9 +80,8 @@ public class SymbolTable
                     //if we're not in global or main, then we saw TFUNC which means we're defining functions, 
                     //which means we reset to global but honestly shouldn't matter
                     scope = "Global";
-                    break;
-                default:
-                    break;
+                }
+                default -> {}
             }
 
 
@@ -115,9 +103,9 @@ public class SymbolTable
         return true;
     }
 
-    public boolean addOccurance(Token _token)
+    public boolean addOccurance(Token _token, ArrayList<Token> _values, String _type, String _scope)
     {
-        Symbol existingSymbol = symbolIsInTable(_token);
+        Symbol existingSymbol = symbolIsInTable(_token, _scope);
         if (existingSymbol != null)
         {
             //symbol is in the table, add an occurance

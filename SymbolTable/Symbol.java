@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Symbol 
 {
     private Token token;
-    private ArrayList<Token> values = new ArrayList<>();
+    private ArrayList<Token> values = new ArrayList<>(); 
     private String type;
     private String scope;
     private ArrayList<Token> occurances = new ArrayList<>();
@@ -17,7 +17,7 @@ public class Symbol
         token = _token;
         type = _type;
         scope = _scope;
-        occurances.add(token);
+        occurances.add(_token);
     }
 
     public Symbol(Token _token, ArrayList<Token> _values, String _type, String _scope)
@@ -26,7 +26,7 @@ public class Symbol
         values = _values;
         type = _type;
         scope = _scope;
-        occurances.add(token);
+        occurances.add(_token);
     }
 
     public void addOccurance(Token _token)

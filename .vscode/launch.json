@@ -16,7 +16,8 @@
             "name": "A2",
             "request": "launch",
             "mainClass": "A2",
-            "projectName": "COMP3290-2024_740664f6"
+            "projectName": "COMP3290-2024_740664f6",
+            "args"  : "cd24Source/a1Grading.cd24"
         }
     ]
 }
