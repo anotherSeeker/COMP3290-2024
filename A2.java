@@ -22,17 +22,19 @@ public class A2
             
             //printTokens();
 
-            String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
+            /*String listing =*/ listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            //TODO: fix symtable
-            SymbolTable symTable = null;//new SymbolTable(tokenList);
+            SymbolTable symTable = new SymbolTable(tokenList);
 
             TokenParser parser = new TokenParser(tokenList, symTable);
             PNodeTree tree = parser.run();
 
-            //tree.printTree();
-            tree.printTreeTraversal();
+            //print tree is the debug print, 
+                //traversal is the requested output print
+            tree.printTree();
+            symTable.printErrorLog();
+            //tree.printTreeTraversal();
 
 
         }
@@ -40,7 +42,7 @@ public class A2
             System.out.println("please provide filepath");
     }
 
-    private static void printTokens()
+    public static void printTokens()
     {
         int currentLineLength = 0;
         String out = "";
@@ -65,7 +67,7 @@ public class A2
         }
     }
 
-    private static void printErrors()
+    public static void printErrors()
     {
         int currentLineLength = 0;
         if (errorList.size() < 1)

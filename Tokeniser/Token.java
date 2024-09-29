@@ -157,6 +157,12 @@ public class Token
         return column;
     }
 
+    public boolean matchLocation(Token inputToken)
+    {
+        //if lines and columns are identical tokens match, technically this could be wrong but you'd have to be messing with the tokens after they're output so just don't do that
+        return (inputToken.getLine() == this.line && inputToken.getColumn() == this.column);
+    }
+
     public String getLocationString()
     {
         return "(Line: "+line+", Column: "+column+")";
@@ -191,5 +197,11 @@ public class Token
     public boolean isValueToken()
     {
         return (type == TokenTypes.TILIT || type == TokenTypes.TFLIT || type == TokenTypes.TSTRG || type == TokenTypes.TIDEN);
+    }
+
+    public boolean matchIdentifier(Token inputToken)
+    {
+        //idents are case sensitive
+        return this.getLexeme().equals(inputToken.getLexeme());
     }
 }

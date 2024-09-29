@@ -42,9 +42,6 @@ public class Rule
         return isRecoveryRule;
     }
     
-
-
-
     public boolean isEpsilonRule()
     {
         return FirstSet[0].equalsIgnoreCase("nEPS");

@@ -1,15 +1,23 @@
 package Parser;
 
+import java.util.ArrayList;
+
 public class PNodeTree 
 {
     //root holds children, children hold their parents and their children all the way down
     private ParserNode treeRoot = null; 
     private int printDepth = -1;
     private static int currentTraversalLineLength = 0;
+    private static final ArrayList<String> errorStrings = new ArrayList<>();
 
     public PNodeTree(ParserNode root) 
     {
         treeRoot = root;
+    }
+
+    public void addError(String errString)
+    {
+        errorStrings.add(errString);
     }
 
     public ParserNode getRoot()
@@ -32,18 +40,6 @@ public class PNodeTree
         printNodeAndChildren(treeRoot, parentDepth, depthChange, onlyTokens);
     }
 
-    private void printNodeAndChildren(ParserNode root)
-    {
-        printDepth++;
-        root.printSelfOld(printDepth);
-
-        for (ParserNode child : root.children)
-        {
-            printNodeAndChildren(child);
-        }
-        printDepth--;
-    }
-
     private void printNodeAndChildren(ParserNode node, int parentDepth, boolean depthChange, boolean onlyTokens)
     {
         printDepth++;
@@ -64,11 +60,14 @@ public class PNodeTree
     public void printTreeTraversal()
     {
         traversalStep(treeRoot);
+        System.out.println("\n");
+        errorPrint(errorStrings);
     }
 
     public void traversalStep(ParserNode node)
     {
         String RESET = "\u001B[0m";
+        String RED = "\u001B[31m";
         String GREEN = "\u001B[32m";
         String BLUE =  "\u001B[34m";
 
@@ -82,10 +81,12 @@ public class PNodeTree
 
         currentTraversalLineLength += travString.length();
 
-        if (node.isToken())
+        if (node.isErr())
+            travString = RED+travString+RESET;
+        else if (node.isToken())
             travString = GREEN+travString+RESET;
         else
-            travString = BLUE+travString;
+            travString = BLUE+travString+RESET;
 
         if (currentTraversalLineLength >= 70)
         {
@@ -111,5 +112,13 @@ public class PNodeTree
         }
 
         return str;
+    }
+
+    private void errorPrint(ArrayList<String> errStrings)
+    {
+        for (String err : errStrings)
+        {
+            System.out.println(err);
+        }
     }
 }

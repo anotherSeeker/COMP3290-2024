@@ -109,7 +109,7 @@ public class ParserRules
         {"nEPS","TCOMA"},//initlistTail
         {"TIDEN"},//init
         {"nEPS", "TTYPD"},//types
-        {"symSTRUCTID", "symTYPEID"},//typelist
+        {"symSTRUCTID", "symTYPEID"},//typelist 
         {"nEPS", "symSTRUCTID", "symTYPEID"},//typelisttail
         {"symSTRUCTID", "symTYPEID"},//type
         {"TIDEN"},//fields
@@ -278,9 +278,7 @@ public class ParserRules
         },//initdecl
         {{"TINTG"}, {"TFLOT"}, {"TBOOL"}
         },//stype 
-        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, 
-         {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},
-         {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
+        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
         },//stats
         {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
         },//stats2tail exists so we avoid indenting and printing stats with every new stats statement
@@ -483,8 +481,8 @@ public class ParserRules
         for (int i = 0; i < first.length; i++) 
         {
             boolean isTailRule = checkIsTailRule(names[i]);
-            //TODO: fix recovery and follow
-            rules.add(new Rule(names[i], first[i], new String[0], matchSets[i], isTailRule, false));
+            
+            rules.add(new Rule(names[i], first[i], new String[0], matchSets[i], isTailRule, isRecoveryRule[i]));
         }
 
         return rules;

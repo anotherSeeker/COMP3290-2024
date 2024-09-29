@@ -7,6 +7,7 @@ cd24Source/a1Grading.cd24
 8: TIDEN studentScore      TTDEF 
 9: TIDEN score TCOLN TFLOT TCOMA TIDEN id    TCOLN TINTG 
 10: TTEND 
+14: TIDEN studentScores     TTDEF TARAY TLBRK TILIT 20    TRBRK TTTOF TIDEN studentScore      TTEND 
 16: TARRD 
 18: TIDEN scores      TCOLN TIDEN studentScores     
 20: TFUNC TIDEN calcScores  TLPAR TCNST TIDEN scores      TCOLN TIDEN studentScores     TCOMA TIDEN numStudents TCOLN TINTG TRPAR TCOLN TFLOT 
@@ -36,10 +37,7 @@ cd24Source/a1Grading.cd24
 47: TIDEN highestID   TCOLN TINTG 
 48: TBEGN 
 49: TIDEN highest     TEQUL TILIT 0     TSEMI 
-50: TTFOR TLPAR TIDEN i     TEQUL TUNDF !     TILIT 0     TSEMI TIDEN i     TLESS TIDEN numStudents TRPAR 
-	TUNDF !(Line: 50, Column: 17)
-	: Illegal symbol: !    
-	
+50: TTFOR TLPAR TIDEN i     TEQUL TIDEN abcd  TILIT 0     TSEMI TIDEN i     TLESS TIDEN numStudents TRPAR 
 51: TIFTH TLPAR TIDEN highest     TLESS TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN score TTTOR TIDEN score TEQEQ TILIT 0     TRPAR 
 52: TIDEN highest     TEQUL TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN score TSEMI 
 53: TIDEN highestID   TEQUL TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN id    TSEMI 

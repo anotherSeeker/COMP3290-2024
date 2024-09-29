@@ -82,7 +82,7 @@ public class ParserNode
                 else
                     par = "";
 
-                System.out.print(GREEN+str/*+par+*/+RESET);
+                System.out.print(GREEN+str+par+RESET);
             }
             else
                 System.out.print(BLUE+name+RESET);  
@@ -94,38 +94,30 @@ public class ParserNode
     public void printSelf(int printDepth, int parentDepth, boolean depthChange, boolean onlyTokens)
     {
         String RESET = "\u001B[0m";
-        String RED = "\u001B[31m";
         String GREEN = "\u001B[32m";
         String BLUE =  "\u001B[34m";
 
         if (isErr())
         {
-            System.out.print(RED+"syntax error: " + errorDesc +RESET+"\n");
-            System.out.print(RED+"Occured At: "+token.getLocationStringErr()+RESET);
-            System.out.print("\n");
+            System.out.print(errorDesc+"\n");
+            //System.out.println(RED+"Occured At: "+token.getLocationStringErr()+RESET);
         }
         else
         {
             if (isToken)
             {
                 handleIndent(printDepth, parentDepth, depthChange);
-                String par = " : parent: ";
                 String str = name;
 
-                if (token.isValueToken())
-                    str = str+" = "+ token.getLexeme();
-                if (parent != null)
-                    par = par + parent.getName();
-                else
-                    par = "";
-
-                System.out.print(GREEN+str/*+par+*/+RESET);
+                System.out.print(GREEN+str+RESET);
                 System.out.print("\n");
             }
             else if (!onlyTokens)
             {
                 handleIndent(printDepth, parentDepth, depthChange);
-                System.out.print(BLUE+name+RESET);
+                String str = name;
+
+                System.out.print(BLUE+str+RESET);
                 System.out.print("\n");  
             }
         }

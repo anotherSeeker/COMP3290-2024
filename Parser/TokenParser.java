@@ -13,8 +13,6 @@ public class TokenParser
     private static Token currentToken;
     private static boolean isFirstNode = true;
 
-    private static String globErrDesc = null;
-
     public TokenParser(ArrayList<Token> tokList, SymbolTable symt)
     {
         tokenList = tokList;
@@ -58,7 +56,7 @@ public class TokenParser
                     //if we hit the epsilon case there are no rules to run so don't it's just that shrimple
                 //currentToken advances when we run a TNAME, or symNAME ruleString to consume specific token type or symbol type
                 executeRules(inputRule, ParentNode, matchSetAddress);
-            }
+            } 
         }
     }
 
@@ -79,21 +77,17 @@ public class TokenParser
                 subRule = getRule(ruleString);
             }
 
-            if (subRule != null)
-            {
-                System.out.print("");
-            }
-
             if (isSubRule == ruleType)
             {
                 
                 ParserNode oldParent = ParentNode;
 
                 //if not a tail ruleString we add to the parse tree
-                if (!subRule.getIsTailRule())
-                {
-                    ParentNode = addNode(subRule, oldParent);
-                }
+                if (subRule != null)
+                    if (!subRule.getIsTailRule())
+                    {
+                        ParentNode = addNode(subRule, oldParent);
+                    }
 
                 //subrule does not consume token
                 matchRule(subRule, ParentNode);
@@ -114,7 +108,6 @@ public class TokenParser
                 else
                 {
                     //our token did not match correctly so we error,
-                    //TODO: do better error stuff
                     addErrorNode(inputRule, ParentNode);
                     advanceCurrentToken();
                 }
@@ -123,17 +116,37 @@ public class TokenParser
             else if (isSymType == ruleType)
             {
                 //we consume the token at the end of this step
-                //TODO: work in symbol table
-
-                if (Token.compareTypeAsString(currentToken, "TIDEN"))
+                if (ruleString.equalsIgnoreCase("symTYPEID"))
                 {
-                    addNode(null, ParentNode);
-                    advanceCurrentToken();
+                    if (symbolTable.lookupTypeExists(currentToken))
+                    {
+                        addNode(null, ParentNode);
+                        advanceCurrentToken();
+                    }
+                    else
+                    {
+                        //our token did not match correctly so we error,
+                        addErrorNode(inputRule, ParentNode);
+                        advanceCurrentToken();
+                    }
+                }
+                else if (ruleString.equalsIgnoreCase("symSTRUCTID"))
+                {
+                    if (symbolTable.lookupStructExists(currentToken))
+                    {
+                        addNode(null, ParentNode);
+                        advanceCurrentToken();
+                    }
+                    else
+                    {
+                        //our token did not match correctly so we error,
+                        addErrorNode(inputRule, ParentNode);
+                        advanceCurrentToken();
+                    }
                 }
                 else
                 {
                     //our token did not match correctly so we error,
-                    //TODO: do better error stuff
                     addErrorNode(inputRule, ParentNode);
                     advanceCurrentToken();
                 }
@@ -150,7 +163,7 @@ public class TokenParser
     {
         String[] firstSet = inputRule.getFirstSet();
 
-        String name = currentToken.getTypeString();
+        String name = currentToken.getTypeString().strip();
 
         for (int i = 0; i < firstSet.length; i++)
         {
@@ -166,14 +179,30 @@ public class TokenParser
                 return 0;
             }
             
-            //handle symbols TODO: lookup symbol table
-            if (firstSet[i].startsWith("sym") && name.equalsIgnoreCase("TIDEN"))
+            //handle symbols
+            if (firstSet[i].equalsIgnoreCase("symSTRUCTID"))
             {
-                if (hasMultipleMatchSets)
-                    if (inputRule.isEpsilonRule())
-                        return i-1;
-                    else
-                        return i;
+                //if in the symTable as a struct we're legal
+                if (symbolTable.lookupStructExists(currentToken))
+                    if (hasMultipleMatchSets)
+                        if (inputRule.isEpsilonRule())
+                            return i-1;
+                        else
+                            return i;
+
+                return 0;
+            }
+
+            if (firstSet[i].equalsIgnoreCase("symTYPEID"))
+            {
+                //if in the symTable as a struct we're legal
+                if (symbolTable.lookupTypeExists(currentToken))
+                    if (hasMultipleMatchSets)
+                        if (inputRule.isEpsilonRule())
+                            return i-1;
+                        else
+                            return i;
+
                 return 0;
             }
         }
@@ -221,15 +250,19 @@ public class TokenParser
 
     private void addErrorNode(Rule rule, ParserNode parentNode)
     {
-        String errorDesc = "Received Token: "+currentToken.toString()+" | "+rule.getName()+" expected token of possible types: "+rule.firstSetToString();
+        String errorDesc = "Received Token: "+currentToken.toString()+" | Malformed input for "+rule.getName();
 
-        if (globErrDesc != null)
-        {
-            errorDesc = globErrDesc;
-        }
+        String RESET = "\u001B[0m";
+        String RED = "\u001B[31m";
+
+        errorDesc = RED+"syntax error: " + errorDesc +RESET+"\n";
+        errorDesc = errorDesc + RED+"Occured At: "+currentToken.getLocationStringErr()+RESET;
+
 
         ParserNode newNode = new ParserNode(currentToken, rule, errorDesc, parentNode);
         parentNode.addChild(newNode);
+
+        nodeTree.addError(errorDesc);
     }
 
     private ParserNode addNode(Rule rule, ParserNode parentNode)
