@@ -25,12 +25,13 @@ public class A2
             String listing = listingGenerator.generateListing(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            SymbolTable symTable = null;new SymbolTable(tokenList);
+            //TODO: fix symtable
+            SymbolTable symTable = null;//new SymbolTable(tokenList);
 
             TokenParser parser = new TokenParser(tokenList, symTable);
-            parser.run();
+            PNodeTree tree = parser.run();
 
-            
+            tree.printTree();
 
 
         }

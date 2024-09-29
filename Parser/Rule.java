@@ -47,7 +47,7 @@ public class Rule
 
     public boolean isEpsilonRule()
     {
-        return FirstSet[0].equals("NEPS");
+        return FirstSet[0].equalsIgnoreCase("nEPS");
     }
 
     public boolean hasMultipleMatchSets()

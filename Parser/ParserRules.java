@@ -73,6 +73,7 @@ public class ParserRules
         "nVLISTTAIL",
         "nVAR",
         "nVARTAIL",
+        "nVARTAILTAIL",
         "nELIST",
         "nELISTTAIL",
         "nBOOL",
@@ -85,11 +86,11 @@ public class ParserRules
         "nEXPRTAIL",
         "nTERM",
         "nTERMTAIL",
+        "nFACT",
         "nFACTTAIL",
         "nEXPONENT",
         "nVARORFNCALL",
         "nVARORFNCALLTAIL",
-        "nFNCALL",
         "nFNCALLTAIL",
         "nPRLIST",
         "nPRLISTTAIL",
@@ -100,8 +101,8 @@ public class ParserRules
         //if first entry is neps we have to receive match sets offset by 1 for each input, can handle this fine
     private static final String[][] first = {
         {"TCD24"},//program
-        {"nEPS", "TCNST", "TTYPD", "TARRD"},//globals
-        {"nEPS", "TCNST"},//constants
+        {"nEPS", "TCONS", "TTYPD", "TARRD"},//globals
+        {"nEPS", "TCONS"},//constants
         {"TIDEN"},//initlist
         {"nEPS","TCOMA"},//initlistTail
         {"TIDEN"},//init
@@ -120,72 +121,72 @@ public class ParserRules
         {"nEPS", "TFUNC"},//funcstail
         {"TFUNC"},//func
         {"TINTG", "TFLOT", "TBOOL", "TVOID"},//rtype
-        {"NEPS", "TIDEN", "TCONST"},//plist
-        {"TIDEN", "TCONST"},//params
+        {"NEPS", "TIDEN", "TCONS"},//plist
+        {"TIDEN", "TCONS"},//params
         {"nEPS", "TCOMA"},//paramsTail
-        {"TIDEN", "TCONST"},//param
+        {"TIDEN", "TCONS"},//param
         {"TIDEN"},//paramDecl
         {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID", "symTYPEID"},//paramDeclTail
         {"TIDEN", "TBEGIN"},//funcbody
         {"nEPS", "TIDEN"},//locals
         {"TIDEN"},//dlist
-        {},//dlisttail
-        {},//decl
-        {},//decltail
-        {},//mainbody
-        {},//slist
-        {},//slistTail
-        {},//sdecl
-        {},//sdecltail
+        {""},//dlisttail
+        {""},//decl
+        {""},//decltail
+        {""},//mainbody
+        {""},//slist
+        {""},//slistTail
+        {""},//sdecl
+        {""},//sdecltail
         {"TIDEN"},//initdecl
         {"TINTG", "TFLOT", "TBOOL"},//stype
-        {},//stats
-        {},//statstail
-        {},//strstat
-        {},//stat
-        {},//forstat
-        {},//repstat
-        {},//dostat
-        {},//asgnlist
-        {},//asgnlisttail
-        {},//ifstat
-        {},//ifstattail
-        {},//switchstat
-        {},//caselist
-        {},//caselisttail
-        {},//asgnstat
-        {},//asgnop
-        {},//iostat
-        {},//callstat
-        {},//callstattail
-        {},//returnstat
-        {},//returnstattail
-        {},//vlist
-        {},//vlisttail
-        {},//var
-        {},//vartail
-        {},//elist
-        {},//elisttail
-        {},//bool
-        {},//booltail
-        {},//rel
-        {},//reltail
-        {},//logop
-        {},//relop
-        {},//expr
-        {},//exprTail
-        {},//term
-        {},//termtail
-        {},//fact
-        {},//facttail
-        {},//exponent
-        {},//varorfncall
-        {},//varorfncalltail
-        {},//fncall
-        {},//fncalltail
-        {},//prlist
-        {},//prlisttail
-        {}//printitem
+        {""},//stats
+        {""},//statstail
+        {""},//strstat
+        {""},//stat
+        {""},//forstat
+        {""},//repstat
+        {""},//dostat
+        {""},//asgnlist
+        {""},//asgnlisttail
+        {""},//ifstat
+        {""},//ifstattail
+        {""},//switchstat
+        {""},//caselist
+        {""},//caselisttail
+        {""},//asgnstat
+        {""},//asgnop
+        {""},//iostat
+        {""},//callstat
+        {""},//callstattail
+        {""},//returnstat
+        {""},//returnstattail
+        {""},//vlist
+        {""},//vlisttail
+        {""},//var
+        {""},//vartail
+        {""},//vartailtail
+        {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//elist
+        {"nEPS", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//elisttail
+        {""},//bool
+        {""},//booltail
+        {""},//rel
+        {""},//reltail
+        {"TTAND", "TTTOR", "TTXOR"},//logop
+        {"TEQEQ", "TTNEQ", "TGRTR", "TGEQL", "TLESS", "TLEQL"},//relop
+        {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//expr
+        {"nEPS", "TPLUS", "TMINS"},//exprTail
+        {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//term
+        {"nEPS", "TSTAR", "TDIVID", "TPERC"},//termtail
+        {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//fact
+        {"nEPS", "TCART"},//facttail
+        {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//exponent
+        {"TIDEN"},//varorfncall
+        {"TLPAR"},//varorfncalltail
+        {""},//fncalltail
+        {""},//prlist
+        {""},//prlisttail
+        {""}//printitem
     };
 
     private static final String[][] follow = {
@@ -196,16 +197,16 @@ public class ParserRules
         {"TTYPD", "TARRD", "TFUNC", "TMAIN", "TCOMA"},//initlisttail
         {"TCOMA", "TTYPD", "TARRD", "TFUNC", "TMAIN"},//init
         {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//types
-        {},//typelist
-        {}
+        {""},//typelist
+        {""}
     };
 
     private static final String[][][] matchSets = {
-        {{"TCD24", "TIDEN", "nGLOB", "nMAIN", "TTEOF"}//nprog
+        {{"TCD24", "TIDEN", "nGLOB", "nMAINBODY", "TTEOF"}//nprog
         },
-        {{"nCONSTS", "nTYPES", "nARRAYS"}//nglob
+        {{"nCONST", "nTYPES", "nARRAYS"}//nglob
         },
-        {{"TCNST", "nINITLIST"}//cnsts
+        {{"TCONS", "nINITLIST"}//cnsts
         },
         {{"nINIT", "nINITLISTTAIL"}//initlist
         },
@@ -249,131 +250,131 @@ public class ParserRules
         },//params
         {{"TCOMA", "nPARAMS"}
         },//paramstail
-        {{}
+        {{"nPARAMDECL"}, {"TCNST", "nARRDECL"}
         },//param
-        {{}
+        {{"nINITDECL", "nPARAMDECLTAIL"}
         },//paramDecl
-        {{}
+        {{"nSDECLTAIL"}, {"symTYPEID"}
         },//paramDeclTail
-        {{}
+        {{"nLOCALS", "TBEGN", "nSTATS", "TTEND"}
         },//funcbody
-        {{}
+        {{"nDLIST"}
         },//locals
-        {{}
+        {{"nDECL", "nDLISTTAIL"}
         },//dlist
-        {{}
+        {{"TCOMA", "nDLIST"}
         },//dlisttail
-        {{}
+        {{"nINITDECL", "nDECLTAIL"}
         },//decl
-        {{}
+        {{"nSDECLTAIL"}, {"nARRDECLTAIL"}
         },//decltail
-        {{}
+        {{"TMAIN", "nSLIST", "TBEGN", "nSTATS", "TTEND", "TCD24", "TIDEN"}
         },//mainbody
-        {{}
+        {{""}
         },//slist
-        {{}
+        {{""}
         },//slistTail
-        {{}
+        {{""}
         },//sdecl
-        {{}
+        {{""}
         },//sdecltail
         {{"TIDEN", "TCOLN"}
         },//initdecl
-        {{}
+        {{""}
         },//stype
-        {{}
+        {{""}
         },//stats
-        {{}
+        {{""}
         },//statstail
-        {{}
+        {{""}
         },//strstat
-        {{}
+        {{""}
         },//stat
-        {{}
+        {{""}
         },//forstat
-        {{}
+        {{""}
         },//repstat
-        {{}
+        {{""}
         },//dostat
-        {{}
+        {{""}
         },//asgnlist
-        {{}
+        {{""}
         },//asgnlisttail
-        {{}
+        {{""}
         },//ifstat
-        {{}
+        {{""}
         },//ifstattail
-        {{}
+        {{""}
         },//switchstat
-        {{}
+        {{""}
         },//caselist
-        {{}
+        {{""}
         },//caselisttail
-        {{}
+        {{""}
         },//asgnstat
-        {{}
+        {{""}
         },//asgnop
-        {{}
+        {{""}
         },//iostat
-        {{}
+        {{""}
         },//callstat
-        {{}
+        {{""}
         },//callstattail
-        {{}
+        {{""}
         },//returnstat
-        {{}
+        {{""}
         },//returnstattail
-        {{}
+        {{""}
         },//vlist
-        {{}
+        {{""}
         },//vlisttail
-        {{}
+        {{""}
         },//var
-        {{}
+        {{""}
         },//vartail
-        {{}
+        {{""}
+        },//vartailtail
+        {{"nBOOL", "nELISTTAIL"}
         },//elist
-        {{}
+        {{"TCOMA", "nELIST"}
         },//elisttail
-        {{}
+        {{""}
         },//bool
-        {{}
+        {{""}
         },//booltail
-        {{}
+        {{""}
         },//rel
-        {{}
+        {{""}
         },//reltail
-        {{}
+        {{"TTAND"}, {"TTTOR"}, {"TTXOR"}, 
         },//logop
-        {{}
+        {{"TEQEQ"}, {"TTNEQ"}, {"TGRTR"}, {"TGEQL"}, {"TLESS"}, {"TLEQL"}
         },//relop
-        {{}
+        {{"nTERM", "nEXPRTAIL"}
         },//expr
-        {{}
+        {{"TPLUS", "nEXPR"}, {"TMINS", "nEXPR"}
         },//exprTail
-        {{}
+        {{"nFACT", "nTERMTAIL"}
         },//term
-        {{}
+        {{"TSTAR", "nTERM"}, {"TDIVD", "nTERM"}, {"TPERC", "nTERM"}
         },//termtail
-        {{}
+        {{"nEXPONENT", "nFACTTAIL"}
         },//fact
-        {{}
+        {{"TCART", "nFACT"}
         },//facttail
-        {{}
+        {{"nVARORFNCALL"}, {"TILIT"}, {"TFLIT"}, {"TTRUE"}, {"TFALS"}, {"TLPAR", "nBOOL", "TRPAR"}
         },//exponent
-        {{}
+        {{"TIDEN", "nVARORFNCALLTAIL"}
         },//varorfncall
-        {{}
+        {{"TLPAR", "nFNCALLTAIL"}
         },//varorfncalltail
-        {{}
-        },//fncall
-        {{}
+        {{"nELIST", "TRPAR"}, {"TRPAR"}
         },//fncalltail
-        {{}
+        {{"nPRINTITEM", "nPRLISTTAIL"}
         },//prlist
-        {{}
+        {{"TCOMA", "PRLIST"}
         },//prlisttail
-        {{}
+        {{"nEXPR"}, {"TSTRG"}
         }//printitem
     }; 
 
@@ -407,8 +408,6 @@ public class ParserRules
         return name.toUpperCase().endsWith("TAIL");   
     }
 }
-
-
     //----------------------------------------------
     //----------------------------------------------
     //----------------------------------------------

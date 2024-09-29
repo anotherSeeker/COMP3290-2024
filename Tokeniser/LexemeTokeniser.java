@@ -14,7 +14,7 @@ public class LexemeTokeniser
     private final String LEGAL_SYMBOLS = "! , [ ] ( ) = + - * \" / % ^ < > : ; . \u001a";
     private final String[] LEGAL_MULTI_CHAR_SYMBOLS = {"<=", ">=", "!=", "==", "+=", "-=", "*=", "/="};
 
-    private final Dictionary<String, TokenTypes> SYMBOL_DICT = new Hashtable<>();
+    private final HashMap<String, TokenTypes> SYMBOL_DICT = new HashMap<>();
 
     private enum tokeniserState
     {

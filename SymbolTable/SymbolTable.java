@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class SymbolTable 
 {
-    private ArrayList<Token> tokenList; 
+    private final ArrayList<Token> tokenList; 
     private ArrayList<Symbol> table;
     private boolean symtError = false;
 
@@ -45,8 +45,6 @@ public class SymbolTable
                                 break;
                             }
                         }
-
-
                     }
                     case TTYPD -> {return;}
                     case TFUNC -> {return;}

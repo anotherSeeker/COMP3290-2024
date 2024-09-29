@@ -135,7 +135,7 @@ public class Token
         return out;
     }
 
-    private String getNumberString()
+    private String getNumberString() 
     {
         String num;
         if (type == TokenTypes.TILIT)
@@ -175,6 +175,11 @@ public class Token
 
     public static boolean compareTypeAsString(Token tok, String strTok)
     {
-        return tok.getType().toString().equalsIgnoreCase(strTok);
+        return tok.getType().toString().strip().equalsIgnoreCase(strTok);
+    }
+
+    public boolean isValueToken()
+    {
+        return (type == TokenTypes.TILIT || type == TokenTypes.TFLIT || type == TokenTypes.TSTRG || type == TokenTypes.TIDEN);
     }
 }

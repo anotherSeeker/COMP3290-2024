@@ -4,6 +4,7 @@ public class PNodeTree
 {
     //root holds children, children hold their parents and their children all the way down
     private ParserNode treeRoot = null; 
+    private int printDepth = -1;
 
     public PNodeTree(ParserNode root) 
     {
@@ -26,7 +27,14 @@ public class PNodeTree
 
     private void printNodeAndChildren(ParserNode root)
     {
-        System.out.print("TODO");
+        printDepth++;
+        root.printSelf(printDepth);
+
+        for (ParserNode child : root.children)
+        {
+            printNodeAndChildren(child);
+        }
+        printDepth--;
     }
 
     

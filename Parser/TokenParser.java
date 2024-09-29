@@ -17,7 +17,7 @@ public class TokenParser
     {
         tokenList = tokList;
         symbolTable = symt;
-        currentToken = getNextToken();
+        advanceCurrentToken();
 
         ruleList = ParserRules.initialiseRules();
     }
@@ -26,32 +26,40 @@ public class TokenParser
     {
         //we run with the first token from our lexical analysis, and the nProg rule no parent because this is the root
         //because isFirstNode is true, this will instantiate new PNodeTree
-        matchRule(currentToken, ruleList.get(0), null);
+        matchRule(ruleList.get(0), null);
 
         return nodeTree;
     }
 
     //---------------------------
 
-    private ParserNode matchRule(Token inputToken, Rule inputRule, ParserNode ParentNode)
+    private void matchRule(Rule inputRule, ParserNode ParentNode)
     {
+        //setup nprog as root
+        if (isFirstNode) {
+            ParentNode = addNode(inputRule, ParentNode);
+        }
+
         boolean hasMultipleMatchSets = inputRule.hasMultipleMatchSets();
         //if we don't have multiple match sets we always use set 0 regardless of epsilon status
 
-        int matchSetAddress = compareFirstSet(inputToken, inputRule.getFirstSet(), hasMultipleMatchSets);
-        boolean valid = matchSetExists(matchSetAddress, inputToken, inputRule, ParentNode);
+        int matchSetAddress = compareFirstSet(inputRule.getFirstSet(), hasMultipleMatchSets);
+        boolean valid = matchSetExists(matchSetAddress, inputRule, ParentNode);
         //if matchset exists we'll execute the rules in that matchset, making children for each new rule that isn't a tail and for each token
             //if it doesn't then matchSetExists has made an error node for us
         if (valid)
         {
-            ParentNode = executeRules(inputToken, inputRule, ParentNode, matchSetAddress);
-            return ParentNode;
+            if (matchSetAddress != -1)
+            {
+                //we're valid and did not hit epsilon case
+                    //if we hit the epsilon case there are no rules to run so don't it's just that shrimple
+                //currentToken advances when we run a TNAME, or symNAME rule to consume specific token type or symbol type
+                executeRules(inputRule, ParentNode, matchSetAddress);
+            }
         }
-
-        return null;
     }
 
-    private ParserNode executeRules(Token inputToken, Rule inputRule, ParserNode ParentNode, int matchSetAddress)
+    private ParserNode executeRules(Rule inputRule, ParserNode ParentNode, int matchSetAddress)
     {
         String[] matchSet = inputRule.getMatchSet(matchSetAddress);
         for (String rule : matchSet)
@@ -70,36 +78,51 @@ public class TokenParser
                 //if not a tail rule we add to the parse tree
                 if (!subRule.getIsTailRule())
                 {
-                    ParentNode = addNode(inputToken, inputRule, oldParent);
-                    //TODO: remove test prints
-                    oldParent.printSelf();
-                    ParentNode.printSelf();
+                    ParentNode = addNode(subRule, oldParent);
                 }
 
-                matchRule(inputToken, subRule, ParentNode);
-
+                //subrule does not consume token
+                matchRule(subRule, ParentNode);
                 ParentNode = oldParent;
             }
 
             else if (isTokenType == ruleType)
             {
                 //we consume the token at the end of this step
-                //we are matching a specific token type or entry in the symbol table
-                //if our inputtoken matches our rule we can add a Node
-                if (Token.compareTypeAsString(inputToken, rule))
+                    //we are matching a specific token type or entry in the symbol table
+                    //if our currentToken matches our rule we can add a Node
+                if (Token.compareTypeAsString(currentToken, rule))
                 {
-                    ParentNode = addNode(inputToken, inputRule, ParentNode);
+                    //token rules do not pass a rule
+                    addNode(null, ParentNode);
+                    advanceCurrentToken();
                 }
-                else if (symbolTable.symbolIsInTable(inputToken, inputRule.getName()) != null)
+                else
                 {
-
+                    //our token did not match correctly so we error,
+                    //TODO: do better error stuff
+                    addErrorNode(inputRule, ParentNode);
+                    advanceCurrentToken();
                 }
-
             }
 
             else if (isSymType == ruleType)
             {
                 //we consume the token at the end of this step
+                //TODO: work in symbol table
+
+                if (Token.compareTypeAsString(currentToken, "TIDEN"))
+                {
+                    addNode(null, ParentNode);
+                    advanceCurrentToken();
+                }
+                else
+                {
+                    //our token did not match correctly so we error,
+                    //TODO: do better error stuff
+                    addErrorNode(inputRule, ParentNode);
+                    advanceCurrentToken();
+                }
             }
         } //end for
 
@@ -109,31 +132,33 @@ public class TokenParser
 
     //---------------------------
 
-    private int compareFirstSet(Token inputToken, String[] firstSet, boolean hasMultipleMatchSets)
+    private int compareFirstSet(String[] firstSet, boolean hasMultipleMatchSets)
     {
-        String name = inputToken.getTypeString();
+        String name = currentToken.getTypeString();
 
         for (int i = 0; i < firstSet.length; i++)
         {
-            //if we matched with the epsilon symbol we have something weird going on but we catch it here anyway
-            if (!(firstSet[i].equalsIgnoreCase("nEPS")))
+            //if we have multiple sets we return the number that corressponds to that array entry, 
+                //else we return 0 because only one set
+            if (name.equalsIgnoreCase(firstSet[i]))
             {
-                if (name.equalsIgnoreCase(firstSet[i]))
-                {
-                    //if we have multiple sets we return the number that corressponds to that array entry, 
-                    //else we return 0 because only one set
-                    if (hasMultipleMatchSets)
-                    {
-                        return i;
-                    }
-                    return 0;
-                }
+                if (hasMultipleMatchSets)
+                    return i;
+                return 0;
+            }
+            
+            //handle symbols TODO: lookup symbol table
+            if (firstSet[i].startsWith("sym") && name.equalsIgnoreCase("TIDEN"))
+            {
+                if (hasMultipleMatchSets)
+                    return i;
+                return 0;
             }
         }
         return -1;
     }
 
-    private boolean matchSetExists(int matchSetAddress, Token inputToken, Rule inputRule, ParserNode ParentNode)
+    private boolean matchSetExists(int matchSetAddress, Rule inputRule, ParserNode ParentNode)
     {
         boolean isEpsilonRule = inputRule.isEpsilonRule();
         boolean hasMultipleMatchSets = inputRule.hasMultipleMatchSets();
@@ -148,7 +173,7 @@ public class TokenParser
             else
             {
                 //if we're not an epsilon rule we've received illegal input and should give semantic error
-                addErrorNode(inputToken, inputRule, ParentNode);
+                addErrorNode(inputRule, ParentNode);
                 return false;
             }
         }
@@ -180,21 +205,22 @@ public class TokenParser
         return -1;
     }
 
-    private void addErrorNode(Token token, Rule rule, ParserNode parentNode)
+    private void addErrorNode(Rule rule, ParserNode parentNode)
     {
-        String errorDesc = "Received Token: "+token.toString()+"Expected token of possible types: "+rule.firstSetToString();
+        String errorDesc = "Received Token: "+currentToken.toString()+" "+rule.getName()+" expected token of possible types: "+rule.firstSetToString();
 
-        ParserNode newNode = new ParserNode(token, "ERROR: "+rule.getName(), errorDesc, parentNode);
+        ParserNode newNode = new ParserNode(currentToken, rule, errorDesc, parentNode);
         parentNode.addChild(newNode);
     }
 
-    private ParserNode addNode(Token token, Rule rule, ParserNode parentNode)
+    private ParserNode addNode(Rule rule, ParserNode parentNode)
     {
-        ParserNode newNode = new ParserNode(token, rule.getName(), parentNode);
+        ParserNode newNode = new ParserNode(currentToken, rule, parentNode);
 
         if (isFirstNode) {
             isFirstNode = false;
             nodeTree = new PNodeTree(newNode);   
+            return newNode;
         }
 
         parentNode.addChild(newNode);
@@ -214,10 +240,11 @@ public class TokenParser
         return null;
     }
 
-    private static Token getNextToken() 
+    private static void advanceCurrentToken() 
     {
+        //returns the token and increments for next time
         Token tok = tokenList.get(currentTokenIndex);
         currentTokenIndex++;
-        return tok;
+        currentToken = tok;
     }
 }
