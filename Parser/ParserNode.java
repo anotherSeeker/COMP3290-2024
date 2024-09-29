@@ -58,10 +58,15 @@ public class ParserNode
 
     public void printSelf(int printDepth)
     {
+        String RESET = "\u001B[0m";
+        String RED = "\u001B[31m";
+        String GREEN = "\u001B[32m";
+        String BLUE =  "\u001B[34m";
+
         handleIndent(printDepth);
 
         if (isErr())
-            System.out.print("Parse Error: " + errorDesc);
+            System.out.print(RED+"Parse Error: " + errorDesc+RESET);
         else
         {
             if (isToken)
@@ -70,20 +75,62 @@ public class ParserNode
                 String str = name;
 
                 if (token.isValueToken())
-                    str = str+"="+ token.getLexeme();
+                    str = str+" = "+ token.getLexeme();
 
                 if (parent != null)
                     par = par + parent.getName();
                 else
                     par = "";
 
-                System.out.print(str+par);
+                System.out.print(GREEN+str/*+par+*/+RESET);
             }
             else
-                System.out.print(name);  
+                System.out.print(BLUE+name+RESET);  
         }
 
         System.out.print("\n");
+    }
+
+    public void printSelf(int printDepth, int parentDepth, boolean depthChange, boolean onlyTokens)
+    {
+        String RESET = "\u001B[0m";
+        String RED = "\u001B[31m";
+        String GREEN = "\u001B[32m";
+        String BLUE =  "\u001B[34m";
+
+        if (isErr())
+        {
+            handleIndent(printDepth, parentDepth, depthChange);
+            System.out.print(RED+"Parse Error: " + errorDesc +RESET+"\n");
+            handleIndent(printDepth, parentDepth, false);
+            System.out.print(RED+"Occured At: "+token.getLocationStringErr()+RESET);
+            System.out.print("\n");
+        }
+        else
+        {
+            if (isToken)
+            {
+                handleIndent(printDepth, parentDepth, depthChange);
+                String par = " : parent: ";
+                String str = name;
+
+                if (token.isValueToken())
+                    str = str+" = "+ token.getLexeme();
+                if (parent != null)
+                    par = par + parent.getName();
+                else
+                    par = "";
+
+                System.out.print(GREEN+str/*+par+*/+RESET);
+                System.out.print("\n");
+            }
+            else if (!onlyTokens)
+            {
+                handleIndent(printDepth, parentDepth, depthChange);
+                System.out.print(BLUE+name+RESET);
+                System.out.print("\n");  
+            }
+        }
     }
 
     public void printChildren(int printDepth)
@@ -116,6 +163,23 @@ public class ParserNode
                 System.out.print("|");
             else
                 System.out.print(" ");
+        }
+    }
+
+    private void handleIndent(int printDepth, int parentDepth, boolean depthChange)
+    {
+        int count = 0;
+        while (count < printDepth)
+        {
+            count++;
+            if (count == parentDepth)
+                System.out.print("│");
+            else if (!depthChange && count > parentDepth)
+                System.out.print("├");
+            else if (count > parentDepth)
+                System.out.print("┌");
+            else
+                System.out.print("│");
         }
     }
 }

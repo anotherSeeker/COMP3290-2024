@@ -22,7 +22,13 @@ public class PNodeTree
 
     public void printTree()
     {
-        printNodeAndChildren(treeRoot);
+        //bookkeeping for the print
+        boolean depthChange = false;
+        int parentDepth = 0;
+        //true only prints tokens, false prints all nodes
+        boolean onlyTokens = false;
+
+        printNodeAndChildren(treeRoot, parentDepth, depthChange, onlyTokens);
     }
 
     private void printNodeAndChildren(ParserNode root)
@@ -34,6 +40,23 @@ public class PNodeTree
         {
             printNodeAndChildren(child);
         }
+        printDepth--;
+    }
+
+    private void printNodeAndChildren(ParserNode node, int parentDepth, boolean depthChange, boolean onlyTokens)
+    {
+        printDepth++;
+        node.printSelf(printDepth, parentDepth, depthChange, onlyTokens);
+
+        depthChange = true;
+        for (int i = 0; i < node.children.size(); i++)
+        {
+            ParserNode child = node.children.get(i);
+
+            printNodeAndChildren(child, printDepth, depthChange, onlyTokens);
+            depthChange = false;
+        }
+        
         printDepth--;
     }
 

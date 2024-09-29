@@ -162,6 +162,16 @@ public class Token
         return "(Line: "+line+", Column: "+column+")";
     }
 
+    public String getLocationStringErr()
+    {
+        String RESET    = "\u001B[0m";
+        String RED      = "\u001B[31m";
+        String GREEN    = "\u001B[32m";
+        String BLUE     = "\u001B[34m";
+
+        return RED+"("+BLUE+"Line: "+BLUE+line+RED+", "+GREEN+"Column: "+GREEN+column+RED+")"+RESET;
+    }
+
     private String getBufferString(ArrayList<LexChar> lexBuffer)
     {
         String out = "";

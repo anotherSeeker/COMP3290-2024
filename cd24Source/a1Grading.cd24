@@ -1,33 +1,33 @@
 CD24 a1Grading
 
 constants 
-    constant = 22,
-    constant2 = 23
+    constantNum1 = 1,
+    constantNum2 = 22212
 
 typedef
     studentScore def 
     score : float, id : int
+end
 
     /--arraytype def
 
-    studentScores def array [20] of studentScore end
+    /--studentScores def array [20] of studentScore end
 
 arraydef /**beep
-
-    **/
+**/
     scores : studentScores
 
-    func calcScores(scores : studentScores, numStudents : int) : float
+    func calcScores(const scores : studentScores, numStudents : int) : float
         total : float,
         i : int
     begin
         for (i = 0; i < numStudents)
             total = scores[i].score;
-            i++;
+            i+=1;
         end
     end
 
-    func getScoreByID(ID : int, numStudents : int, scores : studentScores) : float
+    func getScoreByID(ID : int, numStudents : int, const scores : studentScores) : float
         i : int,
         score : float
     begin
@@ -41,7 +41,7 @@ arraydef /**beep
         return score;
     end
 
-    func getHighestScoreID(scores : studentScores, numStudents : int) : int
+    func getHighestScoreID(const scores : studentScores, numStudents : int) : int
         i : int,
         highest : float,
         highestID : int
@@ -57,16 +57,16 @@ arraydef /**beep
         return highestID;
     end
 
-    func assignScore(score : float, studentID : int, arrayIndex : int, scores : studentScores) : studentScores
+    func assignScore(score : float, studentID : int, arrayIndex : int, const scores : studentScores) : void
         /--nothing needed
     begin
         scores[arrayIndex].id = studentID;
         scores[arrayIndex].score = score;
 
-        return scores;
+        return void;
     end
 
-    func printAllScores(scores, numStudents)
+    func printAllScores(const scores : studentScores, numStudents : int) : void
         /--nothing needed
     begin
         for (i = 0; i < numStudents)
@@ -81,7 +81,8 @@ main
     totalScore : float,
     newID : int,
     index : int,
-    newScore : float
+    newScore : float,
+    a : int
 begin
     print "Input the number of students";
     input numStudents;
@@ -94,7 +95,7 @@ begin
 
         scores = assignScore(newScore, newID, index, scores);
 
-        index++;
+        index+=1;
     end
 
     printAllScores(scores, numStudents);
@@ -105,6 +106,28 @@ begin
     print getHighestScoreID(scores, numStudents); 
     print " : "; 
     printline getScoreByID(getHighestScoreID(scores, numStudents), scores);
+    
+    a = 1;
+
+    for (index = 0; a <= 3)
+        switch (a)
+        begin
+            case 1:
+                if (a == 1)
+                    a = 2;
+                    printline "bwipo";
+                end
+                break;
+            case 2:
+                a = 3;
+                printline "bop";
+                break;
+            default:
+                a = 4;
+                printline "beep";
+        end
+    end
+
 end 
 
 CD24 a1Grading

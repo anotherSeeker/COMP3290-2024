@@ -51,7 +51,6 @@ public class A2
             } catch (Exception e) {
                 System.err.println(e);
             }
-            
 
             currentLineLength += out.length();
 

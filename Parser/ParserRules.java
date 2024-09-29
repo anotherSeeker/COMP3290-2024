@@ -49,9 +49,11 @@ public class ParserRules
         "nINITDECL",
         "nSTYPE",
         "nSTATS",
+        "nSTATS2TAIL",
         "nSTATSTAIL",
         "nSTRSTAT",
         "nSTAT",
+        "nASGNORCALLSTAT",
         "nFORSTAT",
         "nREPSTAT",
         "nDOSTAT",
@@ -63,9 +65,9 @@ public class ParserRules
         "nCASELIST",
         "nCASELISTTAIL",
         "nASGNSTAT",
+        "nASGNSTATTAIL",
         "nASGNOP",
         "nIOSTAT",
-        "nCALLSTAT",
         "nCALLSTATTAIL",
         "nRETURNSTAT",
         "nRETURNSTATTAIL",
@@ -121,57 +123,63 @@ public class ParserRules
         {"nEPS", "TFUNC"},//funcstail
         {"TFUNC"},//func
         {"TINTG", "TFLOT", "TBOOL", "TVOID"},//rtype
-        {"NEPS", "TIDEN", "TCONS"},//plist
-        {"TIDEN", "TCONS"},//params
+        {"NEPS", "TIDEN", "TCNST"},//plist
+        {"TIDEN", "TCNST"},//params
         {"nEPS", "TCOMA"},//paramsTail
-        {"TIDEN", "TCONS"},//param
+        {"TIDEN", "TCNST"},//param
         {"TIDEN"},//paramDecl
         {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID", "symTYPEID"},//paramDeclTail
-        {"TIDEN", "TBEGIN"},//funcbody
+        {"TIDEN", "TBEGN"},//funcbody
         {"nEPS", "TIDEN"},//locals
         {"TIDEN"},//dlist
         {"nEPS", "TCOMA"},//dlisttail
         {"TIDEN"},//decl
         {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID", "symTYPEID"},//decltail
-        {""},//mainbody
-        {""},//slist
-        {""},//slistTail
-        {""},//sdecl
+        {"TMAIN"},//mainbody
+        {"TIDEN"},//slist
+        {"nEPS", "TCOMA"},//slistTail
+        {"TIDEN"},//sdecl
         {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID"},//sdecltail
         {"TIDEN"},//initdecl
         {"TINTG", "TFLOT", "TBOOL"},//stype
-        {""},//stats
-        {""},//statstail
-        {""},//strstat
-        {""},//stat
-        {""},//forstat
-        {""},//repstat
-        {""},//dostat
-        {""},//asgnlist
-        {""},//asgnlisttail
-        {""},//ifstat
-        {""},//ifstattail
-        {""},//switchstat
-        {""},//caselist
-        {""},//caselisttail
-        {""},//asgnstat
-        {""},//asgnop
-        {""},//iostat
-        {""},//callstat
-        {""},//callstattail
-        {""},//returnstat
-        {""},//returnstattail
-        {""},//vlist
-        {""},//vlisttail
-        {""},//var
-        {""},//vartail
-        {""},//vartailtail
+        //stat up to TRETN, strstat from then on
+        {        "TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN", "TTFOR", "TIFTH", "TSWTH", "TTTDO"},//stats
+        //stat up to TRETN, strstat from then on
+        {        "TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN", "TTFOR", "TIFTH", "TSWTH", "TTTDO"},//stats2tail
+        {"nEPS", "TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN", "TTFOR", "TIFTH", "TSWTH", "TTTDO"},//statstail
+        {"TTFOR", "TIFTH", "TSWTH", "TTTDO"},//strstat
+        {"TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN"},//stat
+        {"nEPS", "TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ", "TLPAR"},//asgnorcallstat
+        {"TTFOR"},//forstat
+        {"TREPT"},//repstat
+        {"TTTDO"},//dostat
+        {"nEPS", "TIDEN"},//asgnlist
+        {"nEPS", "TCOMA"},//asgnlisttail
+        {"TIFTH"},//ifstat
+        {"TTEND", "TELSE", "TELIF"},//ifstattail
+        {"TSWTH"},//switchstat
+        {"TCASE", "TDFLT"},//caselist
+        {"nEPS", "TCASE", "TDFLT"},//caselisttail
+        {"TIDEN"},//asgnstat
+        {"TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ"},//asgnstattail used in asgnorcallstat in place of asgnstat
+        {"TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ"},//asgnop
+        {"TINPT", "TPRNT", "TPRLN"},//iostat
+        {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR", "TRPAR"},//callstattail
+        {"TRETN"},//returnstat
+        {"TVOID", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//returnstattail
+        {"TIDEN"},//vlist
+        {"nEPS", "TCOMA"},//vlisttail
+        {"TIDEN"},//var
+        {"nEPS", "TLBRK"},//vartail
+        {"nEPS", "TDOTT"},//vartailtail
         {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//elist
-        {"nEPS", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//elisttail
-        {""},//bool
-        {""},//booltail
-        {""},//rel
-        {""},//reltail
+        {"nEPS", "TCOMA"},//elisttail
+
+        {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//bool
+        {"nEPS", "TTAND", "TTTOR", "TTXOR"},//booltail
+
+        {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//rel
+        {"nEPS", "TEQEQ", "TTNEQ", "TGRTR", "TGEQL", "TLESS", "TLEQL"},//reltail
         {"TTAND", "TTTOR", "TTXOR"},//logop
         {"TEQEQ", "TTNEQ", "TGRTR", "TGEQL", "TLESS", "TLEQL"},//relop
         {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//expr
@@ -182,27 +190,15 @@ public class ParserRules
         {"nEPS", "TCART"},//facttail
         {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//exponent
         {"TIDEN"},//varorfncall
-        {"TLPAR"},//varorfncalltail
-        {""},//fncalltail
-        {""},//prlist
-        {""},//prlisttail
-        {""}//printitem
-    };
-
-    private static final String[][] follow = {
-        {"TTEOF"},//prog
-        {"TFUNC", "TMAIN"},//glob
-        {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//consts
-        {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//initlist
-        {"TTYPD", "TARRD", "TFUNC", "TMAIN", "TCOMA"},//initlisttail
-        {"TCOMA", "TTYPD", "TARRD", "TFUNC", "TMAIN"},//init
-        {"TTYPD", "TARRD", "TFUNC", "TMAIN"},//types
-        {""},//typelist
-        {""}
+        {"nEPS", "TLPAR", "TLBRK"},//varorfncalltail
+        {"TRPAR", "TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//fncalltail
+        {"TSTRG", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//prlist
+        {"nEPS", "TCOMA"},//prlisttail
+        {"TSTRG", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"}//printitem
     };
 
     private static final String[][][] matchSets = {
-        {{"TCD24", "TIDEN", "nGLOB", "nMAINBODY", "TTEOF"}
+        {{"TCD24", "TIDEN", "nGLOB", "nFUNCS", "nMAINBODY", "TTEOF"}
         },//nprog
         {{"nCONST", "nTYPES", "nARRAYS"}
         },//nglob
@@ -224,7 +220,7 @@ public class ParserRules
         },//type
         {{"nSDECL", "nFIELDSTAIL"}
         },//fields
-        {{"TCOMA"}
+        {{"TCOMA", "nFIELDS"}
         },//fieldsTail
         {{"TARRD", "nARRDECLS"}
         },//arrays
@@ -240,13 +236,13 @@ public class ParserRules
         },//funcs
         {{"nFUNCS"}
         },//funcstail
-        {{"TFUNC", }
+        {{"TFUNC", "TIDEN", "TLPAR", "nPLIST", "TRPAR", "TCOLN", "nRTYPE", "nFUNCBODY"}
         },//func
         {{"nSTYPE"}, {"nSTYPE"}, {"nSTYPE"}, {"TVOID"}
         },//rtype
         {{"nPARAMS"}
         },//plist
-        {{"nPARAM", "NPARAMSTAIL"}
+        {{"nPARAM", "nPARAMSTAIL"}
         },//params
         {{"TCOMA", "nPARAMS"}
         },//paramstail
@@ -254,7 +250,7 @@ public class ParserRules
         },//param
         {{"nINITDECL", "nPARAMDECLTAIL"}
         },//paramDecl
-        {{"nSDECLTAIL"}, {"symTYPEID"}
+        {{"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"symTYPEID"}
         },//paramDeclTail
         {{"nLOCALS", "TBEGN", "nSTATS", "TTEND"}
         },//funcbody
@@ -266,7 +262,7 @@ public class ParserRules
         },//dlisttail
         {{"nINITDECL", "nDECLTAIL"}
         },//decl
-        {{"nSDECLTAIL"}, {"nARRDECLTAIL"}
+        {{"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nARRDECLTAIL"}
         },//decltail
         {{"TMAIN", "nSLIST", "TBEGN", "nSTATS", "TTEND", "TCD24", "TIDEN"}
         },//mainbody
@@ -276,20 +272,26 @@ public class ParserRules
         },//slistTail
         {{"nINITDECL", "nSDECLTAIL"}
         },//sdecl
-        {{"nSTYPE"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"},{"symSTRUCTID"}
+        {{"nSTYPE"}, {"nSTYPE"}, {"nSTYPE"},{"symSTRUCTID"}
         },//sdecltail
         {{"TIDEN", "TCOLN"}
         },//initdecl
         {{"TINTG"}, {"TFLOT"}, {"TBOOL"}
-        },//stype
-        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
+        },//stype 
+        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, 
+         {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},
+         {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
         },//stats
-        {{"nSTATS"}
+        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTAT", "TSEMI", "nSTATSTAIL"},{"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
+        },//stats2tail exists so we avoid indenting and printing stats with every new stats statement
+        {{"nSTATS2TAIL"}
         },//statstail
         {{"nFORSTAT"}, {"nIFSTAT"}, {"nSWITCHSTAT"}, {"nDOSTAT"}
         },//strstat
-        {{"nREPTSTAT"}, {"nASGNSTAT"}, {"nIOSTAT"}, {"nCALLSTAT"}, {"nRETURNSTAT"}
+        {{"nREPTSTAT"}, {"TIDEN", "nASGNORCALLSTAT"}, {"nIOSTAT"}, {"nIOSTAT"}, {"nIOSTAT"}, {"nRETURNSTAT"}
         },//stat
+        {{"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"TLPAR", "nCALLSTATTAIL"},
+        },//asgnorcallstat
         {{"TTFOR", "TLPAR", "nASGNLIST", "TSEMI", "nBOOL", "TRPAR", "nSTATS", "TTEND"}
         },//forstat
         {{"TREPT", "TLPAR", "nASGNLIST", "TRPAR", "nSTATS", "TUNTL", "nBOOL"}
@@ -300,25 +302,25 @@ public class ParserRules
         },//asgnlist
         {{"TCOMA", "nASGNLIST"}
         },//asgnlisttail
-        {{"TTTIF", "TLPAR", "nBOOL", "TRPAR", "nSTATS", "nIFSTATTAIL"}
+        {{"TIFTH", "TLPAR", "nBOOL", "TRPAR", "nSTATS", "nIFSTATTAIL"}
         },//ifstat
         {{"TTEND"}, {"TELSE", "nSTATS", "TTEND"}, {"TELIF", "TLPAR", "nBOOL", "nSTATS", "TTEND"}
         },//ifstattail
         {{"TSWTH", "TLPAR", "nEXPR", "TRPAR", "TBEGN", "nCASELIST", "TTEND"}
         },//switchstat
-        {{"TCASE", "nEXPR", "TCOLN", "nSTATS", "TBREK", "TSEMI", "nCASELISTTAIL"}, {"TDFLT", "TCOLN", "TSTATS"}
+        {{"TCASE", "nEXPR", "TCOLN", "nSTATS", "TBREK", "TSEMI", "nCASELISTTAIL"}, {"TDFLT", "TCOLN", "nSTATS"}
         },//caselist
-        {{"nCASELIST"}, {"TDFLT", "TCOLN", "TSTATS"}
-        },//caselisttail
+        {{"nCASELIST"}
+        },//caselisttail3
         {{"nVAR", "nASGNOP", "nBOOL"}
         },//asgnstat
+        {{"nVARTAIL", "nASGNOP", "nBOOL"}
+        },//asgnstattail
         {{"TEQUL"}, {"TPLEQ"}, {"TMNEQ"}, {"TSTEQ"}, {"TDVEQ"}
         },//asgnop
         {{"TINPT", "nVLIST"}, {"TPRNT", "nPRLIST"}, {"TPRLN", "nPRLIST"}
         },//iostat
-        {{"TIDEN", "TLPAR", "nCALLSTATTAIL"}
-        },//callstat
-        {{"nELIST", "TRPAR"}, {"TRPAR"}
+        {{"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"TRPAR"}
         },//callstattail
         {{"TRETN", "nRETURNSTATTAIL"}
         },//returnstat
@@ -330,7 +332,7 @@ public class ParserRules
         },//vlisttail
         {{"TIDEN", "nVARTAIL"}
         },//var
-        {{"TLBRK", "nEXPR", "nVARTAILTAIL"}
+        {{"TLBRK", "nEXPR", "TRBRK", "nVARTAILTAIL"}
         },//vartail
         {{"TDOTT", "TIDEN"}
         },//vartailtail
@@ -338,9 +340,9 @@ public class ParserRules
         },//elist
         {{"TCOMA", "nELIST"}
         },//elisttail
-        {{"TTNOT", "nBOOLTAIL"}, {"nBOOLTAIL"}
+        {{"TTNOT", "nREL", "nBOOLTAIL"}, {"nREL", "nBOOLTAIL"}, {"nREL", "nBOOLTAIL"},{"nREL", "nBOOLTAIL"},{"nREL", "nBOOLTAIL"},{"nREL", "nBOOLTAIL"},{"nREL", "nBOOLTAIL"},
         },//bool
-        {{"nREL"}, {"nBOOL", "nLOGOP", "nREL"}
+        {{"nLOGOP", "nBOOL"},
         },//booltail
         {{"nEXPR", "nRELTAIL"}
         },//rel
@@ -366,15 +368,15 @@ public class ParserRules
         },//exponent
         {{"TIDEN", "nVARORFNCALLTAIL"}
         },//varorfncall
-        {{"TLPAR", "nFNCALLTAIL"}
+        {{"TLPAR", "nFNCALLTAIL"}, {"nVARTAIL"}
         },//varorfncalltail
-        {{"nELIST", "TRPAR"}, {"TRPAR"}
+        {{"TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}
         },//fncalltail
         {{"nPRINTITEM", "nPRLISTTAIL"}
         },//prlist
         {{"TCOMA", "PRLIST"}
         },//prlisttail
-        {{"nEXPR"}, {"TSTRG"}
+        {{"TSTRG"}, {"nEXPR"}, {"nEXPR"}, {"nEXPR"}, {"nEXPR"}, {"nEXPR"}, {"nEXPR"},  
         }//printitem
     }; 
 
@@ -384,9 +386,95 @@ public class ParserRules
     //----------------------------------------------
 
     private static final boolean[] isRecoveryRule = {
-        true,
-        true,
-        true,
+        true,//nprog
+        true,//glob
+        true,//const
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,//arrays
+        false,
+        false,
+        false,
+        false,
+        true,//funcs
+        false,
+        true,//func
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,//funcbody
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,//mainbody
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,//for
+        true,//repeat
+        true,//do
+        false,
+        false,
+        true,//if
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         false
     };
     
