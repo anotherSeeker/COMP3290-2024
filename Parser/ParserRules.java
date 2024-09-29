@@ -130,14 +130,14 @@ public class ParserRules
         {"TIDEN", "TBEGIN"},//funcbody
         {"nEPS", "TIDEN"},//locals
         {"TIDEN"},//dlist
-        {""},//dlisttail
-        {""},//decl
-        {""},//decltail
+        {"nEPS", "TCOMA"},//dlisttail
+        {"TIDEN"},//decl
+        {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID", "symTYPEID"},//decltail
         {""},//mainbody
         {""},//slist
         {""},//slistTail
         {""},//sdecl
-        {""},//sdecltail
+        {"TINTG", "TFLOT", "TBOOL", "symSTRUCTID"},//sdecltail
         {"TIDEN"},//initdecl
         {"TINTG", "TFLOT", "TBOOL"},//stype
         {""},//stats
@@ -202,20 +202,20 @@ public class ParserRules
     };
 
     private static final String[][][] matchSets = {
-        {{"TCD24", "TIDEN", "nGLOB", "nMAINBODY", "TTEOF"}//nprog
-        },
-        {{"nCONST", "nTYPES", "nARRAYS"}//nglob
-        },
-        {{"TCONS", "nINITLIST"}//cnsts
-        },
-        {{"nINIT", "nINITLISTTAIL"}//initlist
-        },
-        {{"TCOMA", "nINITLIST"}//initlisttail
-        },
-        {{"TIDEN","TEQUL", "nEXPR"}//init
-        },
-        {{"TTYPD", "nTYPELIST"}//types
-        },
+        {{"TCD24", "TIDEN", "nGLOB", "nMAINBODY", "TTEOF"}
+        },//nprog
+        {{"nCONST", "nTYPES", "nARRAYS"}
+        },//nglob
+        {{"TCONS", "nINITLIST"}
+        },//cnsts
+        {{"nINIT", "nINITLISTTAIL"}
+        },//initlist
+        {{"TCOMA", "nINITLIST"}
+        },//initlisttail
+        {{"TIDEN","TEQUL", "nEXPR"}
+        },//init
+        {{"TTYPD", "nTYPELIST"}
+        },//types
         {{"nTYPE", "nTYPELISTTAIL"}
         },//typelist
         {{"nTYPELIST"}
@@ -270,81 +270,81 @@ public class ParserRules
         },//decltail
         {{"TMAIN", "nSLIST", "TBEGN", "nSTATS", "TTEND", "TCD24", "TIDEN"}
         },//mainbody
-        {{""}
+        {{"nSDECL", "nSLISTTAIL"}
         },//slist
-        {{""}
+        {{"TCOMA", "nSLIST"}
         },//slistTail
-        {{""}
+        {{"nINITDECL", "nSDECLTAIL"}
         },//sdecl
-        {{""}
+        {{"nSTYPE"}, {"nSDECLTAIL"}, {"nSDECLTAIL"}, {"nSDECLTAIL"},{"symSTRUCTID"}
         },//sdecltail
         {{"TIDEN", "TCOLN"}
         },//initdecl
-        {{""}
+        {{"TINTG"}, {"TFLOT"}, {"TBOOL"}
         },//stype
-        {{""}
+        {{"nSTAT", "TSEMI", "nSTATSTAIL"}, {"nSTRSTAT", "nSTATSTAIL"}
         },//stats
-        {{""}
+        {{"nSTATS"}
         },//statstail
-        {{""}
+        {{"nFORSTAT"}, {"nIFSTAT"}, {"nSWITCHSTAT"}, {"nDOSTAT"}
         },//strstat
-        {{""}
+        {{"nREPTSTAT"}, {"nASGNSTAT"}, {"nIOSTAT"}, {"nCALLSTAT"}, {"nRETURNSTAT"}
         },//stat
-        {{""}
+        {{"TTFOR", "TLPAR", "nASGNLIST", "TSEMI", "nBOOL", "TRPAR", "nSTATS", "TTEND"}
         },//forstat
-        {{""}
+        {{"TREPT", "TLPAR", "nASGNLIST", "TRPAR", "nSTATS", "TUNTL", "nBOOL"}
         },//repstat
-        {{""}
+        {{"TTTDO", "nSTATS", "TWHIL", "TLPAR", "nBOOL", "TRPAR", "TTEND"}
         },//dostat
-        {{""}
+        {{"nASGNSTAT", "nASGNLISTTAIL"}
         },//asgnlist
-        {{""}
+        {{"TCOMA", "nASGNLIST"}
         },//asgnlisttail
-        {{""}
+        {{"TTTIF", "TLPAR", "nBOOL", "TRPAR", "nSTATS", "nIFSTATTAIL"}
         },//ifstat
-        {{""}
+        {{"TTEND"}, {"TELSE", "nSTATS", "TTEND"}, {"TELIF", "TLPAR", "nBOOL", "nSTATS", "TTEND"}
         },//ifstattail
-        {{""}
+        {{"TSWTH", "TLPAR", "nEXPR", "TRPAR", "TBEGN", "nCASELIST", "TTEND"}
         },//switchstat
-        {{""}
+        {{"TCASE", "nEXPR", "TCOLN", "nSTATS", "TBREK", "TSEMI", "nCASELISTTAIL"}, {"TDFLT", "TCOLN", "TSTATS"}
         },//caselist
-        {{""}
+        {{"nCASELIST"}, {"TDFLT", "TCOLN", "TSTATS"}
         },//caselisttail
-        {{""}
+        {{"nVAR", "nASGNOP", "nBOOL"}
         },//asgnstat
-        {{""}
+        {{"TEQUL"}, {"TPLEQ"}, {"TMNEQ"}, {"TSTEQ"}, {"TDVEQ"}
         },//asgnop
-        {{""}
+        {{"TINPT", "nVLIST"}, {"TPRNT", "nPRLIST"}, {"TPRLN", "nPRLIST"}
         },//iostat
-        {{""}
+        {{"TIDEN", "TLPAR", "nCALLSTATTAIL"}
         },//callstat
-        {{""}
+        {{"nELIST", "TRPAR"}, {"TRPAR"}
         },//callstattail
-        {{""}
+        {{"TRETN", "nRETURNSTATTAIL"}
         },//returnstat
-        {{""}
+        {{"TVOID"}, {"nEXPR"}
         },//returnstattail
-        {{""}
+        {{"nVAR", "nVLISTTAIL"}
         },//vlist
-        {{""}
+        {{"TCOMA", "nVLIST"}
         },//vlisttail
-        {{""}
+        {{"TIDEN", "nVARTAIL"}
         },//var
-        {{""}
+        {{"TLBRK", "nEXPR", "nVARTAILTAIL"}
         },//vartail
-        {{""}
+        {{"TDOTT", "TIDEN"}
         },//vartailtail
         {{"nBOOL", "nELISTTAIL"}
         },//elist
         {{"TCOMA", "nELIST"}
         },//elisttail
-        {{""}
+        {{"TTNOT", "nBOOLTAIL"}, {"nBOOLTAIL"}
         },//bool
-        {{""}
+        {{"nREL"}, {"nBOOL", "nLOGOP", "nREL"}
         },//booltail
-        {{""}
+        {{"nEXPR", "nRELTAIL"}
         },//rel
-        {{""}
+        {{"nRELOP", "nEXPR"}
         },//reltail
         {{"TTAND"}, {"TTTOR"}, {"TTXOR"}, 
         },//logop
