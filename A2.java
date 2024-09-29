@@ -31,7 +31,8 @@ public class A2
             TokenParser parser = new TokenParser(tokenList, symTable);
             PNodeTree tree = parser.run();
 
-            tree.printTree();
+            //tree.printTree();
+            tree.printTreeTraversal();
 
 
         }

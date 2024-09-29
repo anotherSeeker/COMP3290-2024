@@ -56,7 +56,7 @@ public class ParserNode
         children.add(childNode);
     }
 
-    public void printSelf(int printDepth)
+    public void printSelfOld(int printDepth)
     {
         String RESET = "\u001B[0m";
         String RED = "\u001B[31m";
@@ -66,7 +66,7 @@ public class ParserNode
         handleIndent(printDepth);
 
         if (isErr())
-            System.out.print(RED+"Parse Error: " + errorDesc+RESET);
+            System.out.print(RED+"Syntax Error: " + errorDesc+RESET);
         else
         {
             if (isToken)
@@ -100,9 +100,7 @@ public class ParserNode
 
         if (isErr())
         {
-            handleIndent(printDepth, parentDepth, depthChange);
-            System.out.print(RED+"Parse Error: " + errorDesc +RESET+"\n");
-            handleIndent(printDepth, parentDepth, false);
+            System.out.print(RED+"syntax error: " + errorDesc +RESET+"\n");
             System.out.print(RED+"Occured At: "+token.getLocationStringErr()+RESET);
             System.out.print("\n");
         }
@@ -133,12 +131,14 @@ public class ParserNode
         }
     }
 
-    public void printChildren(int printDepth)
+    public String getTraversalString()
     {
-        for (ParserNode child : children)
-        {
-            child.printSelf(printDepth);
-        }
+        return getName();
+    }
+
+    public boolean isToken()
+    {
+        return isToken;
     }
 
     public boolean isErr()

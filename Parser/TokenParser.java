@@ -13,6 +13,8 @@ public class TokenParser
     private static Token currentToken;
     private static boolean isFirstNode = true;
 
+    private static String globErrDesc = null;
+
     public TokenParser(ArrayList<Token> tokList, SymbolTable symt)
     {
         tokenList = tokList;
@@ -219,7 +221,12 @@ public class TokenParser
 
     private void addErrorNode(Rule rule, ParserNode parentNode)
     {
-        String errorDesc = "Received Token: "+currentToken.toString()+" "+rule.getName()+" expected token of possible types: "+rule.firstSetToString();
+        String errorDesc = "Received Token: "+currentToken.toString()+" | "+rule.getName()+" expected token of possible types: "+rule.firstSetToString();
+
+        if (globErrDesc != null)
+        {
+            errorDesc = globErrDesc;
+        }
 
         ParserNode newNode = new ParserNode(currentToken, rule, errorDesc, parentNode);
         parentNode.addChild(newNode);

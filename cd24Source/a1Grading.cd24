@@ -47,7 +47,7 @@ arraydef /**beep
         highestID : int
     begin
         highest = 0;
-        for (i = 0; i < numStudents)
+        for (i =! 0; i < numStudents)
             if (highest < scores[i].score or score == 0)
                 highest = scores[i].score;
                 highestID = scores[i].id;

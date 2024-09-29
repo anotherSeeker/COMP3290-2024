@@ -5,27 +5,16 @@ import java.util.ArrayList;
 
 public class Symbol 
 {
-    private Token token;
-    private ArrayList<Token> values = new ArrayList<>(); 
+    private Token firstToken;
     private String type;
-    private String scope;
+    private ArrayList<Token> values = new ArrayList<>(); 
     private ArrayList<Token> occurances = new ArrayList<>();
 
 
-    public Symbol(Token _token, String _type, String _scope)
+    public Symbol(Token _token, String _type)
     {
-        token = _token;
+        firstToken = _token;
         type = _type;
-        scope = _scope;
-        occurances.add(_token);
-    }
-
-    public Symbol(Token _token, ArrayList<Token> _values, String _type, String _scope)
-    {
-        token = _token;
-        values = _values;
-        type = _type;
-        scope = _scope;
         occurances.add(_token);
     }
 

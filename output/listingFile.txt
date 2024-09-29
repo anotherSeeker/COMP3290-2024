@@ -36,7 +36,10 @@ cd24Source/a1Grading.cd24
 47: TIDEN highestID   TCOLN TINTG 
 48: TBEGN 
 49: TIDEN highest     TEQUL TILIT 0     TSEMI 
-50: TTFOR TLPAR TIDEN i     TEQUL TILIT 0     TSEMI TIDEN i     TLESS TIDEN numStudents TRPAR 
+50: TTFOR TLPAR TIDEN i     TEQUL TUNDF !     TILIT 0     TSEMI TIDEN i     TLESS TIDEN numStudents TRPAR 
+	TUNDF !(Line: 50, Column: 17)
+	: Illegal symbol: !    
+	
 51: TIFTH TLPAR TIDEN highest     TLESS TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN score TTTOR TIDEN score TEQEQ TILIT 0     TRPAR 
 52: TIDEN highest     TEQUL TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN score TSEMI 
 53: TIDEN highestID   TEQUL TIDEN scores      TLBRK TIDEN i     TRBRK TDOTT TIDEN id    TSEMI 
