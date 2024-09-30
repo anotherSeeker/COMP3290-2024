@@ -22,7 +22,7 @@ public class A2
             
             //printTokens();
 
-            /*String listing =*/ listingGenerator.generateListing(tokenList, errorList, filePathString);
+            listingGenerator.generateListingA1(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
             SymbolTable symTable = new SymbolTable(tokenList);
@@ -33,6 +33,7 @@ public class A2
             //print tree is the debug print, 
                 //traversal is the requested output print
             //tree.printTree();
+            listingGenerator.generateListingA2(tree, filePathString);
             tree.printTreeTraversal();
 
             //symTableErrors

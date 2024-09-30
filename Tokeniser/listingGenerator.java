@@ -1,12 +1,12 @@
 package Tokeniser;
+import Parser.PNodeTree;
 import java.io.*;
 import java.util.*;
 
 public class listingGenerator 
 {
-    
-   public static String generateListing(ArrayList<Token> tokenList, ArrayList<Token> errorList, String path)
-   {
+    public static String generateListingA1(ArrayList<Token> tokenList, ArrayList<Token> errorList, String path)
+    {
         String outString = path;
 
         int currLine = 0;
@@ -41,10 +41,24 @@ public class listingGenerator
         writeFile(outString);
 
         return outString;
-   } 
+    } 
 
-   private static String addErrors(int line, ArrayList<Token> errorList)
-   {
+    public static String generateListingA2(PNodeTree tree, String path)
+    {
+        String outString = path;
+
+        int currLine = 0;
+        boolean lineHasError = false;
+
+        outString = tree.stringTreeTraversal();
+
+        writeFileA2(outString);
+
+        return outString;
+    }
+
+    private static String addErrors(int line, ArrayList<Token> errorList)
+    {
         String outString = "\n\t";
         for (Token tok : errorList)
         {
@@ -55,20 +69,37 @@ public class listingGenerator
         }
 
         return outString;
-   }
+    }
 
-   private static void writeFile(String fileStr)
-   {
+    private static void writeFile(String fileStr)
+    {
         try  {
-            FileWriter writer = new FileWriter("output/listingFile.txt");
+            FileWriter writer = new FileWriter("output/listingFileA1.txt");
 
             writer.write(fileStr);
 
             writer.close();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
-   }
+    }
+
+    private static void writeFileA2(String fileStr)
+    {
+        try  {
+            FileWriter writer = new FileWriter("output/listingFileA2.txt");
+
+            writer.write(fileStr);
+
+            writer.close();
+        } 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
+    }
 
     private static String padString(String str)
     {

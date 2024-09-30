@@ -64,9 +64,18 @@ public class PNodeTree
         errorPrint(errorStrings);
     }
 
+    public String stringTreeTraversal()
+    {
+        String travString = traversalStepString(treeRoot)+"\n";
+
+        travString += errorStrings(errorStrings);
+
+        return travString;
+    }
+
     public void traversalStep(ParserNode node)
     {
-        String RESET = "\u001B[0m";
+        String RESET = "\u001B[0m"; 
         String RED = "\u001B[31m";
         String GREEN = "\u001B[32m";
         String BLUE =  "\u001B[34m";
@@ -101,6 +110,32 @@ public class PNodeTree
         }
     }
 
+    public String traversalStepString(ParserNode node)
+    {
+        String travString = node.getTraversalString();
+
+        try {
+            travString = padString(travString);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        currentTraversalLineLength += travString.length();
+
+        if (currentTraversalLineLength >= 70)
+        {
+            currentTraversalLineLength = 0;
+            travString = travString + "\n";
+        }
+
+        for (ParserNode child : node.children)
+        {
+            travString = travString + traversalStepString(child);
+        }
+
+        return travString;
+    }
+
     private static String padString(String str)
     {
         int padLen = 7;
@@ -120,5 +155,17 @@ public class PNodeTree
         {
             System.out.println(err);
         }
+    }
+
+    private String errorStrings(ArrayList<String> errStrings)
+    {
+        String out = "";
+
+        for (String err : errStrings)
+        {
+            out += err;
+        }
+
+        return out;
     }
 }
