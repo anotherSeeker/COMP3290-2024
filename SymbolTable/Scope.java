@@ -7,7 +7,7 @@ public class Scope
 {
     private final ArrayList<Symbol> symbols = new ArrayList<>();
     private final ArrayList<Token> scopeOccurances = new ArrayList<>();
-    private final Token scopeToken;
+    private Token scopeToken;
     private final String name;
 
     public Scope(Token _token)
@@ -23,6 +23,12 @@ public class Scope
             name = "Global";
         else
             name = "Main";
+    }
+
+    public void updateMainScopeToken(Token tok)
+    {
+        //this is here purely to set the main scope token after instantiating
+        scopeToken = tok;
     }
 
     public void addSymbol(Symbol sym)
@@ -73,8 +79,18 @@ public class Scope
 
         int inputLine = _token.getLine();
         int inputCol = _token.getColumn();
-        int scopeLine = scopeToken.getLine();
-        int scopeCol = scopeToken.getColumn();
+        int scopeLine;
+        int scopeCol;
+        if (scopeToken != null)
+        {
+            scopeLine = scopeToken.getLine();
+            scopeCol = scopeToken.getColumn();
+        }
+        else
+        {
+            scopeLine = 0;
+            scopeCol = 0;
+        }
 
         for (Symbol sym : symbols)
         {

@@ -185,25 +185,31 @@ public class TokenParser
                 //if in the symTable as a struct we're legal
                 if (symbolTable.lookupStructExists(currentToken))
                     if (hasMultipleMatchSets)
+                    {
                         if (inputRule.isEpsilonRule())
                             return i-1;
                         else
                             return i;
-
-                return 0;
+                    }
+                    else
+                        return 0;
             }
 
-            if (firstSet[i].equalsIgnoreCase("symTYPEID"))
+            else if (firstSet[i].equalsIgnoreCase("symTYPEID"))
             {
                 //if in the symTable as a struct we're legal
                 if (symbolTable.lookupTypeExists(currentToken))
                     if (hasMultipleMatchSets)
+                    {
                         if (inputRule.isEpsilonRule())
                             return i-1;
                         else
                             return i;
-
-                return 0;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
             }
         }
         return -1;

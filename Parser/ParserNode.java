@@ -1,11 +1,12 @@
 package Parser;
 import Tokeniser.Token;
+import Tokeniser.TokenTypes;
 import java.util.ArrayList;
 
 public class ParserNode 
 {
-    //node ruleType, if terminal [token], [Child Nodes]
-    private Token token = null;
+    //node ruleType, if terminal [nodeToken], [Child Nodes]
+    private Token nodeToken = null;
     private String name = "Uninit";
     private Rule ruleType = null;
     private boolean isToken = false;
@@ -16,14 +17,14 @@ public class ParserNode
 
     public ParserNode(Token _token, Rule _ruleType, ParserNode _parentNode)
     {
-        token = _token;
+        nodeToken = _token;
         ruleType = _ruleType;
         parent = _parentNode;
 
         if (ruleType == null)
         {
             isToken = true;
-            name = token.getTypeString();
+            name = nodeToken.getTypeString();
         }
         else
             name = ruleType.getName();
@@ -31,7 +32,7 @@ public class ParserNode
 
     public ParserNode(Token _token, Rule _ruleType, String _errorDesc, ParserNode _parentNode)
     {
-        token = _token;
+        nodeToken = _token;
         ruleType = _ruleType;
         isErr = true;
         errorDesc = _errorDesc;
@@ -40,7 +41,7 @@ public class ParserNode
         if (ruleType == null)
         {
             isToken = true;
-            name = token.getTypeString();
+            name = nodeToken.getTypeString();
         }
         else
             name = ruleType.getName();
@@ -74,8 +75,8 @@ public class ParserNode
                 String par = " : parent: ";
                 String str = name;
 
-                if (token.isValueToken())
-                    str = str+" = "+ token.getLexeme();
+                if (nodeToken.isValueToken())
+                    str = str+" = "+ nodeToken.getLexeme();
 
                 if (parent != null)
                     par = par + parent.getName();
@@ -100,7 +101,7 @@ public class ParserNode
         if (isErr())
         {
             System.out.print(errorDesc+"\n");
-            //System.out.println(RED+"Occured At: "+token.getLocationStringErr()+RESET);
+            //System.out.println(RED+"Occured At: "+nodeToken.getLocationStringErr()+RESET);
         }
         else
         {
@@ -108,6 +109,9 @@ public class ParserNode
             {
                 handleIndent(printDepth, parentDepth, depthChange);
                 String str = name;
+
+                if (nodeToken.getType() == TokenTypes.TIDEN)
+                    str = str+" : "+nodeToken.getLexeme();
 
                 System.out.print(GREEN+str+RESET);
                 System.out.print("\n");

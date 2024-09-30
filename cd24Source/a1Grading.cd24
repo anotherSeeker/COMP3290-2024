@@ -5,13 +5,20 @@ constants
     constantNum2 = 22212
 
 typedef
+
     studentScore def 
-    score : float, id : int
-end
+        score : float, id : int
+    end
+
+    useless def
+        watermelons : int, exists : bool
+    end
 
     /--arraytype def
 
-    studentScores def array [20] of studentScore end
+    studentScores def 
+        array [20] of studentScore 
+    end
 
 arraydef /**beep
 **/
@@ -47,7 +54,7 @@ arraydef /**beep
         highestID : int
     begin
         highest = 0;
-        for (i = abcd 0; i < numStudents)
+        for (i = 0; i < numStudents)
             if (highest < scores[i].score or score == 0)
                 highest = scores[i].score;
                 highestID = scores[i].id;

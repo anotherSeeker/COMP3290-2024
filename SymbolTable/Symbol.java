@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 public class Symbol 
 {
-    public static enum symTypes
-    {
-        symID, ilit, flit, bool, structID, typeID, funcID, undf
+    public static enum symTypes{
+        symID, ilit, flit, bool, 
+        structID, typeID, funcID, undf
     }
 
     private final Token firstToken;
@@ -64,7 +64,6 @@ public class Symbol
     {
         values.add(_token);
     }
-
 
     public symTypes getType()
     {

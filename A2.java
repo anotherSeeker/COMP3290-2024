@@ -32,10 +32,11 @@ public class A2
 
             //print tree is the debug print, 
                 //traversal is the requested output print
-            tree.printTree();
-            symTable.printErrorLog();
-            //tree.printTreeTraversal();
+            //tree.printTree();
+            tree.printTreeTraversal();
 
+            //symTableErrors
+            symTable.printErrorLog();
 
         }
         else
