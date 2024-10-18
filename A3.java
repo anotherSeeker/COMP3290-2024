@@ -3,7 +3,7 @@ import SymbolTable.SymbolTable;
 import Tokeniser.*;
 import java.util.ArrayList;
 
-public class A2
+public class A3
 {
     private static ArrayList<ArrayList<Token>> lists;
     private static ArrayList<Token> tokenList;
@@ -32,12 +32,13 @@ public class A2
 
             //print tree is the debug print, 
                 //traversal is the requested output print
-            //tree.printTree();
+            tree.printTree();
             listingGenerator.generateListingA2(tree, filePathString);
-            tree.printTreeTraversal();
+            //tree.printTreeTraversal();
 
             //symTableErrors
             symTable.printErrorLog();
+            symTable.printTable();
 
         }
         else

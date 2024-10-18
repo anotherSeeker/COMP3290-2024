@@ -47,9 +47,6 @@ public class listingGenerator
     {
         String outString = path;
 
-        int currLine = 0;
-        boolean lineHasError = false;
-
         outString = tree.stringTreeTraversal();
 
         writeFileA2(outString);

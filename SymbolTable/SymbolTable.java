@@ -23,6 +23,14 @@ public class SymbolTable
         populateTable();
     }
 
+    public void printTable()
+    {
+        for (Scope currentScope : scopeList)
+        {
+            for (Symbol sym : currentScope.getSymbols())
+        }
+    }
+
     private void populateTable()
     {
         //scopes 0 and 1 are globalScope and mainScope
