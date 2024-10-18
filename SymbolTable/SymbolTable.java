@@ -500,9 +500,8 @@ public class SymbolTable
             out = scope.lookupSymbol(_token, inputType);
             if (out != null)
             {
-                out.isBefore(line, col);
-
-                return out;
+                if (out.isBefore(line, col))
+                    return out;
             }
         }
         return null;
@@ -513,7 +512,7 @@ public class SymbolTable
         return (lookup(_token, Symbol.symTypes.structID) != null);
     }
     
-    public boolean lookupStructExistsBefore(Token _token, int line, int col)
+    public boolean lookupStructExistsBefore(Token _token)
     {
         return (lookupBefore(_token, Symbol.symTypes.structID) != null);
     }
@@ -522,6 +521,11 @@ public class SymbolTable
     {
         return (lookup(_token, Symbol.symTypes.typeID) != null);
     }
+    public boolean lookupTypeExistsBefore(Token _token)
+    {
+        return (lookupBefore(_token, Symbol.symTypes.typeID) != null);
+    }
+    
 
     public boolean lookupFuncExists(Token _token)
     {
