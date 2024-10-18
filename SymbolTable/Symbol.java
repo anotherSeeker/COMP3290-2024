@@ -1,35 +1,47 @@
 package SymbolTable;
-
 import Tokeniser.Token;
-import Tokeniser.TokenTypes;
 import java.util.ArrayList;
 
 public class Symbol 
 {
     public static enum symTypes{
         ID, intg, flot, bool, 
-        structID, typeID, funcID, undf
+        structID, typeID, funcID, undf, programName
     }
 
-    private final String RESET = "\u001B[0m";
-    private final String RED = "\u001B[31m";
-    private final String GREEN = "\u001B[32m";
-    private final String BLUE =  "\u001B[34m";
-    private final String CYAN = "\u001B[36m";
-    private final String bCYAN = "\u001B[96m";
-    private final String MAGENTA = "\u001B[35m";
-    private final String bMAGENTA = "\u001B[95m";
-    private final String YELLOW = "\u001B[33m";
-    private final String bYELLOW = "\u001B[93m";
-    private final String bBLUE = "\u001B[94m";
-    private final String bGREEN = "\u001B[92m";
-    private final String bRED = "\u001B[91m";
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String BLUE =  "\u001B[34m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String bCYAN = "\u001B[96m";
+    private static final String MAGENTA = "\u001B[35m";
+    private static final String bMAGENTA = "\u001B[95m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String bYELLOW = "\u001B[93m";
+    private static final String bBLUE = "\u001B[94m";
+    private static final String bGREEN = "\u001B[92m";
+    private static final String bRED = "\u001B[91m";
 
     private final Token firstToken;
     private symTypes type;
+    private String subtype = null;
     private final ArrayList<Token> values = new ArrayList<>(); 
     private final ArrayList<Token> occurances = new ArrayList<>();
     private final Scope parentScope;
+
+    public static symTypes typeFromString(String returnType)
+    {
+        try
+        {
+           return symTypes.valueOf(returnType);  
+        }
+        catch (Exception e)
+        {
+            //don't bother with error, we handle null cases outside of this
+            return null;
+        }
+    }
 
     public Symbol(Token _token, symTypes _type, Scope scope)
     {
@@ -37,6 +49,15 @@ public class Symbol
         type = _type;
         occurances.add(_token);
         parentScope = scope;
+    }
+
+    public Symbol(Token _token, symTypes _type, Scope scope, String _subtype)
+    {
+        firstToken = _token;
+        type = _type;
+        occurances.add(_token);
+        parentScope = scope;
+        subtype = _subtype;
     }
 
     @Override
@@ -50,7 +71,6 @@ public class Symbol
             outString+=GREEN+"Name: "+RED+firstToken.getLexeme()+RESET+" : ";
 
         outString+=GREEN+"Type: ";
-
         switch(type)
         {
             case symTypes.ID -> outString+=RESET;
@@ -61,9 +81,12 @@ public class Symbol
             case symTypes.flot -> outString+=bBLUE;
             case symTypes.bool -> outString+=BLUE;
             case symTypes.undf -> outString+=bRED;
+            case symTypes.programName -> outString+=bCYAN;
         }
-
         outString+=type.toString()+RESET+" : ";
+
+        if (subtype != null)
+            outString+=GREEN+"Subtype: "+bYELLOW+subtype+RESET+" : ";
 
         switch (parentScope.getName()) {
             case "Global" -> outString+=GREEN+"Scope: "+bCYAN+parentScope.getName()+RESET+" : ";
@@ -78,8 +101,24 @@ public class Symbol
             Token occurance = occurances.get(i);
 
             outString+="\n\t\t"+bBLUE+i+": ";
-            outString+=occurance.getLocationStringCols()+RESET;
+            outString+=occurance.getLocationStringCols();
+
+            if (occurance.isDefinition)
+                outString+=BLUE+" : Definition"+RESET;
+            if (occurance.isAssignment)
+                outString+=bBLUE+" : Assignment"+RESET;
         }
+
+        int counter = 1;
+        if (!values.isEmpty())
+            outString+=bGREEN+"\n\tValues: "+RESET;
+
+        for (Token tok : values)
+        {
+            outString+="\n\t\t"+counter+": "+bRED+tok.getLexeme()+RESET;
+            counter++;
+        }
+
         return outString;
     }
 
@@ -136,28 +175,16 @@ public class Symbol
     public void addValue(Token _token)
     {
         values.add(_token);
-
-        if (type == symTypes.ID)
-        {
-            updateType(_token);
-        }
     }
 
-    private boolean updateType(Token valueToken)
+    public void setType(symTypes _type)
     {
-        boolean out = false;
-        TokenTypes tokType = valueToken.getType();
-        
-        switch (tokType)
-        {
-            case TokenTypes.TINTG -> {type = symTypes.intg; out=true;}
-            case TokenTypes.TFLOT -> {type = symTypes.flot; out=true;}
-            case TokenTypes.TBOOL -> {type = symTypes.bool; out=true;}
-            case TokenTypes.TIDEN -> {}
+        type = _type;
+    }
 
-            default -> {}
-        }
-        return out;
+    public void setSubType(String _subtype)
+    {
+        subtype = _subtype;
     }
 
     public symTypes getType()

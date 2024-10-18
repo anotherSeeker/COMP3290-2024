@@ -80,7 +80,7 @@ cd24Source/a1Grading.cd24
 100: TINPT TIDEN newID TSEMI 
 101: TPRNT TSTRG "input student score"   TSEMI 
 102: TINPT TIDEN newScore    TSEMI 
-104: TIDEN scores      TEQUL TIDEN assignScore TLPAR TIDEN newScore    TCOMA TIDEN newID TCOMA TIDEN index TCOMA TIDEN scores      TRPAR TSEMI 
+104: TIDEN assignScore TLPAR TIDEN newScore    TCOMA TIDEN newID TCOMA TIDEN index TCOMA TIDEN scores      TRPAR TSEMI 
 106: TIDEN index TPLEQ TILIT 1     TSEMI 
 107: TTEND 
 109: TIDEN printAllScores    TLPAR TIDEN scores      TCOMA TIDEN numStudents TRPAR TSEMI 

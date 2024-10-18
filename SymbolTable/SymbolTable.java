@@ -25,6 +25,7 @@ public class SymbolTable
     private final ArrayList<Scope> scopeList = new ArrayList<>();
     private final Scope globalScope = new Scope(true);
     private final Scope mainScope = new Scope(false);
+    private String progName = null;
     private boolean symtError = false;
     private final ArrayList<String> errorLog = new ArrayList<>();
     
@@ -92,15 +93,14 @@ public class SymbolTable
             if (listToken.getType() == TokenTypes.TFUNC) 
             {
                 try {
-                    scopeToken = tokenList.get(i+1);
+                    i = stepIterator(i, 1);
+                    scopeToken = tokenList.get(i);
 
                     Scope newScope = new Scope(scopeToken);
                     addScope(newScope);
                 } catch (Exception e) {
-                    System.out.println("Scope setup at: "+listToken.getLocationStringErr()+" has failed");
-                    symtError = true;
+                    logError("Scope setup at: "+listToken.getLocationStringErr()+" has failed");
                 }
-                
             }
         }
     }
@@ -122,15 +122,51 @@ public class SymbolTable
                 break;
             listToken = tokenList.get(i);
 
-            stepHandleLooseIds(listToken);
+            stepHandleLooseIds(listToken, i);
+
+            i = stepHandleCD24(listToken, i);
         }
     }
 
-    private void stepHandleLooseIds(Token token)
+    private int stepHandleCD24(Token cd24, int index)
+    {
+        if (cd24.getType() == TokenTypes.TCD24)
+        {
+            index = stepIterator(index, 1);
+            if (index < tokenList.size())
+            {
+                if (progName == null)
+                {
+                    progName = tokenList.get(index).getLexeme();
+                    Symbol.symTypes type = symTypes.programName;
+                    Symbol newSymbol = new Symbol(tokenList.get(index), type, globalScope);
+                    addToScope(newSymbol, globalScope, true);
+                }
+                else if ( !progName.equals(tokenList.get(index).getLexeme()) )
+                {
+                    String log = "Error: recevived \""+tokenList.get(index).getLexeme()+"\" expecting cd24 program name at"+tokenList.get(index).getLocationStringErr();
+                    logError(log);
+                }
+                else
+                {
+                    progName = tokenList.get(index).getLexeme();
+                    Symbol.symTypes type = symTypes.programName;
+                    Symbol newSymbol = new Symbol(tokenList.get(index), type, globalScope);
+                    addToScope(newSymbol, globalScope, false);
+                }
+            }
+        }
+
+        return index;
+    }
+
+    private void stepHandleLooseIds(Token token, int i)
     {
         //scopes are already setup so the scope will check if this is a duplicate (line col comparison) when it's asked to addToScope()
         if (token.getType() == TokenTypes.TIDEN)
         {
+            
+
             if (tokenIsScopeName(token))
             {
                 getScopeFromTokenName(token).addScopeOccurance(token);
@@ -138,10 +174,32 @@ public class SymbolTable
             else
             {
                 Scope _scope = getScopeAtTokenLoc(token);
-                Symbol.symTypes type = getSymTypeFromToken(token);
+                Symbol.symTypes type;
+
+                if (setupAssignOrDefine(token, i) == 0)
+                {
+                    type = getSymTypeFromScopeLookup(token, _scope);
+                }
+                else
+                {
+                    int k = stepIterator(i, 2);
+                    Token newToken = tokenList.get(k);
+                    if (tokenIsScopeName(newToken))
+                    {
+                        String retnType = getScopeFromTokenName(newToken).getReturnType();
+                        type = getTypeFromString(retnType);
+                    }
+                    else
+                    {
+                        type = getSymTypeFromTokenType(newToken);
+                    }
+                }
+
                 Symbol newSymbol = new Symbol(token, type, _scope);
-                addToScope(newSymbol, _scope);
+                addToScope(newSymbol, _scope, token.isDefinition);
             }
+
+            
         } 
     }
 
@@ -189,22 +247,29 @@ public class SymbolTable
         Token valueToken;
         symTypes type;
 
-        Token testTok = tokenList.get(i);
+        Token stepForwardToken = tokenList.get(i);
 
-        if (testTok.getType() == TokenTypes.TARAY)
+        if (stepForwardToken.getType() == TokenTypes.TARAY)
         {
             type = symTypes.typeID;
             Symbol newSymbol = new Symbol(identToken, type, globalScope);
             globalScope.addSymbol(newSymbol);
+
+            identToken.isDefinition = true;
+
             //array [ <expr> ] of <structid> end
             //skip 2 here to bypass the left bracket
             int k = stepIterator(i, 2);
-            valueToken = tokenList.get(k);
-            k = stepIterator(k, 3);
+            
             //add <expr> then add <structid>
-            newSymbol.addValue(valueToken);
             valueToken = tokenList.get(k);
             newSymbol.addValue(valueToken);
+            
+            //<structid>
+            k = stepIterator(k, 3);
+            valueToken = tokenList.get(k);
+            newSymbol.addValue(valueToken);
+            newSymbol.setSubType(valueToken.getLexeme());
 
             if (!lookupStructExistsBefore(valueToken))
             {
@@ -224,7 +289,7 @@ public class SymbolTable
 
             return k;
         }
-        else if (testTok.getType() == TokenTypes.TIDEN) 
+        else if (stepForwardToken.getType() == TokenTypes.TIDEN) 
         {
             //accepts int, float, bool, structID
             //id:type, id:type,... end
@@ -235,7 +300,7 @@ public class SymbolTable
             globalScope.addSymbol(newSymbol);
 
             //add values to newSymbol
-            newSymbol.addValue(testTok);
+            newSymbol.addValue(stepForwardToken);
             i=stepIterator(i, 2);
             valueToken = tokenList.get(i);
             newSymbol.addValue(valueToken);
@@ -291,18 +356,18 @@ public class SymbolTable
         {
             for (int k = i+1; k < tokenList.size();k++)
             {
-                Token testTok = tokenList.get(k);
-                if (testTok.getType() == TokenTypes.TIDEN)
+                Token constTok = tokenList.get(k);
+                if (constTok.getType() == TokenTypes.TIDEN)
                 {
-                    identToken = testTok;
+                    identToken = constTok;
                     
                     //constants are defined when they're assigned
-                    if (setupAssignOrDefine(testTok, k) == -1)
-                        testTok.isDefinition = true;
+                    if (setupAssignOrDefine(constTok, k) == -1)
+                        constTok.isDefinition = true;
 
                     k+=2;
                     valueToken = tokenList.get(k);
-                    type = getSymTypeFromToken(valueToken);
+                    type = getSymTypeFromTokenType(valueToken);
                     if (type == symTypes.undf)
                     {
                         String errStr = "Symbol Table Error: Assigned Illegal Value: "+valueToken.getTypeString()+" to constant: "+identToken.getLexeme()
@@ -312,13 +377,14 @@ public class SymbolTable
 
                     Symbol newSymbol = new Symbol(identToken, type, globalScope);
                     newSymbol.addValue(valueToken);
+                    newSymbol.setSubType("const");
 
                     globalScope.addSymbol(newSymbol);
                 }
-                if (testTok.getType() == TokenTypes.TMAIN 
-                ||  testTok.getType() == TokenTypes.TTYPD 
-                ||  testTok.getType() == TokenTypes.TARRD 
-                ||  testTok.getType() == TokenTypes.TFUNC)
+                if (constTok.getType() == TokenTypes.TMAIN 
+                ||  constTok.getType() == TokenTypes.TTYPD 
+                ||  constTok.getType() == TokenTypes.TARRD 
+                ||  constTok.getType() == TokenTypes.TFUNC)
                 {
                     return k;
                 }
@@ -335,9 +401,16 @@ public class SymbolTable
         scopeList.add(scope);
     }
 
-    private void addToScope(Symbol sym, Scope scope)
+    private void addToScope(Symbol sym, Scope scope, boolean isDefinition)
     {
         scope.addSymbol(sym);
+        if (!isDefinition)
+        {
+            if ( scope != globalScope && isInGlobal(sym.getToken()) )
+            {
+                globalScope.addSymbol(sym);
+            }
+        }
     }
     //-------------------------------------
     //return -1 for assignment, return 1 for definition, 0 else
@@ -355,7 +428,11 @@ public class SymbolTable
             testTok.isDefinition = true;
             return 1;
         }
-        if (tokenList.get(index+1).getType() == TokenTypes.TEQUL)
+        if (tokenList.get(index+1).getType() == TokenTypes.TEQUL || 
+            tokenList.get(index+1).getType() == TokenTypes.TPLEQ || 
+            tokenList.get(index+1).getType() == TokenTypes.TMNEQ || 
+            tokenList.get(index+1).getType() == TokenTypes.TSTEQ || 
+            tokenList.get(index+1).getType() == TokenTypes.TDVEQ) 
         {
             //is assignment
             testTok.isAssignment = true;
@@ -403,7 +480,24 @@ public class SymbolTable
         return false;
     }
 
-    private Symbol.symTypes getSymTypeFromToken(Token token)
+    private Symbol.symTypes getSymTypeFromScopeLookup(Token token, Scope _scope)
+    {
+        if (isInScope(token, _scope))
+        {
+            return _scope.getSymbolByTokenName(token).getType();
+        }
+        if (isInGlobal(token))
+        {
+            return globalScope.getSymbolByTokenName(token).getType();
+        }
+
+        String log = "Symbol Table Error: Failed to find symbol definition, defaulting to \"ID\" "+token.getLocationStringErr();
+        logError(log);
+
+        return symTypes.ID;
+    }
+
+    private Symbol.symTypes getSymTypeFromTokenType(Token token)
     {
         switch (token.getType()) {
             case TIDEN -> {
@@ -419,6 +513,8 @@ public class SymbolTable
             case TILIT -> {return Symbol.symTypes.intg;}
             case TFLIT -> {return Symbol.symTypes.flot;}
             case TBOOL -> {return Symbol.symTypes.bool;}
+            case TINTG -> {return Symbol.symTypes.intg;}
+            case TFLOT -> {return Symbol.symTypes.flot;}
             default -> {return Symbol.symTypes.undf;}
         }
     }
@@ -490,6 +586,18 @@ public class SymbolTable
         return null;
     }
 
+    private Symbol lookup(String name, Symbol.symTypes inputType)
+    {
+        Symbol out;
+        for (Scope scope : scopeList)
+        {
+            out = scope.lookupSymbolbyName(name, inputType);
+            if (out != null)
+                return out;
+        }
+        return null;
+    }
+
     private Symbol lookupBefore(Token _token, Symbol.symTypes inputType)
     {
         int line=_token.getLine(); 
@@ -511,6 +619,11 @@ public class SymbolTable
     {
         return (lookup(_token, Symbol.symTypes.structID) != null);
     }
+
+    public boolean lookupStructExists(String name)
+    {
+        return (lookup(name, Symbol.symTypes.structID) != null);
+    }
     
     public boolean lookupStructExistsBefore(Token _token)
     {
@@ -521,6 +634,12 @@ public class SymbolTable
     {
         return (lookup(_token, Symbol.symTypes.typeID) != null);
     }
+
+    public boolean lookupTypeExists(String name)
+    {
+        return (lookup(name, Symbol.symTypes.typeID) != null);
+    }
+
     public boolean lookupTypeExistsBefore(Token _token)
     {
         return (lookupBefore(_token, Symbol.symTypes.typeID) != null);
@@ -574,5 +693,24 @@ public class SymbolTable
         {
             System.out.println(RED+error+RESET);
         }
+    }
+
+    private symTypes getTypeFromString(String returnString)
+    {
+        symTypes type = Symbol.typeFromString(returnString);
+        
+        if (type == null)
+        {
+            if (lookupStructExists(returnString))
+            {
+                type = symTypes.structID;
+            }
+            else if (lookupTypeExists(returnString))
+            {
+                type = symTypes.typeID;
+            }
+        }
+
+        return type;
     }
 }

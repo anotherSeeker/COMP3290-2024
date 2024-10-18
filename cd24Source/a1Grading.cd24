@@ -101,7 +101,7 @@ begin
         print "input student score";
         input newScore;
 
-        scores = assignScore(newScore, newID, index, scores);
+        assignScore(newScore, newID, index, scores);
 
         index+=1;
     end

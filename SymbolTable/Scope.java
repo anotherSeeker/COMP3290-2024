@@ -8,16 +8,20 @@ public class Scope
     private final ArrayList<Symbol> symbols = new ArrayList<>();
     private final ArrayList<Token> scopeOccurances = new ArrayList<>();
     private Token scopeToken;
+    private String returnType = null;
+    private final boolean isFunc;
     private final String name;
 
     public Scope(Token _token)
     {
         scopeToken = _token;
         name = scopeToken.getLexeme();
+        isFunc = true;
     }
 
     public Scope(boolean globOrMain)
     {
+        isFunc = false;
         scopeToken = null;
         if (globOrMain)
             name = "Global";
@@ -136,6 +140,16 @@ public class Scope
         return null;
     }
 
+    public Symbol lookupSymbolbyName(String name, Symbol.symTypes type)
+    {
+        for (Symbol entry : symbols)
+        {
+            if (entry.matchSymbolByType(name, type))
+                return entry;
+        }
+        return null;
+    }
+
     public Symbol getSymbolByTokenName(Token _token)
     {
         String _name = _token.getLexeme();
@@ -145,6 +159,16 @@ public class Scope
                 return entry;
         }
         return null;
+    }
+
+    public String getReturnType()
+    {
+        return returnType;
+    }
+
+    public boolean isFunc()
+    {
+        return isFunc;
     }
 
     public String getName() 
