@@ -32,13 +32,14 @@ public class A3
 
             //print tree is the debug print, 
                 //traversal is the requested output print
-            tree.printTree();
             listingGenerator.generateListingA2(tree, filePathString);
             //tree.printTreeTraversal();
+            //tree.printTree();
 
             //symTableErrors
-            symTable.printErrorLog();
             symTable.printTable();
+            symTable.printErrorLog();
+            
 
         }
         else

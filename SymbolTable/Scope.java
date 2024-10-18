@@ -25,6 +25,16 @@ public class Scope
             name = "Main";
     }
 
+    public ArrayList<Symbol> getSymbolList()
+    {
+        return symbols;
+    }
+
+    public ArrayList<Token> getOccurances()
+    {
+        return scopeOccurances;
+    }
+
     public void updateMainScopeToken(Token tok)
     {
         //this is here purely to set the main scope token after instantiating

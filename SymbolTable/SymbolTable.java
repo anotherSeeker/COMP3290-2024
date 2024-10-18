@@ -6,6 +6,21 @@ import java.util.ArrayList;
 
 public class SymbolTable 
 {
+    private final String RESET = "\u001B[0m";
+    private final String RED = "\u001B[31m";
+    private final String GREEN = "\u001B[32m";
+    //private final String BLUE =  "\u001B[34m";
+    //private final String CYAN = "\u001B[36m";
+    private final String bCYAN = "\u001B[96m";
+    private final String MAGENTA = "\u001B[35m";
+    //private final String bMAGENTA = "\u001B[95m";
+    private final String YELLOW = "\u001B[33m";
+    //private final String bYELLOW = "\u001B[93m";
+    //private final String bBLUE = "\u001B[94m";
+    //private final String bGREEN = "\u001B[92m";
+    //private final String bRED = "\u001B[91m";
+
+
     private final ArrayList<Token> tokenList; 
     private final ArrayList<Scope> scopeList = new ArrayList<>();
     private final Scope globalScope = new Scope(true);
@@ -27,7 +42,20 @@ public class SymbolTable
     {
         for (Scope currentScope : scopeList)
         {
-            for (Symbol sym : currentScope.getSymbols())
+            String name = currentScope.getName();
+            switch (name) {
+                case "Global" -> System.out.println(GREEN+"Scope: "+bCYAN+name+RESET+" : ");
+                case "Main" -> System.out.println(GREEN+"Scope: "+MAGENTA+name+RESET+" : ");
+                default -> System.out.println(GREEN+"Scope: "+YELLOW+name+RESET+" : ");
+            }
+            //System.out.println(GREEN+"Scope: "+currentScope.getName()+RESET);
+            for (Symbol sym : currentScope.getSymbolList())
+            {
+                String outString = "";
+
+                outString += sym.toString();
+                System.out.println(outString);
+            }
         }
     }
 
@@ -129,6 +157,14 @@ public class SymbolTable
                 if (testTok.getType() == TokenTypes.TIDEN)
                 {
                     identToken = testTok;
+
+                    //is always name def [stuff]
+                    if (setupAssignOrDefine(testTok, k) != 1)
+                    {
+                        String log = "Symbol Table Error: expecting \"name def ...\" for type setup"+testTok.getLocationStringErr();
+                        logError(log);
+                    }
+
                     //is always name def [stuff]
                         //we skip two to bypass def, simply hard coding this cause it's faster and if you made a mistake it'll be flagged as an error anyway
                     k=stepIterator(k,2);
@@ -170,7 +206,7 @@ public class SymbolTable
             valueToken = tokenList.get(k);
             newSymbol.addValue(valueToken);
 
-            if (!lookupStructExists(valueToken))
+            if (!lookupStructExistsBefore(valueToken))
             {
                 String log = "Symbol Table Error: Arrays must be defined with a StructID, that StructID has to be defined before them "+valueToken.getLocationStringErr();
                 logError(log);
@@ -259,6 +295,11 @@ public class SymbolTable
                 if (testTok.getType() == TokenTypes.TIDEN)
                 {
                     identToken = testTok;
+                    
+                    //constants are defined when they're assigned
+                    if (setupAssignOrDefine(testTok, k) == -1)
+                        testTok.isDefinition = true;
+
                     k+=2;
                     valueToken = tokenList.get(k);
                     type = getSymTypeFromToken(valueToken);
@@ -299,6 +340,31 @@ public class SymbolTable
         scope.addSymbol(sym);
     }
     //-------------------------------------
+    //return -1 for assignment, return 1 for definition, 0 else
+    public int setupAssignOrDefine(Token testTok, int index)
+    {
+        if (tokenList.get(index+1).getType() == TokenTypes.TCOLN)
+        {
+            //is definition
+            testTok.isDefinition = true;
+            return 1;
+        }
+        if (tokenList.get(index+1).getType() == TokenTypes.TTDEF)
+        {
+            //is definition
+            testTok.isDefinition = true;
+            return 1;
+        }
+        if (tokenList.get(index+1).getType() == TokenTypes.TEQUL)
+        {
+            //is assignment
+            testTok.isAssignment = true;
+            return -1;
+        }
+        
+        return 0;
+    }
+    
     public boolean tokenIsStructName(Token _token)
     {
         Symbol sym = globalScope.getSymbolByTokenName(_token);
@@ -348,10 +414,10 @@ public class SymbolTable
                 else if (tokenIsTypeName(token))
                     return Symbol.symTypes.typeID;
                 else
-                    return Symbol.symTypes.symID;
+                    return Symbol.symTypes.ID;
             }
-            case TILIT -> {return Symbol.symTypes.ilit;}
-            case TFLIT -> {return Symbol.symTypes.flit;}
+            case TILIT -> {return Symbol.symTypes.intg;}
+            case TFLIT -> {return Symbol.symTypes.flot;}
             case TBOOL -> {return Symbol.symTypes.bool;}
             default -> {return Symbol.symTypes.undf;}
         }
@@ -424,9 +490,32 @@ public class SymbolTable
         return null;
     }
 
+    private Symbol lookupBefore(Token _token, Symbol.symTypes inputType)
+    {
+        int line=_token.getLine(); 
+        int col=_token.getColumn();
+        Symbol out;
+        for (Scope scope : scopeList)
+        {
+            out = scope.lookupSymbol(_token, inputType);
+            if (out != null)
+            {
+                out.isBefore(line, col);
+
+                return out;
+            }
+        }
+        return null;
+    }
+
     public boolean lookupStructExists(Token _token)
     {
         return (lookup(_token, Symbol.symTypes.structID) != null);
+    }
+    
+    public boolean lookupStructExistsBefore(Token _token, int line, int col)
+    {
+        return (lookupBefore(_token, Symbol.symTypes.structID) != null);
     }
 
     public boolean lookupTypeExists(Token _token)
@@ -476,9 +565,6 @@ public class SymbolTable
     {
         if (symtError == false)
             return;
-
-        String RESET = "\u001B[0m";
-        String RED = "\u001B[31m";
 
         for (String error : errorLog)
         {

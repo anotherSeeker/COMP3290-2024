@@ -5,6 +5,21 @@ import java.util.ArrayList;
 
 public class Token
 {
+    private final String RESET = "\u001B[0m";
+    private final String RED = "\u001B[31m";
+    private final String GREEN = "\u001B[32m";
+    private final String BLUE =  "\u001B[34m";
+    //private final String CYAN = "\u001B[36m";
+    private final String bCYAN = "\u001B[96m";
+    //private final String MAGENTA = "\u001B[35m";
+    private final String bMAGENTA = "\u001B[95m";
+    //private final String YELLOW = "\u001B[33m";
+    //private final String bYELLOW = "\u001B[93m";
+    //private final String bBLUE = "\u001B[94m";
+    //private final String bGREEN = "\u001B[92m";
+    //private final String bRED = "\u001B[91m";
+
+
     public final String[] tokenOutputStrings = {
         "TTEOF ", 
         "TCD24 ", "TCONS ", "TTYPD ", "TTDEF ", "TARRD ", "TMAIN ", "TBEGN ", "TTEND ", "TARAY ", "TTTOF ", "TFUNC ", "TVOID ", 
@@ -35,6 +50,10 @@ public class Token
 
     //short description for undefined tokens
     private String tokenError = "N/A";
+
+    //used and set by symboltable
+    public boolean isAssignment;
+    public boolean isDefinition;
 
     private final int line;
     private final int column;
@@ -168,13 +187,13 @@ public class Token
         return "(Line: "+line+", Column: "+column+")";
     }
 
+    public String getLocationStringCols()
+    {
+        return GREEN+"(Line: "+bMAGENTA+line+GREEN+", Column: "+bCYAN+column+GREEN+")";
+    }
+
     public String getLocationStringErr()
     {
-        String RESET    = "\u001B[0m";
-        String RED      = "\u001B[31m";
-        String GREEN    = "\u001B[32m";
-        String BLUE     = "\u001B[34m";
-
         return RED+"("+BLUE+"Line: "+BLUE+line+RED+", "+GREEN+"Column: "+GREEN+column+RED+")"+RESET;
     }
 
