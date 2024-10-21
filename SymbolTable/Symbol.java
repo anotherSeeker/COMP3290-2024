@@ -11,17 +11,20 @@ public class Symbol
 
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
+    private static final String B_RED = "\u001B[91m";
     private static final String GREEN = "\u001B[32m";
+    private static final String B_GREEN = "\u001B[92m";
     private static final String BLUE =  "\u001B[34m";
+    private static final String B_BLUE = "\u001B[94m";
     private static final String CYAN = "\u001B[36m";
-    private static final String bCYAN = "\u001B[96m";
+    private static final String B_CYAN = "\u001B[96m";
     private static final String MAGENTA = "\u001B[35m";
-    private static final String bMAGENTA = "\u001B[95m";
+    private static final String B_MAGENTA = "\u001B[95m";
     private static final String YELLOW = "\u001B[33m";
-    private static final String bYELLOW = "\u001B[93m";
-    private static final String bBLUE = "\u001B[94m";
-    private static final String bGREEN = "\u001B[92m";
-    private static final String bRED = "\u001B[91m";
+    private static final String B_YELLOW = "\u001B[93m";
+    
+    
+    
 
     private final Token firstToken;
     private symTypes type;
@@ -75,47 +78,50 @@ public class Symbol
         {
             case symTypes.ID -> outString+=RESET;
             case symTypes.structID -> outString+=CYAN;
-            case symTypes.typeID -> outString+=bMAGENTA;
-            case symTypes.funcID -> outString+=bYELLOW;
+            case symTypes.typeID -> outString+=B_MAGENTA;
+            case symTypes.funcID -> outString+=B_YELLOW;
             case symTypes.intg -> outString+=RED;
-            case symTypes.flot -> outString+=bBLUE;
+            case symTypes.flot -> outString+=B_BLUE;
             case symTypes.bool -> outString+=BLUE;
-            case symTypes.undf -> outString+=bRED;
-            case symTypes.programName -> outString+=bCYAN;
+            case symTypes.undf -> outString+=B_RED;
+            case symTypes.programName -> outString+=B_CYAN;
         }
         outString+=type.toString()+RESET+" : ";
 
         if (subtype != null)
-            outString+=GREEN+"Subtype: "+bYELLOW+subtype+RESET+" : ";
+            if (subtype.equals("const"))
+                outString+=GREEN+"Subtype: "+B_MAGENTA+subtype+RESET+" : ";
+            else
+                outString+=GREEN+"Subtype: "+B_YELLOW+subtype+RESET+" : ";
 
         switch (parentScope.getName()) {
-            case "Global" -> outString+=GREEN+"Scope: "+bCYAN+parentScope.getName()+RESET+" : ";
+            case "Global" -> outString+=GREEN+"Scope: "+B_CYAN+parentScope.getName()+RESET+" : ";
             case "Main" -> outString+=GREEN+"Scope: "+MAGENTA+parentScope.getName()+RESET+" : ";
             default -> outString+=GREEN+"Scope: "+YELLOW+parentScope.getName()+RESET+" : ";
         }
 
-        outString+=bGREEN+"\n\tOccurances: ";
+        outString+=B_GREEN+"\n\tOccurances: ";
 
         for (int i = 0;i<occurances.size();i++)
         {
             Token occurance = occurances.get(i);
 
-            outString+="\n\t\t"+bBLUE+i+": ";
+            outString+="\n\t\t"+B_BLUE+i+": ";
             outString+=occurance.getLocationStringCols();
 
             if (occurance.isDefinition)
                 outString+=BLUE+" : Definition"+RESET;
             if (occurance.isAssignment)
-                outString+=bBLUE+" : Assignment"+RESET;
+                outString+=B_BLUE+" : Assignment"+RESET;
         }
 
         int counter = 1;
         if (!values.isEmpty())
-            outString+=bGREEN+"\n\tValues: "+RESET;
+            outString+=B_GREEN+"\n\tValues: "+RESET;
 
         for (Token tok : values)
         {
-            outString+="\n\t\t"+counter+": "+bRED+tok.getLexeme()+RESET;
+            outString+="\n\t\t"+counter+": "+B_RED+tok.getLexeme()+RESET;
             counter++;
         }
 

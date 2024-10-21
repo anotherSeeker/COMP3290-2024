@@ -138,7 +138,7 @@ public class SymbolTable
                 if (progName == null)
                 {
                     progName = tokenList.get(index).getLexeme();
-                    Symbol.symTypes type = symTypes.programName;
+                    symTypes type = symTypes.programName;
                     Symbol newSymbol = new Symbol(tokenList.get(index), type, globalScope);
                     addToScope(newSymbol, globalScope, true);
                 }
@@ -165,8 +165,6 @@ public class SymbolTable
         //scopes are already setup so the scope will check if this is a duplicate (line col comparison) when it's asked to addToScope()
         if (token.getType() == TokenTypes.TIDEN)
         {
-            
-
             if (tokenIsScopeName(token))
             {
                 getScopeFromTokenName(token).addScopeOccurance(token);
