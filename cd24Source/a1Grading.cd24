@@ -2,7 +2,8 @@ CD24 a1Grading
 
 constants 
     constantNum1 = 1,
-    constantNum2 = 22212
+    constantNum2 = 22212,
+    constantNum3 = 22212.2
 
 typedef
 
@@ -100,7 +101,7 @@ begin
         print "input student score";
         input newScore;
 
-        scores = assignScore(newScore, newID, index, scores);
+        assignScore(newScore, newID, index, scores);
 
         index+=1;
     end
