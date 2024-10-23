@@ -41,14 +41,7 @@ public class ParserNode
         if (ruleType == null)
         {
             isToken = true;
-            if (nodeToken.getType() == TokenTypes.TIDEN || nodeToken.getType() == TokenTypes.TILIT  || nodeToken.getType() == TokenTypes.TFLIT  || nodeToken.getType() == TokenTypes.TBOOL)
-            {
-                name = nodeToken.getTypeString()+nodeToken.getLexeme();
-            }
-            else
-            {
-                name = nodeToken.getTypeString();
-            }
+            name = nodeToken.getTypeString();
         }
         else
             name = ruleType.getName();
