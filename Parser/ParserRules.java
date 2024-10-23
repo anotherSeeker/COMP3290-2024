@@ -149,7 +149,7 @@ public class ParserRules
         {"nEPS", "TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN", "TTFOR", "TIFTH", "TSWTH", "TTTDO"},//statstail
         {"TTFOR", "TIFTH", "TSWTH", "TTTDO"},//strstat
         {"TREPT", "TIDEN", "TINPT", "TPRNT", "TPRLN", "TRETN"},//stat
-        {"nEPS", "TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ", "TLPAR"},//asgnorcallstat
+        {"nEPS", "TDOTT", "TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ", "TLPAR"},//asgnorcallstat
         {"TTFOR"},//forstat
         {"TREPT"},//repstat
         {"TTTDO"},//dostat
@@ -161,7 +161,7 @@ public class ParserRules
         {"TCASE", "TDFLT"},//caselist
         {"nEPS", "TCASE", "TDFLT"},//caselisttail
         {"TIDEN"},//asgnstat
-        {"TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ"},//asgnstattail used in asgnorcallstat in place of asgnstat
+        {"TDOTT", "TLBRK", "TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ"},//asgnstattail used in asgnorcallstat in place of asgnstat WE MISSED TDOTT IN THE FIRST SUBMISSION
         {"TEQUL", "TPLEQ", "TMNEQ", "TSTEQ", "TDVEQ"},//asgnop
         {"TINPT", "TPRNT", "TPRLN"},//iostat
         {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR", "TRPAR"},//callstattail
@@ -170,7 +170,7 @@ public class ParserRules
         {"TIDEN"},//vlist
         {"nEPS", "TCOMA"},//vlisttail
         {"TIDEN"},//var
-        {"nEPS", "TLBRK"},//vartail
+        {"nEPS", "TLBRK", "TDOTT"},//vartail
         {"nEPS", "TDOTT"},//vartailtail
         {"TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//elist
         {"nEPS", "TCOMA"},//elisttail
@@ -190,7 +190,7 @@ public class ParserRules
         {"nEPS", "TCART"},//facttail
         {"TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//exponent
         {"TIDEN"},//varorfncall
-        {"nEPS", "TLPAR", "TLBRK"},//varorfncalltail
+        {"nEPS", "TLPAR", "TLBRK", "TDOTT"},//varorfncalltail
         {"TRPAR", "TTNOT", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//fncalltail
         {"TSTRG", "TIDEN", "TILIT", "TFLIT", "TTRUE", "TFALS", "TLPAR"},//prlist
         {"nEPS", "TCOMA"},//prlisttail
@@ -288,7 +288,7 @@ public class ParserRules
         },//strstat
         {{"nREPTSTAT"}, {"TIDEN", "nASGNORCALLSTAT"}, {"nIOSTAT"}, {"nIOSTAT"}, {"nIOSTAT"}, {"nRETURNSTAT"}
         },//stat
-        {{"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"TLPAR", "nCALLSTATTAIL"},
+        {{"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"nASGNSTATTAIL"}, {"TLPAR", "nCALLSTATTAIL"},
         },//asgnorcallstat
         {{"TTFOR", "TLPAR", "nASGNLIST", "TSEMI", "nBOOL", "TRPAR", "nSTATS", "TTEND"}
         },//forstat
@@ -330,7 +330,7 @@ public class ParserRules
         },//vlisttail
         {{"TIDEN", "nVARTAIL"}
         },//var
-        {{"TLBRK", "nEXPR", "TRBRK", "nVARTAILTAIL"}
+        {{"TLBRK", "nEXPR", "TRBRK", "nVARTAILTAIL"}, {"nVARTAILTAIL"}
         },//vartail
         {{"TDOTT", "TIDEN"}
         },//vartailtail
@@ -366,7 +366,7 @@ public class ParserRules
         },//exponent
         {{"TIDEN", "nVARORFNCALLTAIL"}
         },//varorfncall
-        {{"TLPAR", "nFNCALLTAIL"}, {"nVARTAIL"}
+        {{"TLPAR", "nFNCALLTAIL"}, {"nVARTAIL"}, {"nVARTAIL"}
         },//varorfncalltail
         {{"TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}, {"nELIST", "TRPAR"}
         },//fncalltail
