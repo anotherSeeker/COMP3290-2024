@@ -94,10 +94,6 @@ public class ParserNode
 
     public void printSelf(int printDepth, int parentDepth, boolean depthChange, boolean onlyTokens)
     {
-        String RESET = "\u001B[0m";
-        String GREEN = "\u001B[32m";
-        String BLUE =  "\u001B[34m";
-
         if (isErr())
         {
             System.out.print(errorDesc+"\n");
