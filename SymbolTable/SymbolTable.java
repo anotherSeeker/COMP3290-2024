@@ -196,8 +196,6 @@ public class SymbolTable
                 Symbol newSymbol = new Symbol(token, type, _scope);
                 addToScope(newSymbol, _scope, token.isDefinition);
             }
-
-            
         } 
     }
 
@@ -480,17 +478,24 @@ public class SymbolTable
 
     private Symbol.symTypes getSymTypeFromScopeLookup(Token token, Scope _scope)
     {
+        symTypes type;
         if (isInScope(token, _scope))
         {
-            return _scope.getSymbolByTokenName(token).getType();
+            type = _scope.getSymbolByTokenName(token).getType();
+            if (type == symTypes.typeID || type == symTypes.structID)
+            {
+
+            }
+            return type;
         }
         if (isInGlobal(token))
         {
-            return globalScope.getSymbolByTokenName(token).getType();
+            type = globalScope.getSymbolByTokenName(token).getType();
+            return type;
         }
 
-        String log = "Symbol Table Error: Failed to find symbol definition, defaulting to \"ID\" "+token.getLocationStringErr();
-        logError(log);
+        //String log = "Symbol Table Error: Failed to find symbol definition, defaulting to \"ID\" "+token.getLocationStringErr();
+        //logError(log);
 
         return symTypes.ID;
     }
@@ -685,7 +690,10 @@ public class SymbolTable
     public void printErrorLog()
     {
         if (symtError == false)
+        {
+            System.out.println("No Symbol Table Errors");
             return;
+        }
 
         for (String error : errorLog)
         {

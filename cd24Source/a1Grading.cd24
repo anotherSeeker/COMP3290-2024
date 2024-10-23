@@ -3,7 +3,7 @@ CD24 a1Grading
 constants 
     constantNum1 = 1,
     constantNum2 = 22212,
-    constantNum3 = 22212.2,
+    constantNum3 = 22212.2
 
 typedef
 

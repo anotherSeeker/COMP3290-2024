@@ -10,18 +10,22 @@ constants
     a = 12,  
     b = 13, 
     c = 5,
-    d = 1.2345a
+    d = 1.2345
 
 typedef
 
     location def 
         visited : bool, x:int, y : int
+    end
 
 
 func chekcVisited(place : location) : void
+/--no needed things
 begin
     if (place.visited == false)
-        print "get walking you ahven't visited this yet";
+        print "Get walking you haven't visited this yet";
+    else
+        print "You have visited this";
     end
 end
 
@@ -29,17 +33,17 @@ main
     a : int,
     b : int,
     vis : bool,
-    place : location
+    newPlace : location
 begin
     
     a = 2;
-    b = 3;
+    b = 3+a;
     vis = false;
 
-    place.visited = vis;
-    place.x = a;
-    place.y = b;
+    newPlace.visited = vis;
+    newPlace.x = a;
+    newPlace.y = b;
 
-    checkVisited(place);
+    checkVisited(newPlace);
 
 end CD24 biggerSimple

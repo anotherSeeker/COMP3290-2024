@@ -19,14 +19,17 @@ public class A3
             lists = tokeniser.run(filePathString);
             tokenList = lists.get(0);
             errorList = lists.get(1);
-            
+            printLexErrors();
             //printTokens();
 
             listingGenerator.generateListingA1(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
             SymbolTable symTable = new SymbolTable(tokenList);
-
+            //symTableErrors
+            //symTable.printTable();
+            symTable.printErrorLog();
+            
             TokenParser parser = new TokenParser(tokenList, symTable);
             PNodeTree tree = parser.run();
 
@@ -36,9 +39,6 @@ public class A3
             //tree.printTreeTraversal();
             //tree.printTree();
 
-            //symTableErrors
-            symTable.printTable();
-            symTable.printErrorLog();
             
 
         }
@@ -71,7 +71,7 @@ public class A3
         }
     }
 
-    public static void printErrors()
+    public static void printLexErrors()
     {
         int currentLineLength = 0;
         if (errorList.size() < 1)

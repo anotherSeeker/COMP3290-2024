@@ -73,6 +73,15 @@ public class PNodeTree
         return travString;
     }
 
+    public String stringErrors()
+    {
+        String travString = "";
+
+        travString += errorStrings(errorStrings);
+
+        return travString;
+    }
+
     public void traversalStep(ParserNode node)
     {
         String RESET = "\u001B[0m"; 
