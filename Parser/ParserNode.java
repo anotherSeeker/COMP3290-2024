@@ -129,6 +129,13 @@ public class ParserNode
 
     public String getTraversalString()
     {
+        if (isToken())
+        {
+            if (nodeToken.getType() == TokenTypes.TIDEN || nodeToken.getType() == TokenTypes.TILIT || nodeToken.getType() == TokenTypes.TFLIT || nodeToken.getType() == TokenTypes.TBOOL)
+            {
+                return getName()+" "+nodeToken.getTypeString();
+            }
+        }
         return getName();
     }
 
