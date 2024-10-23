@@ -23,25 +23,31 @@ func checkVisited(place : location) : void
 /--no needed things
 begin
     if (place.visited == false)
-        print "Get walking you haven't visited this yet";
+        printline "Get walking you haven't visited ";
+        print place.x;
+        print " ";
+        printline place.y;
     else
-        print "You have visited this";
+        print "You have visited ";
+        print place.x;
+        print " ";
+        printline place.y;
     end
 end
 
 main
-    a : int,
+    amain : int,
     b : int,
     vis : bool,
     newPlace : location
 begin
     
-    a = 2;
+    amain = a;
     b = 3+a;
     vis = false;
 
     newPlace.visited = vis;
-    newPlace.x = a;
+    newPlace.x = amain;
     newPlace.y = b;
 
     checkVisited(newPlace);

@@ -58,6 +58,8 @@ public class Token
     private final int line;
     private final int column;
 
+    private int index = -1;
+
     //Public
 
     public Token(TokenTypes inputType, ArrayList<LexChar> _lexBuffer, int _line, int _column)
@@ -174,6 +176,16 @@ public class Token
     public int getColumn()
     {
         return column;
+    }
+
+    public int getIndex()
+    {
+        return index;
+    }
+
+    public void setIndex(int _index)
+    {
+        index = _index;
     }
 
     public boolean matchLocation(Token inputToken)

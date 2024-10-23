@@ -12,22 +12,28 @@ cd24Source/biggerSimple.cd24
 22: TFUNC TIDEN checkVisited      TLPAR TIDEN place TCOLN TIDEN location    TRPAR TCOLN TVOID 
 24: TBEGN 
 25: TIFTH TLPAR TIDEN place TDOTT TIDEN visited     TEQEQ TFALS TRPAR 
-26: TPRNT TSTRG "Get walking you haven't visited this yet"      TSEMI 
-27: TELSE 
-28: TPRNT TSTRG "You have visited this" TSEMI 
-29: TTEND 
-30: TTEND 
-32: TMAIN 
-33: TIDEN a     TCOLN TINTG TCOMA 
-34: TIDEN b     TCOLN TINTG TCOMA 
-35: TIDEN vis   TCOLN TBOOL TCOMA 
-36: TIDEN newPlace    TCOLN TIDEN location    
-37: TBEGN 
-39: TIDEN a     TEQUL TILIT 2     TSEMI 
-40: TIDEN b     TEQUL TILIT 3     TPLUS TIDEN a     TSEMI 
-41: TIDEN vis   TEQUL TFALS TSEMI 
-43: TIDEN newPlace    TDOTT TIDEN visited     TEQUL TIDEN vis   TSEMI 
-44: TIDEN newPlace    TDOTT TIDEN x     TEQUL TIDEN a     TSEMI 
-45: TIDEN newPlace    TDOTT TIDEN y     TEQUL TIDEN b     TSEMI 
-47: TIDEN checkVisited      TLPAR TIDEN newPlace    TRPAR TSEMI 
-49: TTEND TCD24 TIDEN biggerSimple      TTEOF 
+26: TPRLN TSTRG "Get walking you haven't visited "  TSEMI 
+27: TPRNT TIDEN place TDOTT TIDEN x     TSEMI 
+28: TPRNT TSTRG " "   TSEMI 
+29: TPRLN TIDEN place TDOTT TIDEN y     TSEMI 
+30: TELSE 
+31: TPRNT TSTRG "You have visited "     TSEMI 
+32: TPRNT TIDEN place TDOTT TIDEN x     TSEMI 
+33: TPRNT TSTRG " "   TSEMI 
+34: TPRLN TIDEN place TDOTT TIDEN y     TSEMI 
+35: TTEND 
+36: TTEND 
+38: TMAIN 
+39: TIDEN amain TCOLN TINTG TCOMA 
+40: TIDEN b     TCOLN TINTG TCOMA 
+41: TIDEN vis   TCOLN TBOOL TCOMA 
+42: TIDEN newPlace    TCOLN TIDEN location    
+43: TBEGN 
+45: TIDEN amain TEQUL TIDEN a     TSEMI 
+46: TIDEN b     TEQUL TILIT 3     TPLUS TIDEN a     TSEMI 
+47: TIDEN vis   TEQUL TFALS TSEMI 
+49: TIDEN newPlace    TDOTT TIDEN visited     TEQUL TIDEN vis   TSEMI 
+50: TIDEN newPlace    TDOTT TIDEN x     TEQUL TIDEN amain TSEMI 
+51: TIDEN newPlace    TDOTT TIDEN y     TEQUL TIDEN b     TSEMI 
+53: TIDEN checkVisited      TLPAR TIDEN newPlace    TRPAR TSEMI 
+55: TTEND TCD24 TIDEN biggerSimple      TTEOF 

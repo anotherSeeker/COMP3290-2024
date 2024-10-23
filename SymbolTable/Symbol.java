@@ -5,23 +5,23 @@ import java.util.ArrayList;
 public class Symbol 
 {
     public static enum symTypes{
-        ID, intg, flot, bool, 
+        ID, intg, flot, bool, symVoid,
         structID, typeID, funcID, undf, programName
     }
 
-    private static final String RESET = "\u001B[0m";
-    private static final String RED = "\u001B[31m";
-    private static final String B_RED = "\u001B[91m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String B_GREEN = "\u001B[92m";
-    private static final String BLUE =  "\u001B[34m";
-    private static final String B_BLUE = "\u001B[94m";
-    private static final String CYAN = "\u001B[36m";
-    private static final String B_CYAN = "\u001B[96m";
-    private static final String MAGENTA = "\u001B[35m";
-    private static final String B_MAGENTA = "\u001B[95m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String B_YELLOW = "\u001B[93m";
+    private static final String RESET = /*""//*/"\u001B[0m";
+    private static final String RED = /*""//*/"\u001B[31m";
+    private static final String B_RED = /*""//*/"\u001B[91m";
+    private static final String GREEN = /*""//*/"\u001B[32m";
+    private static final String B_GREEN = /*""//*/"\u001B[92m";
+    private static final String BLUE =  /*""//*/"\u001B[34m";
+    private static final String B_BLUE = /*""//*/"\u001B[94m";
+    private static final String CYAN = /*""//*/"\u001B[36m";
+    private static final String B_CYAN = /*""//*/"\u001B[96m";
+    private static final String MAGENTA = /*""//*/"\u001B[35m";
+    private static final String B_MAGENTA = /*""//*/"\u001B[95m";
+    private static final String YELLOW = /*""//*/"\u001B[33m";
+    private static final String B_YELLOW = /*""//*/"\u001B[93m";
     
     
     
@@ -33,17 +33,19 @@ public class Symbol
     private final ArrayList<Token> occurances = new ArrayList<>();
     private final Scope parentScope;
 
-    public static symTypes typeFromString(String returnType)
+    public static symTypes typeFromString(String returnString)
     {
-        try
-        {
-           return symTypes.valueOf(returnType);  
+        symTypes outType = null;
+        //ID, intg, flot, bool, symVoid, structID, typeID, funcID,
+        switch (returnString) {
+            case "TINTG" -> {outType = symTypes.intg;}
+            case "TFLOT" -> {outType = symTypes.flot;}
+            case "TBOOL" -> {outType = symTypes.bool;}
+            case "TVOID" -> {outType = symTypes.symVoid;}
+            //if we get an integer that's what the next step is for
         }
-        catch (Exception e)
-        {
-            //don't bother with error, we handle null cases outside of this
-            return null;
-        }
+
+        return outType;
     }
 
     public Symbol(Token _token, symTypes _type, Scope scope)
@@ -85,6 +87,7 @@ public class Symbol
             case symTypes.bool -> outString+=BLUE;
             case symTypes.undf -> outString+=B_RED;
             case symTypes.programName -> outString+=B_CYAN;
+            case symTypes.symVoid -> outString+=YELLOW;
         }
         outString+=type.toString()+RESET+" : ";
 
@@ -107,7 +110,7 @@ public class Symbol
             Token occurance = occurances.get(i);
 
             outString+="\n\t\t"+B_BLUE+i+": ";
-            outString+=occurance.getLocationStringCols();
+            outString+=occurance.getLocationStringCols()+RESET;
 
             if (occurance.isDefinition)
                 outString+=BLUE+" : Definition"+RESET;

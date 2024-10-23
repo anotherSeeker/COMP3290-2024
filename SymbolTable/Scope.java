@@ -8,7 +8,7 @@ public class Scope
     private final ArrayList<Symbol> symbols = new ArrayList<>();
     private final ArrayList<Token> scopeOccurances = new ArrayList<>();
     private Token scopeToken;
-    private String returnType = null;
+    private Symbol.symTypes returnType = null;
     private final boolean isFunc;
     private final String name;
 
@@ -17,6 +17,14 @@ public class Scope
         scopeToken = _token;
         name = scopeToken.getLexeme();
         isFunc = true;
+    }
+
+    public Scope(Token _token, Symbol.symTypes _returnType)
+    {
+        scopeToken = _token;
+        name = scopeToken.getLexeme();
+        isFunc = true;
+        returnType = _returnType;
     }
 
     public Scope(boolean globOrMain)
@@ -161,7 +169,12 @@ public class Scope
         return null;
     }
 
-    public String getReturnType()
+    public void setReturnType(Symbol.symTypes _returnType)
+    {
+        returnType = _returnType;
+    }
+
+    public Symbol.symTypes getReturnType()
     {
         return returnType;
     }

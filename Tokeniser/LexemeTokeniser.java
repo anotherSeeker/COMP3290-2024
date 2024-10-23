@@ -49,6 +49,13 @@ public class LexemeTokeniser
         lists.add(TOKEN_LIST);
         lists.add(ERROR_LIST);
 
+        for (int i = 0; i<TOKEN_LIST.size(); i++)
+        {
+            //to make it easier to reference tokens in our symbol table
+            Token tok = TOKEN_LIST.get(i);
+            tok.setIndex(0);
+        }
+
         return lists;
     }
 
@@ -153,7 +160,7 @@ public class LexemeTokeniser
 
     private boolean isReadyToTokenise(LexChar newChar)
     {
-        boolean shouldTokenise = true;
+        boolean shouldTokenise;
         String charStr = newChar.getCharacter();
         boolean isWhitespaceChar = Character.isWhitespace(charStr.charAt(0));
 
@@ -205,7 +212,7 @@ public class LexemeTokeniser
             case number -> shouldTokenise = numberValidate(strChar, buffer);
             case floatlit -> shouldTokenise = flitValidate(strChar, buffer);
             case comment -> shouldTokenise = commentValidate(strChar);
-            case multicomment -> shouldTokenise = multiCommentValidate(strChar, buffer);
+            case multicomment -> shouldTokenise = multiCommentValidate(buffer);
             case string -> shouldTokenise = stringValidate(lexChar, buffer);
             case symbol -> shouldTokenise = validateSymbol(lexChar, buffer);
             default -> throw new AssertionError();
@@ -368,7 +375,7 @@ public class LexemeTokeniser
 
     private boolean shouldTokeniseStringState(LexChar current)
     {
-        boolean shouldTokenise = false;
+        boolean shouldTokenise;
         if (current.getCharacter().equals("\n"))
         {
             state = tokeniserState.undefined;
@@ -383,7 +390,7 @@ public class LexemeTokeniser
         return shouldTokenise;
     }
 
-    private boolean multiCommentValidate(String currChar, ArrayList<LexChar> buffer)
+    private boolean multiCommentValidate(ArrayList<LexChar> buffer)
     {
         return endMultiLineComment(buffer);
     }

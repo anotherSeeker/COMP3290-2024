@@ -160,10 +160,17 @@ public class PNodeTree
 
     private void errorPrint()
     {
+        if (errorStrings.isEmpty())
+        {
+            System.out.println("No Parser Errors Found");
+            return;
+        }
+
         for (String err : errorStrings)
         {
             System.out.println(err);
         }
+        
     }
 
     private String errorStrings()

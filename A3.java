@@ -27,18 +27,18 @@ public class A3
 
             SymbolTable symTable = new SymbolTable(tokenList);
             //symTableErrors
-            //symTable.printTable();
+            symTable.printTable();
             symTable.printErrorLog();
             
             TokenParser parser = new TokenParser(tokenList, symTable);
             PNodeTree tree = parser.run();
-            //tree.printErrors();
+            tree.printErrors();
 
             //print tree is the debug print, 
                 //traversal is the requested output print
             listingGenerator.generateListingA2(tree, filePathString);
             //tree.printTreeTraversal();
-            tree.printTree();
+            //tree.printTree();
 
             
 

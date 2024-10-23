@@ -44,12 +44,19 @@ public class SymbolTable
         for (Scope currentScope : scopeList)
         {
             String name = currentScope.getName();
+            symTypes returnType = currentScope.getReturnType();
+
             switch (name) {
                 case "Global" -> System.out.println(GREEN+"Scope: "+bCYAN+name+RESET+" : ");
                 case "Main" -> System.out.println(GREEN+"Scope: "+MAGENTA+name+RESET+" : ");
                 default -> System.out.println(GREEN+"Scope: "+YELLOW+name+RESET+" : ");
             }
-            //System.out.println(GREEN+"Scope: "+currentScope.getName()+RESET);
+
+            if (returnType != null)
+            {
+                System.out.println(GREEN+"ReturnType: "+YELLOW+returnType+RESET);
+            }
+
             for (Symbol sym : currentScope.getSymbolList())
             {
                 String outString = "";
@@ -63,9 +70,16 @@ public class SymbolTable
     private void populateTable()
     {
         //scopes 0 and 1 are globalScope and mainScope
-        scopeSetup();
+        setupScopes();
 
         stepThroughTokens();
+        for (Scope scope : scopeList)
+        {
+            if (scope.getReturnType() == symTypes.ID)
+            {
+                validateReturnTypes(mainScope);
+            }
+        }
 
         if (symtError)
         {
@@ -73,7 +87,7 @@ public class SymbolTable
         }
     }
 
-    private void scopeSetup()
+    private void setupScopes()
     {
         //these are always the first two scopes
         addScope(globalScope);
@@ -95,14 +109,54 @@ public class SymbolTable
                 try {
                     i = stepIterator(i, 1);
                     scopeToken = tokenList.get(i);
+                    
+                    Token returnToken = getNextReturnToken(i);
+                    symTypes returnType = standardiseReturnType(returnToken);
 
-                    Scope newScope = new Scope(scopeToken);
+                    Scope newScope;
+                    if (returnToken == null)
+                    {
+                        logError("Symbol Table Error: No return type found for "+scopeToken.getLexeme()+" at "+scopeToken.getLocationString());
+                        newScope = new Scope(scopeToken);
+                    }
+                    else
+                    {
+                        newScope = new Scope(scopeToken, returnType);
+                    }
+
                     addScope(newScope);
                 } catch (Exception e) {
+                    //e.printStackTrace();
                     logError("Scope setup at: "+listToken.getLocationStringErr()+" has failed");
                 }
             }
         }
+    }
+
+    private Token getNextReturnToken(int index)
+    {
+        try
+        {
+            for (int i = index; i < tokenList.size(); i++)
+            {
+                Token listToken = tokenList.get(i);
+                if (listToken.getType() == TokenTypes.TRPAR)
+                {
+                    //step forward
+                    listToken = tokenList.get(i+1);
+                    if (listToken.getType() == TokenTypes.TCOLN)
+                    {
+                        return tokenList.get(i+2);
+                    }
+                }
+            }
+        } 
+        catch(Exception e) 
+        {
+            //e.printStackTrace();
+            logError("Symbol Table Error: Finding function return type has failed");
+        }
+        return null;
     }
 
     private void stepThroughTokens()
@@ -184,8 +238,7 @@ public class SymbolTable
                     Token newToken = tokenList.get(k);
                     if (tokenIsScopeName(newToken))
                     {
-                        String retnType = getScopeFromTokenName(newToken).getReturnType();
-                        type = getTypeFromString(retnType);
+                        type = getScopeFromTokenName(newToken).getReturnType();
                     }
                     else
                     {
@@ -295,11 +348,12 @@ public class SymbolTable
             Symbol newSymbol = new Symbol(identToken, type, globalScope);
             globalScope.addSymbol(newSymbol);
 
-            //add values to newSymbol
+            //add initial value to struct
             newSymbol.addValue(stepForwardToken);
             i=stepIterator(i, 2);
             valueToken = tokenList.get(i);
             newSymbol.addValue(valueToken);
+
             //see if there are additional values to add
             for (int k = i+1; k<tokenList.size(); k++)
             {
@@ -334,11 +388,12 @@ public class SymbolTable
                         return k;
                     }
                 }
-
-                i = k;
+                else
+                {
+                    return k;
+                }
             }
         }
-
         return i;
     }
 
@@ -701,11 +756,20 @@ public class SymbolTable
         }
     }
 
-    private symTypes getTypeFromString(String returnString)
+    private symTypes standardiseReturnType(Token returnToken)
     {
+        boolean isIden = false;
+        String returnString = returnToken.getTypeString();
+
+        //if we're using the symType name directly we can get away with this
+        if (returnToken.getType() == TokenTypes.TIDEN)
+        {
+            isIden = true;
+        }
+
         symTypes type = Symbol.typeFromString(returnString);
-        
-        if (type == null)
+
+        if (isIden)
         {
             if (lookupStructExists(returnString))
             {
@@ -715,8 +779,35 @@ public class SymbolTable
             {
                 type = symTypes.typeID;
             }
+            else
+            {
+                type = symTypes.ID;
+            }
         }
 
         return type;
     }
+
+    private void validateReturnTypes(Scope scope)
+    {
+        Token scopeToken = scope.getToken();
+        
+        Token returnToken = getNextReturnToken(scopeToken.getIndex());
+        String returnString = returnToken.getLexeme();
+        if (returnString != null)
+        {
+            if (lookupStructExists(returnString))
+            {
+                scope.setReturnType(symTypes.structID);
+            }
+            else if (lookupTypeExists(returnString))
+            {
+                scope.setReturnType(symTypes.typeID);
+            }
+            else
+            {
+                logError("Symbol Table Error: assigned return type is not a Struct or Array");
+            }
+        }
+    } 
 }

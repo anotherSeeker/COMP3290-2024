@@ -25,64 +25,64 @@ arraydef /**beep
 **/
     scores : studentScores
 
-    func calcScores(const scores : studentScores, numStudents : int) : float
-        total : float,
-        i : int
-    begin
-        for (i = 0; i < numStudents)
-            total = scores[i].score;
-            i+=1;
+func calcScores(const scores : studentScores, numStudents : int) : float
+    total : float,
+    i : int
+begin
+    for (i = 0; i < numStudents)
+        total = scores[i].score;
+        i+=1;
+    end
+end
+
+func getScoreByID(ID : int, numStudents : int, const scores : studentScores) : float
+    i : int,
+    score : float
+begin
+    score = 0;
+    for (i = 0; i < numStudents)
+        if (scores[i].id == ID)
+            score = scores[i].score;
         end
     end
 
-    func getScoreByID(ID : int, numStudents : int, const scores : studentScores) : float
-        i : int,
-        score : float
-    begin
-        score = 0;
-        for (i = 0; i < numStudents)
-            if (scores[i].id == ID)
-                score = scores[i].score;
-            end
-        end
+    return score;
+end
 
-        return score;
-    end
-
-    func getHighestScoreID(const scores : studentScores, numStudents : int) : int
-        i : int,
-        highest : float,
-        highestID : int
-    begin
-        highest = 0;
-        for (i = 0; i < numStudents)
-            if (highest < scores[i].score or score == 0)
-                highest = scores[i].score;
-                highestID = scores[i].id;
-            end
-        end
-
-        return highestID;
-    end
-
-    func assignScore(score : float, studentID : int, arrayIndex : int, const scores : studentScores) : void
-        /--nothing needed
-    begin
-        scores[arrayIndex].id = studentID;
-        scores[arrayIndex].score = score;
-
-        return void;
-    end
-
-    func printAllScores(const scores : studentScores, numStudents : int) : void
-        /--nothing needed
-    begin
-        for (i = 0; i < numStudents)
-            print scores[i].id;
-            print " : ";
-            printline scores[i].score;
+func getHighestScoreID(const scores : studentScores, numStudents : int) : int
+    i : int,
+    highest : float,
+    highestID : int
+begin
+    highest = 0;
+    for (i = 0; i < numStudents)
+        if (highest < scores[i].score or score == 0)
+            highest = scores[i].score;
+            highestID = scores[i].id;
         end
     end
+
+    return highestID;
+end
+
+func assignScore(score : float, studentID : int, arrayIndex : int, const scores : studentScores) : void
+    /--nothing needed
+begin
+    scores[arrayIndex].id = studentID;
+    scores[arrayIndex].score = score;
+
+    return void;
+end
+
+func printAllScores(const scores : studentScores, numStudents : int) : void
+    /--nothing needed
+begin
+    for (i = 0; i < numStudents)
+        print scores[i].id;
+        print " : ";
+        printline scores[i].score;
+    end
+end
 
 main
     numStudents : int,
