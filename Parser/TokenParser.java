@@ -66,7 +66,6 @@ public class TokenParser
         for (String ruleString : matchSet)
         {
             Rule subRule = null;
-
             int isSubRule = 0;
             int isTokenType = 1;
             int isSymType = 2;

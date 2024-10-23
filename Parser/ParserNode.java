@@ -110,7 +110,7 @@ public class ParserNode
                 handleIndent(printDepth, parentDepth, depthChange);
                 String str = name;
 
-                if (nodeToken.getType() == TokenTypes.TIDEN)
+                if (nodeToken.getType() == TokenTypes.TIDEN || nodeToken.getType() == TokenTypes.TILIT || nodeToken.getType() == TokenTypes.TFLIT || nodeToken.getType() == TokenTypes.TBOOL)
                     str = str+" : "+nodeToken.getLexeme();
 
                 System.out.print(GREEN+str+RESET);

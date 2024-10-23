@@ -19,7 +19,7 @@ typedef
     end
 
 
-func chekcVisited(place : location) : void
+func checkVisited(place : location) : void
 /--no needed things
 begin
     if (place.visited == false)

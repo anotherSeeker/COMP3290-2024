@@ -61,14 +61,14 @@ public class PNodeTree
     {
         traversalStep(treeRoot);
         System.out.println("\n");
-        errorPrint(errorStrings);
+        errorPrint();
     }
 
     public String stringTreeTraversal()
     {
         String travString = traversalStepString(treeRoot)+"\n";
 
-        travString += errorStrings(errorStrings);
+        travString += errorStrings();
 
         return travString;
     }
@@ -77,7 +77,7 @@ public class PNodeTree
     {
         String travString = "";
 
-        travString += errorStrings(errorStrings);
+        travString += errorStrings();
 
         return travString;
     }
@@ -158,23 +158,28 @@ public class PNodeTree
         return str;
     }
 
-    private void errorPrint(ArrayList<String> errStrings)
+    private void errorPrint()
     {
-        for (String err : errStrings)
+        for (String err : errorStrings)
         {
             System.out.println(err);
         }
     }
 
-    private String errorStrings(ArrayList<String> errStrings)
+    private String errorStrings()
     {
         String out = "";
 
-        for (String err : errStrings)
+        for (String err : errorStrings)
         {
             out += err;
         }
 
         return out;
+    }
+
+    public void printErrors()
+    {
+        errorPrint();
     }
 }
