@@ -41,7 +41,14 @@ public class ParserNode
         if (ruleType == null)
         {
             isToken = true;
-            name = nodeToken.getTypeString();
+            if (nodeToken.getType() == TokenTypes.TIDEN || nodeToken.getType() == TokenTypes.TILIT  || nodeToken.getType() == TokenTypes.TFLIT  || nodeToken.getType() == TokenTypes.TBOOL)
+            {
+                name = nodeToken.getTypeString()+nodeToken.getLexeme();
+            }
+            else
+            {
+                name = nodeToken.getTypeString();
+            }
         }
         else
             name = ruleType.getName();
@@ -129,6 +136,13 @@ public class ParserNode
 
     public String getTraversalString()
     {
+        if (isToken())
+        {
+            if (nodeToken.getType() == TokenTypes.TIDEN || nodeToken.getType() == TokenTypes.TILIT  || nodeToken.getType() == TokenTypes.TFLIT  || nodeToken.getType() == TokenTypes.TBOOL)
+            {
+                return getName()+" "+nodeToken.getLexeme();
+            }
+        }   
         return getName();
     }
 
