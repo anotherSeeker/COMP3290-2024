@@ -90,13 +90,6 @@ public class PNodeTree
 
         currentTraversalLineLength += travString.length();
 
-        if (node.isErr())
-            travString = RED+travString+RESET;
-        else if (node.isToken())
-            travString = GREEN+travString+RESET;
-        else
-            travString = BLUE+travString+RESET;
-
         if (currentTraversalLineLength >= 70)
         {
             currentTraversalLineLength = 0;

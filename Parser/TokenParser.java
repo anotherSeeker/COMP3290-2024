@@ -261,8 +261,8 @@ public class TokenParser
         String RESET = "\u001B[0m";
         String RED = "\u001B[31m";
 
-        errorDesc = RED+"syntax error: " + errorDesc +RESET+"\n";
-        errorDesc = errorDesc + RED+"Occured At: "+currentToken.getLocationStringErr()+RESET;
+        errorDesc = "syntax error: " + errorDesc +"\n";
+        errorDesc = errorDesc + "Occured At: "+currentToken.getLocationStringErr();
 
 
         ParserNode newNode = new ParserNode(currentToken, rule, errorDesc, parentNode);

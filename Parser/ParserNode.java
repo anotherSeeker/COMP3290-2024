@@ -67,7 +67,7 @@ public class ParserNode
         handleIndent(printDepth);
 
         if (isErr())
-            System.out.print(RED+"Syntax Error: " + errorDesc+RESET);
+            System.out.print("Syntax Error: " + errorDesc);
         else
         {
             if (isToken)
@@ -83,10 +83,10 @@ public class ParserNode
                 else
                     par = "";
 
-                System.out.print(GREEN+str+par+RESET);
+                System.out.print(str+par);
             }
             else
-                System.out.print(BLUE+name+RESET);  
+                System.out.print(name);  
         }
 
         System.out.print("\n");
@@ -101,7 +101,7 @@ public class ParserNode
         if (isErr())
         {
             System.out.print(errorDesc+"\n");
-            //System.out.println(RED+"Occured At: "+nodeToken.getLocationStringErr()+RESET);
+            //System.out.println("Occured At: "+nodeToken.getLocationStringErr());
         }
         else
         {
@@ -113,7 +113,7 @@ public class ParserNode
                 if (nodeToken.getType() == TokenTypes.TIDEN)
                     str = str+" : "+nodeToken.getLexeme();
 
-                System.out.print(GREEN+str+RESET);
+                System.out.print(str);
                 System.out.print("\n");
             }
             else if (!onlyTokens)
@@ -121,7 +121,7 @@ public class ParserNode
                 handleIndent(printDepth, parentDepth, depthChange);
                 String str = name;
 
-                System.out.print(BLUE+str+RESET);
+                System.out.print(str);
                 System.out.print("\n");  
             }
         }

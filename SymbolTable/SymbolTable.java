@@ -474,7 +474,7 @@ public class SymbolTable
 
         for (String error : errorLog)
         {
-            System.out.println(RED+error+RESET);
+            System.out.println(error);
         }
     }
 }

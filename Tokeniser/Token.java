@@ -175,7 +175,7 @@ public class Token
         String GREEN    = "\u001B[32m";
         String BLUE     = "\u001B[34m";
 
-        return RED+"("+BLUE+"Line: "+BLUE+line+RED+", "+GREEN+"Column: "+GREEN+column+RED+")"+RESET;
+        return "("+"Line: "+line+", "+"Column: "+column+")";
     }
 
     private String getBufferString(ArrayList<LexChar> lexBuffer)

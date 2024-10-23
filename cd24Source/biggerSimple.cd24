@@ -10,15 +10,16 @@ constants
     a = 12,  
     b = 13, 
     c = 5,
-    d = 1.2345a
+    d = 1.2345
 
 typedef
 
     location def 
         visited : bool, x:int, y : int
+    end
 
 
-func chekcVisited(place : location) : void
+func checkVisited(place : location) : void
 begin
     if (place.visited == false)
         print "get walking you ahven't visited this yet";
