@@ -18,9 +18,6 @@ public class SemanticChecker
         symt = _symt;
 
         errorFree = runSemCheck();
-
-
-        printErrorLog();
     }
 
 
@@ -51,12 +48,12 @@ public class SemanticChecker
         return false;
     }
 
-
     private boolean validateDeclarationBeforeUse()
     {
-        symt.validateVariableUses();
+        ArrayList<String> errors = symt.validateVariableUses();
+        logError(errors);
 
-        return false;
+        return errors.isEmpty();
     }
 
 
@@ -73,15 +70,24 @@ public class SemanticChecker
 
 
 
-    public boolean getHasError()
+    public boolean hasErrors()
     {
-        return errorFree;
+        return !errorFree;
     }
 
     private void logError(String log)
     {
         errorFree = false;
         errorLog.add(log);
+    }
+
+    private void logError(ArrayList<String> logs)
+    {
+        errorFree = false;
+        for (String log : logs)
+        {
+            errorLog.add(log);
+        }
     }
 
     public void printErrorLog()

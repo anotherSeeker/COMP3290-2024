@@ -15,6 +15,7 @@ public class Scope
     public Scope(Token _token)
     {
         scopeToken = _token;
+        scopeToken.isDefinition = true;
         name = scopeToken.getLexeme();
         isFunc = true;
     }
@@ -22,6 +23,7 @@ public class Scope
     public Scope(Token _token, Symbol.symTypes _returnType)
     {
         scopeToken = _token;
+        scopeToken.isDefinition = true;
         name = scopeToken.getLexeme();
         isFunc = true;
         returnType = _returnType;

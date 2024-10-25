@@ -226,4 +226,95 @@ public class Symbol
     {
         return occurances;
     }
+
+    public ArrayList<String> occurancesAreDefined(Scope globalScope, Scope mainScope)
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        Token definitionToken = null;
+
+        for (Token occurance : occurances)
+        {
+            if (occurance.isDefinition)
+            {
+                definitionToken = occurance;
+            }
+        }
+
+        if (definitionToken == null)
+        {
+            definitionToken = searchGlobalAndMainForDefinition(globalScope, mainScope);
+        }
+
+
+        if (definitionToken == null)
+        {
+            String log = "Semantic Error: symbol "+this.firstToken.getLexeme()+"failed to find a definition token";
+            errorList.add(log);
+            return errorList;
+        }
+
+        for (Token occurance : occurances)
+        {
+            if (occurance != definitionToken)
+            {
+                if (!occurance.isAfter(definitionToken))
+                {
+                    //we have used this variable before its definition, log and error
+                    String log = "Semantic Error: symbol "+occurance.getLexeme()+" used at "+occurance.getLocationString()+" before definition at "+definitionToken.getLocationString();
+                    errorList.add(log);
+                }
+            }
+        }
+
+        return errorList;
+    }
+
+    private Token searchGlobalAndMainForDefinition(Scope globalScope, Scope mainScope)
+    {
+        Token definitionToken = null;
+
+        if (this.parentScope == mainScope)
+        {
+            definitionToken = searchScopeForDef(mainScope);
+        }
+
+        if (definitionToken == null)
+        {
+            definitionToken = searchScopeForDef(globalScope);
+        }
+
+        return definitionToken;
+    }
+
+
+    private Token searchScopeForDef(Scope scope)
+    {
+        Token definitionToken = null;
+        Symbol sym = findSymbolInScope(scope);
+
+        if (sym!=null)
+        {
+            for (Token occurance : sym.getOccurances())
+            {
+                if (occurance.isDefinition)
+                {
+                    definitionToken = occurance;
+                    break;
+                }
+            }
+        }
+        return definitionToken;
+    }
+
+    private Symbol findSymbolInScope(Scope scope)
+    {
+        for (Symbol sym : scope.getSymbolList())
+        {
+            if (sym.firstToken.matchIdentifier(this.firstToken))
+            {
+                return sym;
+            }
+        }
+        return null;
+    }
 }

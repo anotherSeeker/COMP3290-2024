@@ -195,6 +195,7 @@ public class SymbolTable
                 {
                     progName = tokenList.get(index).getLexeme();
                     symTypes type = symTypes.programName;
+                    tokenList.get(index).isDefinition = true;
                     Symbol newSymbol = new Symbol(tokenList.get(index), type, globalScope);
                     addToScope(newSymbol, globalScope, true);
                 }
@@ -934,24 +935,27 @@ public class SymbolTable
         return isValid;
     }
 
-    public boolean validateVariableUses()
+    public ArrayList<String> validateVariableUses()
     {
-        boolean isValid = false;
+        ArrayList<String> errorList = new ArrayList<>();
+        ArrayList<String> newErrors;
 
         for (Scope scope : scopeList)
         {
             for (Symbol sym : scope.getSymbolList())
             {
-                for (Token occurance : sym.getOccurances())
+                newErrors = sym.occurancesAreDefined(globalScope, mainScope);
+                
+                for (String error : newErrors)
                 {
-
+                    errorList.add(error);
                 }
             }
         }
 
 
 
-        return false;
+        return errorList;
     }
 
 

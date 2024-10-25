@@ -1,6 +1,7 @@
+import Generator.*;
 import Parser.*;
-import SemanticChecker.SemanticChecker;
-import SymbolTable.SymbolTable;
+import SemanticChecker.*;
+import SymbolTable.*;
 import Tokeniser.*;
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ public class A3
         PNodeTree parserTree;
         TokenParser parser;
         SemanticChecker semChecker;
+        CodeGenerator gen;
 
         if (args.length > 0)
         {
@@ -47,12 +49,15 @@ public class A3
                 //tree.printTreeTraversal();
                 //tree.printTree();
 
-
-                semChecker = new SemanticChecker(tokenList, symTable);
-
                 if (!parserTree.hasErrors())
                 {
                     semChecker = new SemanticChecker(tokenList, symTable);
+                    semChecker.printErrorLog();
+                    
+                    if (semChecker.hasErrors())
+                    {
+
+                    }
                 }
                 else
                 {

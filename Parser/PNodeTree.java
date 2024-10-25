@@ -191,6 +191,6 @@ public class PNodeTree
 
     public boolean hasErrors()
     {
-        return errorStrings.isEmpty();
+        return !errorStrings.isEmpty();
     }
 }
