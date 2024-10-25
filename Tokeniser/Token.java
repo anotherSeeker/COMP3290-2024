@@ -201,7 +201,7 @@ public class Token
 
     public String getLocationStringCols()
     {
-        return GREEN+"(Line: "+bMAGENTA+line+GREEN+", Column: "+bCYAN+column+GREEN+")";
+        return GREEN+"(Line: "+bMAGENTA+line+GREEN+", Column: "+bCYAN+column+GREEN+")"+RESET;
     }
 
     public String getLocationStringErr()

@@ -162,7 +162,7 @@ public class PNodeTree
     {
         if (errorStrings.isEmpty())
         {
-            System.out.println("No Parser Errors Found");
+            System.out.println("No Parser Errors");
             return;
         }
 

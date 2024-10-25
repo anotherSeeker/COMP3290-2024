@@ -6,19 +6,19 @@ import java.util.ArrayList;
 
 public class SymbolTable 
 {
-    private final String RESET = "\u001B[0m";
-    private final String RED = "\u001B[31m";
-    private final String GREEN = "\u001B[32m";
-    //private final String BLUE =  "\u001B[34m";
-    //private final String CYAN = "\u001B[36m";
-    private final String bCYAN = "\u001B[96m";
-    private final String MAGENTA = "\u001B[35m";
-    //private final String bMAGENTA = "\u001B[95m";
-    private final String YELLOW = "\u001B[33m";
-    //private final String bYELLOW = "\u001B[93m";
-    //private final String bBLUE = "\u001B[94m";
-    //private final String bGREEN = "\u001B[92m";
-    //private final String bRED = "\u001B[91m";
+    private static final String RESET = /*""//*/"\u001B[0m";
+    private static final String RED = /*""//*/"\u001B[31m";
+    //private static final String B_RED = /*""//*/"\u001B[91m";
+    private static final String GREEN = /*""//*/"\u001B[32m";
+    //private static final String B_GREEN = /*""//*/"\u001B[92m";
+    //private static final String BLUE =  /*""//*/"\u001B[34m";
+    //private static final String B_BLUE = /*""//*/"\u001B[94m";
+    //private static final String CYAN = /*""//*/"\u001B[36m";
+    private static final String B_CYAN = /*""//*/"\u001B[96m";
+    private static final String MAGENTA = /*""//*/"\u001B[35m";
+    //private static final String B_MAGENTA = /*""//*/"\u001B[95m";
+    private static final String YELLOW = /*""//*/"\u001B[33m";
+    //private static final String B_YELLOW = /*""//*/"\u001B[93m";
 
 
     private final ArrayList<Token> tokenList; 
@@ -47,12 +47,16 @@ public class SymbolTable
         {
             String name = currentScope.getName();
             symTypes returnType = currentScope.getReturnType();
+            String outString = "";
+
 
             switch (name) {
-                case "Global" -> System.out.println(GREEN+"Scope: "+bCYAN+name+RESET+" : "+currentScope.occurancesToString());
-                case "Main" -> System.out.println(GREEN+"Scope: "+MAGENTA+name+RESET+" : "+currentScope.occurancesToString());
-                default -> System.out.println(GREEN+"Scope: "+YELLOW+name+RESET+" : "+currentScope.occurancesToString());
+                case "Global" -> outString+=GREEN+"Scope: "+B_CYAN+name+RESET+" : ";
+                case "Main" -> outString+=GREEN+"Scope: "+MAGENTA+name+RESET+" : ";
+                default -> outString+=GREEN+"Scope: "+YELLOW+name+RESET+" : "+currentScope.occurancesToString();
             }
+
+            System.out.println(outString);
 
             if (returnType != null)
             {
@@ -61,7 +65,7 @@ public class SymbolTable
 
             for (Symbol sym : currentScope.getSymbolList())
             {
-                String outString = "";
+                outString = "";
 
                 outString += sym.toString();
                 System.out.println(outString);
@@ -237,12 +241,11 @@ public class SymbolTable
                     //is not followed by def, =, :, if a struct or array is not followed by those it's referencing the whole object
                     type = getSymTypeFromScopeLookup(token, _scope);
 
-                    if (type == symTypes.structID || type == symTypes.typeID)
+                    if (type == symTypes.structID || type == symTypes.typeID || type == symTypes.structVar || type == symTypes.typeVar)
                     {
-                        Symbol newSymbol = new Symbol(token, type, _scope);
+                        Symbol newSymbol = new Symbol(token, type, _scope); 
                         addToScope(newSymbol, _scope, token.isDefinition);
-
-                        int structOrArrayState = isStructOrArrayReference(token, _scope, i, type);
+                        int structOrArrayState = isStructOrArrayReference(i, _scope, token);
                         if (structOrArrayState != 0)
                         {
                             return globalIterator;
@@ -251,32 +254,47 @@ public class SymbolTable
                 }
                 else
                 {
-                    int k = stepIterator(i, 2);
-                    Token newToken = tokenList.get(k);
-                    if (tokenIsScopeName(newToken))
-                    {
-                        type = getScopeFromTokenName(newToken).getReturnType();
-                    }
-                    else
-                    {
-                        type = getSymTypeFromTokenType(newToken);
-                    }
-
-                    if (type == symTypes.typeID || type == symTypes.structID)
-                    {
-                        //name : type
-                        i = stepIterator(i, 2);
-                        subtype = tokenList.get(i).getLexeme();
-                    }
-
-                    Symbol newSymbol = new Symbol(token, type, _scope);
-                    addToScope(newSymbol, _scope, token.isDefinition);
-                    if (subtype!=null)
-                        newSymbol.setSubType(subtype);
+                    i = handleLooseAssignOrDefine(i, subtype, _scope, token);
                 }
             }
         }
         return i; 
+    }
+
+    private int handleLooseAssignOrDefine(int i, String subtype, Scope _scope, Token oldToken)
+    {
+        i = stepIterator(i, 2);
+        Token newToken = tokenList.get(i);
+        symTypes type;
+        if (tokenIsScopeName(newToken))
+        {
+            type = getScopeFromTokenName(newToken).getReturnType();
+        }
+        else
+        {
+            type = getSymTypeFromTokenType(newToken);
+        }
+
+        symTypes newSymType = type;
+        if (type == symTypes.typeID || type == symTypes.structID)
+        {
+            if (type == symTypes.typeID)
+                newSymType = symTypes.typeVar;
+            else if (type == symTypes.structID)
+                newSymType = symTypes.structVar;
+
+            //name : type, step past :
+                //not a define as we already handled those in stepHandleTypes
+            //i = stepIterator(i, 2);
+            subtype = tokenList.get(i).getLexeme();
+        }
+
+        Symbol newSymbol = new Symbol(oldToken, newSymType, _scope);
+        addToScope(newSymbol, _scope, oldToken.isDefinition);
+        if (subtype!=null)
+            newSymbol.setSubType(subtype);
+
+        return i;
     }
 
     private int stepHandleTypes(Token token, int i)
@@ -337,12 +355,11 @@ public class SymbolTable
             //skip 2 here to bypass the left bracket
             int k = stepIterator(i, 2);
             
-            //add <expr> then add <structid>
-            valueToken = tokenList.get(k);
-            newSymbol.addValue(valueToken);
-            
+            k = addExpressionValuesToArraySymbol(newSymbol, k);
+            //breaks once reaching "]", returns index of "]"
+
             //<structid>
-            k = stepIterator(k, 3);
+            k = stepIterator(k, 2);
             valueToken = tokenList.get(k);
             newSymbol.addValue(valueToken);
             newSymbol.setSubType(valueToken.getLexeme());
@@ -374,6 +391,7 @@ public class SymbolTable
             type = symTypes.structID;
             Symbol newSymbol = new Symbol(identToken, type, globalScope);
             globalScope.addSymbol(newSymbol);
+            newSymbol = globalScope.getSymbolByTokenName(newSymbol.getToken());
 
             //add initial value to struct
             newSymbol.addValue(stepForwardToken);
@@ -475,13 +493,26 @@ public class SymbolTable
     private void addToScope(Symbol sym, Scope scope, boolean isDefinition)
     {
         scope.addSymbol(sym);
+        //symbol is not being defined, nor is it defined in this scope
         if (!isDefinition)
         {
-            if ( scope != globalScope && isInGlobal(sym.getToken()) )
+            if (!isDefinitionInCurrentScope(scope, sym))
             {
-                globalScope.addSymbol(sym);
+                if ( scope != globalScope && isInGlobal(sym.getToken()) )
+                {
+                    globalScope.addSymbol(sym);
+                }
             }
         }
+    }
+
+    private boolean isDefinitionInCurrentScope(Scope scope, Symbol _sym)
+    {
+        Symbol sym = scope.getSymbolByTokenName(_sym.getToken());
+
+        Token symTok = sym.searchSelfForDefinition();
+        
+        return symTok!=null;
     }
     //-------------------------------------
     //return -1 for assignment, return 1 for definition, 0 else
@@ -513,49 +544,125 @@ public class SymbolTable
         return 0;
     }
 
+    private int addExpressionValuesToArraySymbol(Symbol newSymbol, int index)
+    {
+        //starts on first token in "index", in name[index]
+        int i;
+        for (i = index; i < tokenList.size(); i++)
+        {
+            Token tok = tokenList.get(i);
+            if (tok.getType() == TokenTypes.TRBRK)
+            {
+                return i;
+            }
+            
+            switch (tok.getType())
+            {
+                //int lits and constants, constant is checked for being an int const elsewhere
+                case TokenTypes.TILIT -> newSymbol.addValue(tok);
+                case TokenTypes.TIDEN -> newSymbol.addValue(tok);
+                //arithmetic
+                case TokenTypes.TPLUS -> newSymbol.addValue(tok);
+                case TokenTypes.TMINS -> newSymbol.addValue(tok);
+                case TokenTypes.TSTAR -> newSymbol.addValue(tok);
+                case TokenTypes.TDIVD -> newSymbol.addValue(tok);
+                case TokenTypes.TCART -> newSymbol.addValue(tok);
+                default -> {
+                    String log = "Symbol Table Error: Invalid token type in array definition "+tok.getTypeString()+" : "+tok.getLocationString();
+                    logError(log);
+                }
+            }
+        }
+
+        return i;
+    }
+
+    private int addExpressionValuesToArrayVar(Symbol newSymbol, int index)
+    {
+        //starts on first token in "index", in name[index].var, ends on ]
+        int i;
+        for (i = index; i < tokenList.size(); i++)
+        {
+            Token tok = tokenList.get(i);
+            if (tok.getType() == TokenTypes.TRBRK)
+            {
+                return i;
+            }
+            
+            switch (tok.getType())
+            {
+                //int lits and constants, constant is checked for being an int const elsewhere
+                case TokenTypes.TILIT -> newSymbol.addValue(tok);
+                case TokenTypes.TIDEN -> newSymbol.addValue(tok);
+                //arithmetic
+                case TokenTypes.TPLUS -> newSymbol.addValue(tok);
+                case TokenTypes.TMINS -> newSymbol.addValue(tok);
+                case TokenTypes.TSTAR -> newSymbol.addValue(tok);
+                case TokenTypes.TDIVD -> newSymbol.addValue(tok);
+                case TokenTypes.TCART -> newSymbol.addValue(tok);
+                default -> {
+                    String log = "Symbol Table Error: Invalid token type in array index "+tok.getTypeString()+" : "+tok.getLocationString();
+                    logError(log);
+                }
+            }
+        }
+
+        return i;
+    }
+
+
     //structName.var returns 1, arrayName[index] returns 2, arrayName[index].var returns 3, else return 0
     //structName.var adds var token as a value
     //arrayName[index]      adds index as a value,   then adds null as a value
     //arrayName[index].var  add index as a value,    then adds var as a value
-    private int isStructOrArrayReference(Token token, Scope scope, int i, symTypes type)
+    private int isStructOrArrayReference(int i, Scope scope, Token _symbolToken)
     {
-        //TODO: cannot handle struct values as array indexes, fix either internally or externally
         globalIterator = stepIterator(i, 1);
-        
-        if (tokenList.get(globalIterator).getType() == TokenTypes.TDOTT)
+        Token tok=tokenList.get(globalIterator);
+        Symbol newSymbol = scope.getSymbolByTokenName(_symbolToken);
+
+        int outValue = 0;
+
+        if (tok.getType() == TokenTypes.TDOTT)
         {
             //is struct, step forward one and add name to value, we'll use struct
+                //structName.var
             globalIterator = stepIterator(globalIterator, 1);
-            if (type == symTypes.typeID)
-            {
-                scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
-                scope.getSymbolByTokenName(token).addValue(null);
-            }
-            scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
-            return 1;
+            tok = tokenList.get(globalIterator);
+            newSymbol.addValue(tok);
+            outValue = 1;
         }
         else if (tokenList.get(globalIterator).getType() == TokenTypes.TLBRK)
         {
-            //is struct, step forward one and add name to value, we'll use struct
+            //is array ("type"), step forward one and add array expression to thingo
+                ////name[expression] ...
             globalIterator = stepIterator(globalIterator, 1);
-            scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
+            globalIterator = addExpressionValuesToArrayVar(newSymbol, globalIterator);
 
             //step two so we go past the right bracket name[index].var
-            globalIterator = stepIterator(globalIterator, 2);
+            globalIterator = stepIterator(globalIterator, 1);
             if (tokenList.get(globalIterator).getType() == TokenTypes.TDOTT)
             {
                 //is name[index].var
                 globalIterator = stepIterator(globalIterator, 1);
-                scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
-                scope.getSymbolByTokenName(token).addValue(null);
-                return 3;
+                tok = tokenList.get(globalIterator);
+                newSymbol.addValue(tok);
+
+                outValue = 3;
             }
-            //is name[index]
-            scope.getSymbolByTokenName(token).addValue(null);
-            return 2;
+            else
+            {
+                //is name[index]
+                outValue = 2;
+            }
+        }
+        else
+        {
+            //for struct refs or direct array refs
+            newSymbol.addValue(null);
         }
 
-        return 0;
+        return outValue;
     }
     
     public boolean tokenIsStructName(Token _token)
@@ -780,6 +887,11 @@ public class SymbolTable
         return isInScope(_token, globalScope); 
     }
 
+    public ArrayList<Scope> getScopeList()
+    {
+        return scopeList;
+    }
+
     public boolean isInMain(Token _token)
     {
         return isInScope(_token, mainScope); 
@@ -952,13 +1064,42 @@ public class SymbolTable
                 }
             }
         }
+        return errorList;
+    }
 
+    public ArrayList<String> validateArraySizing()
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        ArrayList<String> newErrors;
+
+        for (Scope scope : scopeList)
+        {
+            for (Symbol sym : scope.getSymbolList())
+            {
+                if (sym.getType() == symTypes.typeID)
+                {
+                    //confirmed as array type
+                    newErrors = sym.validateArraySizing();
+
+                    for (String error : newErrors)
+                    {
+                        errorList.add(error);
+                    }
+                }
+            }
+        }
+        return errorList;
+    }
+    
+    public ArrayList<String> validateExpressions()
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        ArrayList<String> newErrors;
+
+        
 
 
         return errorList;
     }
-
-
-    
 
 }

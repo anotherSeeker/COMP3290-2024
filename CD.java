@@ -5,7 +5,7 @@ import SymbolTable.*;
 import Tokeniser.*;
 import java.util.ArrayList;
 
-public class A3
+public class CD
 {
     private static ArrayList<ArrayList<Token>> lists;
     private static ArrayList<Token> tokenList;
@@ -38,25 +38,29 @@ public class A3
                 //symTableErrors
                 symTable.printTable();
                 symTable.printErrorLog();
-            
-                parser = new TokenParser(tokenList, symTable);
-                parserTree = parser.run();
-                parserTree.printErrors();
 
                 //print tree is the debug print, 
-                    //traversal is the requested output print
+                //traversal is the requested output print for A2
+                parser = new TokenParser(tokenList, symTable);
+                parserTree = parser.run();
+
+                //parserTree.printTreeTraversal();
+                //parserTree.printTree();
+                parserTree.printErrors();
+
+                
                 listingGenerator.generateListingA2(parserTree, filePathString);
-                //tree.printTreeTraversal();
-                //tree.printTree();
+                
 
                 if (!parserTree.hasErrors())
                 {
                     semChecker = new SemanticChecker(tokenList, symTable);
                     semChecker.printErrorLog();
-                    
+
                     if (semChecker.hasErrors())
                     {
-
+                        //TODO: generate code
+                        gen = new CodeGenerator();
                     }
                 }
                 else

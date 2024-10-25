@@ -44,6 +44,11 @@ public class Scope
         return symbols;
     }
 
+    public Token getScopeToken()
+    {
+        return scopeToken;
+    }
+
     public ArrayList<Token> getOccurances()
     {
         return scopeOccurances;
@@ -59,16 +64,19 @@ public class Scope
     {
         Token _token = sym.getToken();
         if (isInScope(_token))
-            addSymbolOccurance(_token);
+            addSymbolOccurance(_token, sym.getValues());
         else
             symbols.add(sym);
     }
 
-    private void addSymbolOccurance(Token _token)
+    private void addSymbolOccurance(Token _token, ArrayList<Token> values)
     {
         Symbol entry = getSymbolByTokenName(_token);
         if (entry != null)
+        {
             entry.addOccurance(_token);
+            entry.addValues(values);
+        }
     }
 
     public void addScopeOccurance(Token _token)
@@ -217,6 +225,10 @@ public class Scope
         for (Token occurance : scopeOccurances)
         {
             outString += "\n\t"+count+": "+occurance.getLocationStringCols();
+            if (occurance.isDefinition)
+                outString+=" : Definition";
+            if (occurance.isAssignment)
+                outString+=" : Assignment";
             count++;
         }
 

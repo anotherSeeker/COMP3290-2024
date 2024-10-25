@@ -3,7 +3,8 @@ CD24 a1Grading
 constants 
     constantNum1 = 1,
     constantNum2 = 22212,
-    constantNum3 = 22212.2
+    constantNum3 = 22212.2,
+    arraySize = 20
 
 typedef
 
@@ -18,7 +19,7 @@ typedef
     /--arraytype def
 
     studentScores def 
-        array [20] of studentScore 
+        array [arraySize/**20**/] of studentScore 
     end
 
 arraydef /**beep
@@ -75,7 +76,7 @@ begin
 end
 
 func printAllScores(const scores : studentScores, numStudents : int) : void
-    /--nothing needed
+    i : int
 begin
     for (i = 0; i < numStudents)
         print scores[i].id;

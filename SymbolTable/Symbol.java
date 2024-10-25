@@ -6,7 +6,7 @@ public class Symbol
 {
     public static enum symTypes{
         ID, intg, flot, bool, symVoid,
-        structID, typeID, funcID, undf, programName
+        structID, typeID, typeVar, structVar, funcID, undf, programName
     }
 
     private static final String RESET = /*""//*/"\u001B[0m";
@@ -22,8 +22,6 @@ public class Symbol
     private static final String B_MAGENTA = /*""//*/"\u001B[95m";
     private static final String YELLOW = /*""//*/"\u001B[33m";
     private static final String B_YELLOW = /*""//*/"\u001B[93m";
-    
-    
     
 
     private final Token firstToken;
@@ -80,7 +78,9 @@ public class Symbol
         {
             case symTypes.ID -> outString+=RESET;
             case symTypes.structID -> outString+=CYAN;
+            case symTypes.structVar -> outString+=CYAN;
             case symTypes.typeID -> outString+=B_MAGENTA;
+            case symTypes.typeVar -> outString+=B_MAGENTA;
             case symTypes.funcID -> outString+=B_YELLOW;
             case symTypes.intg -> outString+=RED;
             case symTypes.flot -> outString+=B_BLUE;
@@ -118,7 +118,7 @@ public class Symbol
                 outString+=B_BLUE+" : Assignment"+RESET;
         }
 
-        int counter = 1;
+        int counter = 0;
         if (!values.isEmpty())
             outString+=B_GREEN+"\n\tValues: "+RESET;
 
@@ -187,6 +187,15 @@ public class Symbol
         occurances.add(_token);
     }
 
+    public void addValues(ArrayList<Token> _values)
+    {
+        for (Token value : _values)
+        {
+            values.add(value);
+        }
+    }
+
+
     public void addValue(Token _token)
     {
         values.add(_token);
@@ -230,15 +239,9 @@ public class Symbol
     public ArrayList<String> occurancesAreDefined(Scope globalScope, Scope mainScope)
     {
         ArrayList<String> errorList = new ArrayList<>();
-        Token definitionToken = null;
+        Token definitionToken;
 
-        for (Token occurance : occurances)
-        {
-            if (occurance.isDefinition)
-            {
-                definitionToken = occurance;
-            }
-        }
+        definitionToken = searchSelfForDefinition();
 
         if (definitionToken == null)
         {
@@ -248,13 +251,14 @@ public class Symbol
 
         if (definitionToken == null)
         {
-            String log = "Semantic Error: symbol "+this.firstToken.getLexeme()+"failed to find a definition token";
+            String log = "Semantic Error: symbol "+this.firstToken.getLexeme()+" failed to find a definition token in scope "+parentScope.getName()+" at "+firstToken.getLocationStringCols();
             errorList.add(log);
             return errorList;
         }
 
         for (Token occurance : occurances)
         {
+            //if occurance is the definition token we're fine
             if (occurance != definitionToken)
             {
                 if (!occurance.isAfter(definitionToken))
@@ -287,6 +291,18 @@ public class Symbol
     }
 
 
+    public Token searchSelfForDefinition()
+    {
+        for (Token occurance : occurances)
+        {
+            if (occurance.isDefinition)
+            {
+                return occurance;
+            }
+        }
+        return null;
+    }
+
     private Token searchScopeForDef(Scope scope)
     {
         Token definitionToken = null;
@@ -316,5 +332,49 @@ public class Symbol
             }
         }
         return null;
+    }
+
+    public ArrayList<String> validateArraySizing()
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        Token definitionToken;
+
+        definitionToken = searchSelfForDefinition();
+        if (definitionToken == null)
+        {
+            //does not contain definition, must be defined elsewhere
+            return errorList;
+        }
+
+        //arrdef is always tokname def array [integerExpression] of structid end
+        //always just two values
+        boolean sizeValid = false;
+        
+        for (Token arrSizeToken : values)
+        {
+            if (arrSizeToken != values.getLast())
+            {
+                if (arrSizeToken.getType()!=null)
+                {
+                    switch (arrSizeToken.getType()) 
+                    {
+                        case TILIT -> sizeValid = true;
+                        case TIDEN -> {
+                            Symbol newSym = this.parentScope.lookupSymbolbyName(arrSizeToken.getLexeme(), symTypes.intg);
+                            sizeValid = (newSym != null && newSym.subtype.equals("const"));
+                        }
+                        default -> sizeValid = false;
+                    }
+                }
+            }
+        }
+
+        if (sizeValid == false)
+        {
+            String log = "Semantic Error: Array must have valid integer expression for sizing";
+            errorList.add(log);
+        }
+
+        return errorList;
     }
 }

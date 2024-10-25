@@ -76,7 +76,10 @@ public class CodeGenerator
     private final String OP_LA2 = "92";
     //done with OP_ codes
 
-
+    public CodeGenerator()
+    {
+        System.out.println("Code Generation is non functional, however, \nthe program has passed all checks hopefully this is correct");
+    }
 
 
 }

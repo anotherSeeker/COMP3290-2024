@@ -52,7 +52,7 @@ begin
     b = 3+a;
     vis = false;
 
-    funnyLocations[0].visited = false;
+    funnyLocations[1+2-3].visited = false;
     funnyLocations[0].x = a;
     funnyLocations[0].y = b;
 

@@ -4,12 +4,12 @@ import SymbolTable.SymbolTable;
 import Tokeniser.Token;
 import java.util.ArrayList;
 
-public class SemanticChecker 
+public final class SemanticChecker 
 {
-    private ArrayList<Token> tokenList;
+    private final ArrayList<Token> tokenList;
     private final ArrayList<String> errorLog = new ArrayList<>();
-    private SymbolTable symt;
-    private int listIndex = 0;
+    private final SymbolTable symt;
+    //private int listIndex = 0;
     private boolean errorFree = true;
 
     public SemanticChecker(ArrayList<Token> _tokenList, SymbolTable _symt) 
@@ -21,7 +21,7 @@ public class SemanticChecker
     }
 
 
-    public boolean runSemCheck()
+    public final boolean runSemCheck()
     {
         boolean isValid = false;
 
@@ -29,7 +29,11 @@ public class SemanticChecker
         {
             if (validateDeclarationBeforeUse())
             {
-                isValid = true;
+                if (validateArraySizesAreDeclared())
+                {
+                   isValid = true; 
+                }
+                
             }
         }
 
@@ -51,6 +55,22 @@ public class SemanticChecker
     private boolean validateDeclarationBeforeUse()
     {
         ArrayList<String> errors = symt.validateVariableUses();
+        logError(errors);
+
+        return errors.isEmpty();
+    }
+
+    private boolean validateArraySizesAreDeclared()
+    {
+        ArrayList<String> errors = symt.validateArraySizing();
+        logError(errors);
+
+        return errors.isEmpty();
+    }
+
+    private boolean validateExpressions()
+    {
+        ArrayList<String> errors = symt.validateExpressions();
         logError(errors);
 
         return errors.isEmpty();
