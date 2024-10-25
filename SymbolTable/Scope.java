@@ -169,6 +169,20 @@ public class Scope
         return null;
     }
 
+    public ArrayList<Symbol> getAllOfType(Symbol.symTypes type)
+    {
+        ArrayList<Symbol> syms = new ArrayList<>();
+
+        for (Symbol entry : symbols)
+        {
+            if (entry.matchSymbolByType(type))
+                syms.add(entry);
+        }
+
+
+        return syms;
+    }
+
     public void setReturnType(Symbol.symTypes _returnType)
     {
         returnType = _returnType;
@@ -192,5 +206,19 @@ public class Scope
     public Token getToken()
     {
         return scopeToken;
+    }
+
+    public String occurancesToString()
+    {
+        String outString = "";
+        int count = 0;
+        for (Token occurance : scopeOccurances)
+        {
+            outString += "\n\t"+count+": "+occurance.getLocationStringCols();
+            count++;
+        }
+
+
+        return outString;
     }
 }

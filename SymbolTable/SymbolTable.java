@@ -28,6 +28,8 @@ public class SymbolTable
     private String progName = null;
     private boolean symtError = false;
     private final ArrayList<String> errorLog = new ArrayList<>();
+
+    private int globalIterator = -1;
     
     private enum SymState {
         Global, Main, Func
@@ -47,9 +49,9 @@ public class SymbolTable
             symTypes returnType = currentScope.getReturnType();
 
             switch (name) {
-                case "Global" -> System.out.println(GREEN+"Scope: "+bCYAN+name+RESET+" : ");
-                case "Main" -> System.out.println(GREEN+"Scope: "+MAGENTA+name+RESET+" : ");
-                default -> System.out.println(GREEN+"Scope: "+YELLOW+name+RESET+" : ");
+                case "Global" -> System.out.println(GREEN+"Scope: "+bCYAN+name+RESET+" : "+currentScope.occurancesToString());
+                case "Main" -> System.out.println(GREEN+"Scope: "+MAGENTA+name+RESET+" : "+currentScope.occurancesToString());
+                default -> System.out.println(GREEN+"Scope: "+YELLOW+name+RESET+" : "+currentScope.occurancesToString());
             }
 
             if (returnType != null)
@@ -176,7 +178,7 @@ public class SymbolTable
                 break;
             listToken = tokenList.get(i);
 
-            stepHandleLooseIds(listToken, i);
+            i = stepHandleLooseIds(listToken, i);
 
             i = stepHandleCD24(listToken, i);
         }
@@ -214,7 +216,7 @@ public class SymbolTable
         return index;
     }
 
-    private void stepHandleLooseIds(Token token, int i)
+    private int stepHandleLooseIds(Token token, int i)
     {
         //scopes are already setup so the scope will check if this is a duplicate (line col comparison) when it's asked to addToScope()
         if (token.getType() == TokenTypes.TIDEN)
@@ -227,10 +229,24 @@ public class SymbolTable
             {
                 Scope _scope = getScopeAtTokenLoc(token);
                 Symbol.symTypes type;
+                String subtype = null;
 
                 if (setupAssignOrDefine(token, i) == 0)
                 {
+                    //is not followed by def, =, :, if a struct or array is not followed by those it's referencing the whole object
                     type = getSymTypeFromScopeLookup(token, _scope);
+
+                    if (type == symTypes.structID || type == symTypes.typeID)
+                    {
+                        Symbol newSymbol = new Symbol(token, type, _scope);
+                        addToScope(newSymbol, _scope, token.isDefinition);
+
+                        int structOrArrayState = isStructOrArrayReference(token, _scope, i, type);
+                        if (structOrArrayState != 0)
+                        {
+                            return globalIterator;
+                        }
+                    }                    
                 }
                 else
                 {
@@ -244,12 +260,22 @@ public class SymbolTable
                     {
                         type = getSymTypeFromTokenType(newToken);
                     }
-                }
 
-                Symbol newSymbol = new Symbol(token, type, _scope);
-                addToScope(newSymbol, _scope, token.isDefinition);
+                    if (type == symTypes.typeID || type == symTypes.structID)
+                    {
+                        //name : type
+                        i = stepIterator(i, 2);
+                        subtype = tokenList.get(i).getLexeme();
+                    }
+
+                    Symbol newSymbol = new Symbol(token, type, _scope);
+                    addToScope(newSymbol, _scope, token.isDefinition);
+                    if (subtype!=null)
+                        newSymbol.setSubType(subtype);
+                }
             }
-        } 
+        }
+        return i; 
     }
 
     private int stepHandleTypes(Token token, int i)
@@ -380,13 +406,6 @@ public class SymbolTable
                             return k;
                         }
                     }
-
-                    k=stepIterator(k, 1);
-                    valueToken = tokenList.get(k);
-                    if (valueToken.getType() != TokenTypes.TCOMA)
-                    {
-                        return k;
-                    }
                 }
                 else
                 {
@@ -490,6 +509,51 @@ public class SymbolTable
             return -1;
         }
         
+        return 0;
+    }
+
+    //structName.var returns 1, arrayName[index] returns 2, arrayName[index].var returns 3, else return 0
+    //structName.var adds var token as a value
+    //arrayName[index]      adds index as a value,   then adds null as a value
+    //arrayName[index].var  add index as a value,    then adds var as a value
+    private int isStructOrArrayReference(Token token, Scope scope, int i, symTypes type)
+    {
+        //TODO: cannot handle struct values as array indexes, fix either internally or externally
+        globalIterator = stepIterator(i, 1);
+        
+        if (tokenList.get(globalIterator).getType() == TokenTypes.TDOTT)
+        {
+            //is struct, step forward one and add name to value, we'll use struct
+            globalIterator = stepIterator(globalIterator, 1);
+            if (type == symTypes.typeID)
+            {
+                scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
+                scope.getSymbolByTokenName(token).addValue(null);
+            }
+            scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
+            return 1;
+        }
+        else if (tokenList.get(globalIterator).getType() == TokenTypes.TLBRK)
+        {
+            //is struct, step forward one and add name to value, we'll use struct
+            globalIterator = stepIterator(globalIterator, 1);
+            scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
+
+            //step two so we go past the right bracket name[index].var
+            globalIterator = stepIterator(globalIterator, 2);
+            if (tokenList.get(globalIterator).getType() == TokenTypes.TDOTT)
+            {
+                //is name[index].var
+                globalIterator = stepIterator(globalIterator, 1);
+                scope.getSymbolByTokenName(token).addValue(tokenList.get(globalIterator));
+                scope.getSymbolByTokenName(token).addValue(null);
+                return 3;
+            }
+            //is name[index]
+            scope.getSymbolByTokenName(token).addValue(null);
+            return 2;
+        }
+
         return 0;
     }
     
@@ -810,4 +874,87 @@ public class SymbolTable
             }
         }
     } 
+
+    private Symbol getProgramNameSymbol(Scope scope)
+    {
+        ArrayList<Symbol> syms;
+        symTypes type = symTypes.programName;
+
+        syms = scope.getAllOfType(type);
+        if (!syms.isEmpty() && syms.size()==1)
+        {
+            Symbol sym = syms.get(0);
+
+            return sym;
+        }
+
+        return null;
+    }
+
+    public boolean programNameIsValid()
+    {
+        boolean isValid = false;
+        for (Scope scope : scopeList)
+        {
+            Symbol sym = getProgramNameSymbol(scope);
+            if (sym != null)
+            {
+                if (isValid == false)
+                {
+                    isValid = matchProgNameOccurances(sym);
+                    if (isValid == false)
+                        return isValid;//if name ever doesn't match here, we can immediately exit
+                }
+                else
+                {
+                    //we found a second instance of program name, this shouldn't ever happen
+                    isValid = false;
+                    return isValid;
+                }
+            }
+        }
+
+        return isValid;
+    }
+
+    private boolean matchProgNameOccurances(Symbol sym)
+    {
+        ArrayList<Token> toks = sym.getOccurances();
+        String initialName = toks.get(0).getLexeme();
+
+        boolean isValid = false;
+
+        for (int i = 1; i<toks.size();i++)
+        {
+            String name = toks.get(i).getLexeme();
+
+            isValid = name.equalsIgnoreCase(initialName);
+        }
+
+        return isValid;
+    }
+
+    public boolean validateVariableUses()
+    {
+        boolean isValid = false;
+
+        for (Scope scope : scopeList)
+        {
+            for (Symbol sym : scope.getSymbolList())
+            {
+                for (Token occurance : sym.getOccurances())
+                {
+
+                }
+            }
+        }
+
+
+
+        return false;
+    }
+
+
+    
+
 }

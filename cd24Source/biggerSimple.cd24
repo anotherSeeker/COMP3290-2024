@@ -18,12 +18,18 @@ typedef
         visited : bool, x:int, y : int
     end
 
+    locations def 
+        array [20] of location 
+    end
+
+arraydef
+    funnyLocations : locations
 
 func checkVisited(place : location) : void
-/--no needed things
+    /--no needed things
 begin
     if (place.visited == false)
-        printline "Get walking you haven't visited ";
+        print "Get walking you haven't visited ";
         print place.x;
         print " ";
         printline place.y;
@@ -42,9 +48,13 @@ main
     newPlace : location
 begin
     
-    amain = a;
+    amain = a+1;
     b = 3+a;
     vis = false;
+
+    funnyLocations[0].visited = false;
+    funnyLocations[0].x = a;
+    funnyLocations[0].y = b;
 
     newPlace.visited = vis;
     newPlace.x = amain;

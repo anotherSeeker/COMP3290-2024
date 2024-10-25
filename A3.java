@@ -1,4 +1,5 @@
 import Parser.*;
+import SemanticChecker.SemanticChecker;
 import SymbolTable.SymbolTable;
 import Tokeniser.*;
 import java.util.ArrayList;
@@ -13,6 +14,10 @@ public class A3
     {      
         LexemeTokeniser tokeniser = new LexemeTokeniser();
         String filePathString = args[0];
+        SymbolTable symTable;
+        PNodeTree parserTree;
+        TokenParser parser;
+        SemanticChecker semChecker;
 
         if (args.length > 0)
         {
@@ -25,26 +30,42 @@ public class A3
             listingGenerator.generateListingA1(tokenList, errorList, filePathString);
             //System.out.println(listing);
 
-            SymbolTable symTable = new SymbolTable(tokenList);
-            //symTableErrors
-            symTable.printTable();
-            symTable.printErrorLog();
+            if (errorList.isEmpty())
+            {
+                symTable = new SymbolTable(tokenList);
+                //symTableErrors
+                symTable.printTable();
+                symTable.printErrorLog();
             
-            TokenParser parser = new TokenParser(tokenList, symTable);
-            PNodeTree tree = parser.run();
-            tree.printErrors();
+                parser = new TokenParser(tokenList, symTable);
+                parserTree = parser.run();
+                parserTree.printErrors();
 
-            //print tree is the debug print, 
-                //traversal is the requested output print
-            listingGenerator.generateListingA2(tree, filePathString);
-            //tree.printTreeTraversal();
-            //tree.printTree();
+                //print tree is the debug print, 
+                    //traversal is the requested output print
+                listingGenerator.generateListingA2(parserTree, filePathString);
+                //tree.printTreeTraversal();
+                //tree.printTree();
 
-            
 
+                semChecker = new SemanticChecker(tokenList, symTable);
+
+                if (!parserTree.hasErrors())
+                {
+                    semChecker = new SemanticChecker(tokenList, symTable);
+                }
+                else
+                {
+                    System.out.println("\nAborting Semantic Checking due to Symbol Table and/or Parsing Error(s)");
+                }
+            }
+            else
+            {
+                System.out.println("\nAborting Parsing due to Lexical Error(s)");
+            }         
         }
         else
-            System.out.println("please provide filepath");
+            System.out.println("\nAborting Tokenising due to missing Filepath");
     }
 
     public static void printTokens()

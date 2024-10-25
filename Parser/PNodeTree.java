@@ -170,7 +170,6 @@ public class PNodeTree
         {
             System.out.println(err);
         }
-        
     }
 
     private String errorStrings()
@@ -188,5 +187,10 @@ public class PNodeTree
     public void printErrors()
     {
         errorPrint();
+    }
+
+    public boolean hasErrors()
+    {
+        return errorStrings.isEmpty();
     }
 }

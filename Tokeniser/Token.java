@@ -235,4 +235,22 @@ public class Token
         //idents are case sensitive
         return this.getLexeme().equals(inputToken.getLexeme());
     }
+
+    public boolean isAfter(Token otherToken)
+    {
+        if (getLine() > otherToken.getLine())
+        {
+            return true;
+        }
+        else if  (getLine() == otherToken.getLine())
+        {
+            if (getColumn() > otherToken.getColumn())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

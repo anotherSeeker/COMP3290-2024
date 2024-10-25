@@ -124,7 +124,11 @@ public class Symbol
 
         for (Token tok : values)
         {
-            outString+="\n\t\t"+counter+": "+B_RED+tok.getLexeme()+RESET;
+            if (tok == null)
+                outString+="\n\t\t"+counter+": "+B_RED+"null"+RESET;
+            else
+                outString+="\n\t\t"+counter+": "+B_RED+tok.getLexeme()+" "+tok.getLocationStringCols()+RESET;
+
             counter++;
         }
 
@@ -155,13 +159,15 @@ public class Symbol
         boolean matchesLex = firstToken.getLexeme().equals(inputName);
         if (matchesLex)
         {
-            if (inputType == type) 
-            {
-                return true;
-            }
+            return inputType == type;
         }
 
         return false;
+    }
+
+    public boolean matchSymbolByType(symTypes inputType)
+    {
+        return inputType==type;
     }
 
     public boolean matchSymbolByName(String inputName)
