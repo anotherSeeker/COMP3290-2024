@@ -7,7 +7,7 @@ public class Symbol
     public static enum symTypes{
         ID, intg, flot, bool, symVoid,
         structID, typeID, typeVar, structVar, funcID, undf, programName
-    }
+    }//struct/type ID is declaration of the "type" while var is a variable of that type
 
     private static final String RESET = /*""//*/"\u001B[0m";
     private static final String RED = /*""//*/"\u001B[31m";
@@ -31,11 +31,12 @@ public class Symbol
     private final ArrayList<Token> occurances = new ArrayList<>();
     private final Scope parentScope;
 
-    public static symTypes typeFromString(String returnString)
+    public static symTypes symTypeFromString(String tokenTypeString)
     {
         symTypes outType = null;
-        //ID, intg, flot, bool, symVoid, structID, typeID, funcID,
-        switch (returnString) {
+        //ID, intg, flot, bool, symVoid, structID, typeID, structVar, typeVar, funcID,
+        switch (tokenTypeString) {
+            case "TIDEN" -> {outType = symTypes.ID;}//we cannot clarify closer here, we will need to search for if this is a scope or symbol
             case "TINTG" -> {outType = symTypes.intg;}
             case "TFLOT" -> {outType = symTypes.flot;}
             case "TBOOL" -> {outType = symTypes.bool;}
@@ -236,6 +237,11 @@ public class Symbol
         return occurances;
     }
 
+    public String getSubtype()
+    {
+        return subtype;
+    }
+
     public ArrayList<String> occurancesAreDefined(Scope globalScope, Scope mainScope)
     {
         ArrayList<String> errorList = new ArrayList<>();
@@ -334,6 +340,7 @@ public class Symbol
         return null;
     }
 
+    //the symbol is an array we're validating the declared size
     public ArrayList<String> validateArraySizing()
     {
         ArrayList<String> errorList = new ArrayList<>();
@@ -376,5 +383,47 @@ public class Symbol
         }
 
         return errorList;
+    }
+
+    public Token getStructValueToken(Token tok)
+    {
+        Token typeNameTok = null;
+        if (type == symTypes.structID)
+        {
+            for (int i = 0; i<values.size();i++)
+            {
+                Token value = values.get(i);
+                //if it's not a definition we tick up counter for values array
+                if (value.matchIdentifier(tok))
+                {
+                    //idents match, so next token in the list is the typing token
+                    typeNameTok = values.get(i+1);
+                }
+            }
+        }
+        else
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+
+        return typeNameTok;
+    }
+
+    public String structValueByTokenName(Token tok)
+    {
+        String outString = null;
+        String tokName = tok.getLexeme();
+        //we step through two at a time as values are added in pairs of name and type
+        for (int i = 0; i<values.size();i+=2)
+        {
+            Token valueTok = values.get(i);
+
+            if (tokName.equals(valueTok.getLexeme()))
+            {
+                //if names match then necessarily the nextToken is the type
+                outString = values.get(i+1).getLexeme();
+                break;
+            }
+        }
+
+        return outString;
     }
 }

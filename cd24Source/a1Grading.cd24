@@ -4,7 +4,7 @@ constants
     constantNum1 = 1,
     constantNum2 = 22212,
     constantNum3 = 22212.2,
-    arraySize = 20
+    arraySize = 3
 
 typedef
 
@@ -19,7 +19,7 @@ typedef
     /--arraytype def
 
     studentScores def 
-        array [arraySize/**20**/] of studentScore 
+        array [arraySize] of studentScore 
     end
 
 arraydef /**beep
@@ -34,6 +34,7 @@ begin
         total = scores[i].score;
         i+=1;
     end
+    return void;
 end
 
 func getScoreByID(ID : int, numStudents : int, const scores : studentScores) : float
@@ -83,6 +84,7 @@ begin
         print " : ";
         printline scores[i].score;
     end
+    return void;
 end
 
 main
@@ -93,8 +95,7 @@ main
     newScore : float,
     a : int
 begin
-    print "Input the number of students";
-    input numStudents;
+    numStudents = arraySize;
 
     for (index = 0; index < numStudents)
         print "input studentID";

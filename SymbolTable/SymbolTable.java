@@ -4,6 +4,12 @@ import Tokeniser.Token;
 import Tokeniser.TokenTypes;
 import java.util.ArrayList;
 
+
+
+/*  The complexity of all the symbol table logic got away from me, this needs significant cleanup and to be designed 
+    such that functions are more reusable than they are currently that is completely impractical with the timeline of 
+    this and my other assignments especially while working on this alone I am frankly disgusted by the length of this file.
+*/
 public class SymbolTable 
 {
     private static final String RESET = /*""//*/"\u001B[0m";
@@ -391,7 +397,7 @@ public class SymbolTable
             type = symTypes.structID;
             Symbol newSymbol = new Symbol(identToken, type, globalScope);
             globalScope.addSymbol(newSymbol);
-            newSymbol = globalScope.getSymbolByTokenName(newSymbol.getToken());
+            newSymbol = globalScope.lookupSymbolByTokenName(newSymbol.getToken());
 
             //add initial value to struct
             newSymbol.addValue(stepForwardToken);
@@ -508,7 +514,7 @@ public class SymbolTable
 
     private boolean isDefinitionInCurrentScope(Scope scope, Symbol _sym)
     {
-        Symbol sym = scope.getSymbolByTokenName(_sym.getToken());
+        Symbol sym = scope.lookupSymbolByTokenName(_sym.getToken());
 
         Token symTok = sym.searchSelfForDefinition();
         
@@ -619,7 +625,7 @@ public class SymbolTable
     {
         globalIterator = stepIterator(i, 1);
         Token tok=tokenList.get(globalIterator);
-        Symbol newSymbol = scope.getSymbolByTokenName(_symbolToken);
+        Symbol newSymbol = scope.lookupSymbolByTokenName(_symbolToken);
 
         int outValue = 0;
 
@@ -667,7 +673,7 @@ public class SymbolTable
     
     public boolean tokenIsStructName(Token _token)
     {
-        Symbol sym = globalScope.getSymbolByTokenName(_token);
+        Symbol sym = globalScope.lookupSymbolByTokenName(_token);
         if (sym != null)
             return sym.getType() == Symbol.symTypes.structID;
 
@@ -676,7 +682,7 @@ public class SymbolTable
 
     public boolean tokenIsTypeName(Token _token)
     {
-        Symbol sym = globalScope.getSymbolByTokenName(_token);
+        Symbol sym = globalScope.lookupSymbolByTokenName(_token);
         if (sym != null)
             return sym.getType() == Symbol.symTypes.typeID;
         
@@ -708,7 +714,7 @@ public class SymbolTable
         symTypes type;
         if (isInScope(token, _scope))
         {
-            type = _scope.getSymbolByTokenName(token).getType();
+            type = _scope.lookupSymbolByTokenName(token).getType();
             if (type == symTypes.typeID || type == symTypes.structID)
             {
 
@@ -717,7 +723,7 @@ public class SymbolTable
         }
         if (isInGlobal(token))
         {
-            type = globalScope.getSymbolByTokenName(token).getType();
+            type = globalScope.lookupSymbolByTokenName(token).getType();
             return type;
         }
 
@@ -907,6 +913,14 @@ public class SymbolTable
         symtError = true;
         errorLog.add(log);
     }
+    private void logError(ArrayList<String> logs)
+    {
+        symtError = false;
+        for (String log : logs)
+        {
+            errorLog.add(log);
+        }
+    }
 
     private int stepIterator(int i, int stepSize)
     {
@@ -944,7 +958,7 @@ public class SymbolTable
             isIden = true;
         }
 
-        symTypes type = Symbol.typeFromString(returnString);
+        symTypes type = Symbol.symTypeFromString(returnString);
 
         if (isIden)
         {
@@ -987,6 +1001,26 @@ public class SymbolTable
             }
         }
     } 
+
+    private int advanceUntil(TokenTypes[] types, int index)
+    {
+        int i;
+        for (i = index; i<tokenList.size(); i++)
+        {
+            Token tok = tokenList.get(i);
+            for (TokenTypes type : types)
+            {
+                if (type == tok.getType())
+                {
+                    return i;
+                }
+            }
+        }
+        return i;
+    }
+
+
+
 
     private Symbol getProgramNameSymbol(Scope scope)
     {
@@ -1080,11 +1114,7 @@ public class SymbolTable
                 {
                     //confirmed as array type
                     newErrors = sym.validateArraySizing();
-
-                    for (String error : newErrors)
-                    {
-                        errorList.add(error);
-                    }
+                    errorList.addAll(newErrors);
                 }
             }
         }
@@ -1096,10 +1126,349 @@ public class SymbolTable
         ArrayList<String> errorList = new ArrayList<>();
         ArrayList<String> newErrors;
 
-        
-
+        //TODO: AAAAAAAAAAAAAAA
 
         return errorList;
     }
 
+
+    public ArrayList<String> validateFunctionReturns()
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+
+        for (Scope scope : scopeList)
+        {
+            if (scope.isFunc())
+            {
+                //is not global or main
+
+                int index = scope.getToken().getIndex();
+
+                boolean inBody = false;
+                boolean hasReturn = false;
+
+                Token currToken;
+                for (int i = index; i<tokenList.size();i++)
+                {
+                    currToken = tokenList.get(i);
+                    if (currToken.getType() == TokenTypes.TMAIN || currToken.getType() == TokenTypes.TFUNC)
+                    {
+                        break;
+                    }
+
+                    if (!inBody)
+                    {
+                        if (currToken.getType() == TokenTypes.TBEGN)
+                        {
+                            inBody = true;
+                        }
+                    }
+
+                    if (inBody)
+                    {
+                        if (currToken.getType() == TokenTypes.TRETN)
+                        {
+                            hasReturn = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasReturn)
+                {
+                    String log = "Semantic Error: Func "+scope.getName()+" "+scope.getScopeToken().getLocationStringCols()+" must include a return statement";
+                    errorList.add(log);
+                }
+            }
+        }
+
+        return errorList;
+    }
+
+    public ArrayList<String> validateFunctionParameters()
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        ArrayList<String> newErrors;
+
+        for (Scope scope : scopeList)
+        {
+            if (scope.isFunc())
+            {
+                ArrayList<String> paramTypes = scope.getParameterTypes(tokenList);
+
+                //for each time that scope is referenced in code
+                for (Token occurance : scope.getOccurances())
+                {
+                    //for each time that scope is called
+                    if (!occurance.isDefinition)
+                    {
+                        newErrors = validateParamTypes(occurance, paramTypes, scope);
+
+                        errorList.addAll(newErrors);
+                    }
+                }
+            }
+        }
+
+        return errorList;
+    }
+
+    public ArrayList<String> validateParamTypes(Token funcOccurance, ArrayList<String> declarationParamTypes, Scope functionScope)
+    {
+        ArrayList<String> errorList = new ArrayList<>();
+        ArrayList<String> occuranceParamTypes = setupOccuranceParams(funcOccurance);
+
+        if (occuranceParamTypes.size() != declarationParamTypes.size())
+        {
+            String log = "Semantic Error: Incorrect number of parameters in function reference "+funcOccurance.getLexeme()+" at "+funcOccurance.getLocationStringCols();
+            errorList.add(log);
+            return errorList;
+        }
+
+        for (int i = 0; i<occuranceParamTypes.size(); i++)
+        {
+            String occrType = occuranceParamTypes.get(i);
+            String decType = declarationParamTypes.get(i);
+
+            if (!occrType.equals(decType))
+            {
+                //if both types don't match we error
+                String log = "Semantic Error: Incorrect parameter type \""+occrType+"\" expecting \""+decType+"\" in "+funcOccurance.getLexeme()+" at "+funcOccurance.getLocationStringCols();
+                errorList.add(log);
+            }
+        }
+
+        return errorList;
+    }
+
+    private ArrayList<String> setupOccuranceParams(Token funcOccurance)
+    {
+        ArrayList<String> occuranceParamTypes = new ArrayList<>();
+
+        for (int i = funcOccurance.getIndex()+2; i<tokenList.size(); i++)
+        {
+            String strType;
+            //starting at funcName of funcName( param1, ... , paramN);
+                //getIndex()+2 skips the (
+            
+            Token paramTok = tokenList.get(i);
+
+            if (paramTok.getType() == TokenTypes.TRPAR)
+            {
+                //we have hit ) and must be done with our parameters
+                break;
+            }
+
+            Scope paramFunc = getScopeFromTokenName(paramTok);
+            if (paramFunc != null)
+            {
+                strType = paramFunc.getReturnType().toString();
+                occuranceParamTypes.add(strType);
+                TokenTypes[] advanceTypes = {TokenTypes.TCOMA, TokenTypes.TRPAR};
+
+                //done with consume, gonna advance till we pass it
+                i = advanceUntil(advanceTypes, i); 
+            }
+            else
+            {
+                strType = consumeVarReturnTyping(funcOccurance);
+                occuranceParamTypes.add(strType);
+                TokenTypes[] advanceTypes = {TokenTypes.TCOMA, TokenTypes.TRPAR};
+
+                //done with consume, gonna advance till we pass it
+                i = advanceUntil(advanceTypes, i);
+
+                //wasn't a function so if we're on TRPAR now we wanna break as we're done
+                if (tokenList.get(i).getType() == TokenTypes.TRPAR)
+                    break;
+            }
+                       
+        }
+
+        return occuranceParamTypes;
+    }
+
+
+    public String consumeVarReturnTyping(Token funcOccurance)
+    {
+        //funcName(var)
+        //var == structName || structName.var || arrayName || arrayName[index] || arrayName[index].var || funcName(parameters) <- hate this >:(, also hate arrays esp when they can be inside a funcparameter
+
+        //index of funcName, need to step forward 2 to get to the start of var
+        int funcIndex = funcOccurance.getIndex()+2;
+        String outString = null;
+        Boolean varIsFunc;
+
+        Scope callScope = getScopeAtTokenLoc(funcOccurance);
+        varIsFunc = lookupFuncExists(funcOccurance);
+        if (varIsFunc)
+        {
+            Scope funcScope = getScopeFromTokenName(funcOccurance);
+
+            //if we're a function we're getting the function return type
+            outString = funcScope.getReturnType().toString();
+            return outString;
+        }
+
+        Symbol varSym = callScope.lookupSymbolByTokenName(funcOccurance);
+
+ 
+        symTypes symType = varSym.getType();
+
+
+        if (symType == symTypes.structVar)
+        {
+            //if we've received a structVar it is either done or followed by .varName
+            
+            //so we step index and check if the next token is TDOTT
+            Token varTok;
+            funcIndex++;
+            varTok = tokenList.get(funcIndex);
+
+            if (varTok.getType() == TokenTypes.TDOTT)
+            {
+                //is structName.varName to get var we step forward once more and reference the type in the declaration of startingSym
+                funcIndex++;
+                varTok = tokenList.get(funcIndex);
+
+                Symbol structIdSymbol = getStructIdOf(varSym);
+                Token structValueTok = structIdSymbol.getStructValueToken(varTok);
+
+                if (structValueTok==null)
+                    return null;
+
+                //get the type as a string from our value token, convert this string to a symTypes type, then convert to a string to compare against the other values
+                outString = Symbol.symTypeFromString(structValueTok.getTypeString()).toString();
+                return outString;
+            }
+            else
+            {
+                //is varName and varName is a struct, so return the subtype of varName
+                outString = varSym.getSubtype();
+                return outString;
+            }
+        }
+        else if (symType == symTypes.typeVar)
+        {
+            Token varTok;
+            funcIndex++;
+            varTok = tokenList.get(funcIndex);
+
+            //khvkhlvkhbl
+                //varTok is the first token after typeName in typeName[index].var
+                //if we do not receive TLBRK we are using the raw typing of the array 
+                    //e.g. locations from locations def array [20] of location end
+                //if we do array indexes matter, if we have an index we're using the raw typing of the 
+                    //e.g. location from locations def array [20] of location end
+            if (varTok.getType() == TokenTypes.TLBRK)
+            {
+                //now what, because we can use struct/array.var as a legal input if it's an integer
+                //not too bad in case of struct but arrays are little rat bastards incorporating their own []'s
+
+                //so step forward and grab that first token
+                boolean lastWasOperator = false;
+                boolean handlingIndex = true;
+                String arrayType;
+
+                while (handlingIndex)
+                {
+                    //step token forward
+                    funcIndex++;
+                    varTok = tokenList.get(funcIndex);
+
+                    if (varTok.getType() == TokenTypes.TRBRK)
+                    {
+                        //last input in the index was a maths operator and that's not legal
+                        if (lastWasOperator)
+                            return null;
+                    }
+
+
+                    if (varTok.getType() == TokenTypes.TINTG)
+                    {
+                        //this is legal but it's also only the index, so just do nothing move onto next step
+                    }
+                    else if (varTok.getType() == TokenTypes.TIDEN)
+                    {
+                        //if not ident, then we need it to be an int lit and if it is an ident it has to be an int symbol or struct.intVar
+
+                        String newType = consumeVarReturnTyping(funcOccurance);
+                        //we've consumed a function, so we have to step past that function. 
+                            //TODO: This will break if we have to step past a function taking multiple parameters or a function as a parameter, I would fix this by returning typeString and the new index but it's late and I wanna turn this innnnnn
+                        TokenTypes[] advanceTypes = {TokenTypes.TCOMA, TokenTypes.TRPAR};
+                        funcIndex = advanceUntil(advanceTypes, funcIndex);
+
+                        if (!newType.equals(symTypes.intg.toString()))
+                        {
+                            //we did not get an integer typed thingo and so we'll error by returning null
+                            return null;
+                        }
+                    }
+
+                    //we've consumed some form of int token, we step and look for end of index or a mathematical operator + - * / ^ 
+                    //step token forward
+                    funcIndex++;
+                    varTok = tokenList.get(funcIndex);
+
+                    //TODO: does not handle functions returning structs that you immediately reference eg getStruct().varName is illegal but I think that's just generally illegal? unclear.
+                    switch (varTok.getType())
+                    {
+                        case TRBRK -> handlingIndex=false;
+                        //these are legal operators and so we do nothing and keep looking for end or
+                        case TPLUS -> {lastWasOperator = true;}
+                        case TMINS -> {lastWasOperator = true;}
+                        case TSTAR -> {lastWasOperator = true;}
+                        case TDIVD -> {lastWasOperator = true;}
+                        case TCART -> {lastWasOperator = true;}
+                        default -> {
+                            //not TLBRK or a maths op, err
+                            return null;}
+                    }
+                }
+
+                if (varTok.getType() == TokenTypes.TDOTT)
+                {
+                    //we now have to do all the same logic from struct but as if it were an Array
+                }
+                else
+                {
+                    //raw array Type ref, so return type is teh typeVar's subtype
+                    outString = ;
+                }
+
+            }
+            
+            
+
+        }
+        else
+        {
+            //typing is intg, flot, etc and can just be grabbed from the symbol
+            outString = symType.toString();
+        }
+
+        return outString;
+    }
+
+
+    private Symbol getStructIdOf(Symbol startingSym)
+    {
+        if (startingSym.getType() == symTypes.structVar)
+        {
+            return globalScope.lookupSymbolbyName(startingSym.getSubtype(), symTypes.structID);
+        }
+        else
+        {
+            if (startingSym.getType() == symTypes.typeVar)
+            {
+                return globalScope.lookupSymbolbyName(startingSym.getSubtype(), symTypes.typeID);
+            }
+        }
+        //invalid typing
+        return null;
+    }
 }
+
+//The complexity of all the symbol table logic got away from me, this needs significant cleanup and to be designed 
+//such that functions are more reusable than they are currently that is completely impractical with the timeline of 
+//this and my other assignments especially while working on this alone I am frankly disgusted by the length of this file.

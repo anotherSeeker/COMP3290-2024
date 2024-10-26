@@ -31,7 +31,15 @@ public final class SemanticChecker
             {
                 if (validateArraySizesAreDeclared())
                 {
-                   isValid = true; 
+                    if (validateExpressions())
+                    {
+                        if (validateFunctions())
+                        {
+                            isValid = true; 
+                    
+                        }
+                
+                    }
                 }
                 
             }
@@ -77,7 +85,18 @@ public final class SemanticChecker
     }
 
 
+    private boolean validateFunctions()
+    {
+        ArrayList<String> errors;
+        
+        errors = symt.validateFunctionReturns();
+        logError(errors);
 
+        errors = symt.validateFunctionParameters();
+        logError(errors);
+
+        return errors.isEmpty();
+    }
 
 
 

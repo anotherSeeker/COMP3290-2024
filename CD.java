@@ -57,9 +57,9 @@ public class CD
                     semChecker = new SemanticChecker(tokenList, symTable);
                     semChecker.printErrorLog();
 
-                    if (semChecker.hasErrors())
+                    if (!semChecker.hasErrors())
                     {
-                        //TODO: generate code
+                        //TODO: generate code and cry
                         gen = new CodeGenerator();
                     }
                 }
@@ -74,7 +74,9 @@ public class CD
             }         
         }
         else
+        {
             System.out.println("\nAborting Tokenising due to missing Filepath");
+        }
     }
 
     public static void printTokens()

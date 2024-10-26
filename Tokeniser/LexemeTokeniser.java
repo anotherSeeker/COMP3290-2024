@@ -53,7 +53,7 @@ public class LexemeTokeniser
         {
             //to make it easier to reference tokens in our symbol table
             Token tok = TOKEN_LIST.get(i);
-            tok.setIndex(0);
+            tok.setIndex(i);
         }
 
         return lists;

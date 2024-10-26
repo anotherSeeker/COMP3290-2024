@@ -1,14 +1,17 @@
 package SymbolTable;
 
+import SymbolTable.Symbol.symTypes;
 import Tokeniser.Token;
+import Tokeniser.TokenTypes;
 import java.util.ArrayList;
 
 public class Scope 
 {
+    private static Scope globalScope;
     private final ArrayList<Symbol> symbols = new ArrayList<>();
     private final ArrayList<Token> scopeOccurances = new ArrayList<>();
     private Token scopeToken;
-    private Symbol.symTypes returnType = null;
+    private symTypes returnType = null;
     private final boolean isFunc;
     private final String name;
 
@@ -20,7 +23,7 @@ public class Scope
         isFunc = true;
     }
 
-    public Scope(Token _token, Symbol.symTypes _returnType)
+    public Scope(Token _token, symTypes _returnType)
     {
         scopeToken = _token;
         scopeToken.isDefinition = true;
@@ -34,7 +37,10 @@ public class Scope
         isFunc = false;
         scopeToken = null;
         if (globOrMain)
+        {
             name = "Global";
+            globalScope = this;
+        }
         else
             name = "Main";
     }
@@ -71,7 +77,7 @@ public class Scope
 
     private void addSymbolOccurance(Token _token, ArrayList<Token> values)
     {
-        Symbol entry = getSymbolByTokenName(_token);
+        Symbol entry = lookupSymbolByTokenName(_token);
         if (entry != null)
         {
             entry.addOccurance(_token);
@@ -147,7 +153,7 @@ public class Scope
         return false;
     }
 
-    public Symbol lookupSymbol(Token _token, Symbol.symTypes type)
+    public Symbol lookupSymbol(Token _token, symTypes type)
     {
         String _name = _token.getLexeme();
         for (Symbol entry : symbols)
@@ -158,7 +164,7 @@ public class Scope
         return null;
     }
 
-    public Symbol lookupSymbolbyName(String name, Symbol.symTypes type)
+    public Symbol lookupSymbolbyName(String name, symTypes type)
     {
         for (Symbol entry : symbols)
         {
@@ -168,7 +174,7 @@ public class Scope
         return null;
     }
 
-    public Symbol getSymbolByTokenName(Token _token)
+    public Symbol lookupSymbolByTokenName(Token _token)
     {
         String _name = _token.getLexeme();
         for (Symbol entry : symbols)
@@ -179,7 +185,7 @@ public class Scope
         return null;
     }
 
-    public ArrayList<Symbol> getAllOfType(Symbol.symTypes type)
+    public ArrayList<Symbol> getAllOfType(symTypes type)
     {
         ArrayList<Symbol> syms = new ArrayList<>();
 
@@ -193,12 +199,12 @@ public class Scope
         return syms;
     }
 
-    public void setReturnType(Symbol.symTypes _returnType)
+    public void setReturnType(symTypes _returnType)
     {
         returnType = _returnType;
     }
 
-    public Symbol.symTypes getReturnType()
+    public symTypes getReturnType()
     {
         return returnType;
     }
@@ -234,5 +240,78 @@ public class Scope
 
 
         return outString;
+    }
+
+
+
+
+
+
+    public ArrayList<String> getParameterTypes(ArrayList<Token> tokenList)
+    {        
+        //we'll add the required type to this list one by one
+        ArrayList<String> paramTypes = new ArrayList<>();
+
+        for (int i = scopeToken.getIndex(); i<tokenList.size(); i++)
+        {
+            //need to know if a symbol is a parameter
+            Token tok = tokenList.get(i);
+            if (tok.getType() == TokenTypes.TRPAR)
+            {
+                //we have reached the end of the parameters
+                return paramTypes;
+            }
+
+            if (tok.getType() == TokenTypes.TIDEN)
+            {
+                Symbol sym = lookupSymbolByTokenName(tok);
+                if (sym != null)
+                {
+                    symTypes symType = sym.getType();
+
+                    if (symType == symTypes.structVar || symType == symTypes.typeVar)
+                    {
+                        paramTypes.add(sym.getSubtype());
+                    }
+                    else
+                    {
+                        paramTypes.add(symType.toString());
+                    }
+                    //we've grabbed the type from the symbol however we're still sitting at the first ident token
+                    //we want to see either a , or a ) to end and we need to step past the type as that token can be an ident
+                        //name : type, name : type)
+                        //if we can't step two tokens forward in a definition here we have incorrect formatting, type is always one token
+                    i+=2;
+                }
+            }          
+        }
+
+        return paramTypes;
+    }
+
+    private String getStructOrTypeRefSubtype(Token inputTok, Symbol sym, ArrayList<Token> tokenList)
+    {
+        String outString = null;
+
+        //step through looking for matching parameters
+        for (int i = inputTok.getIndex()+1; i<tokenList.size();i++)
+        {
+            Token tok = tokenList.get(i);
+            switch (tok.getType()) 
+            {
+                case TLBRK -> {
+
+                }
+                case TDOTT -> {
+
+                }
+                default -> {
+                    outString = sym.getSubtype();
+                }
+            }
+        }
+
+
+        return outString;//returns null on fail
     }
 }
