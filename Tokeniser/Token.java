@@ -5,19 +5,19 @@ import java.util.ArrayList;
 
 public class Token
 {
-    private final String RESET = "\u001B[0m";
-    private final String RED = "\u001B[31m";
-    private final String GREEN = "\u001B[32m";
-    private final String BLUE =  "\u001B[34m";
-    //private final String CYAN = "\u001B[36m";
-    private final String bCYAN = "\u001B[96m";
-    //private final String MAGENTA = "\u001B[35m";
-    private final String bMAGENTA = "\u001B[95m";
-    //private final String YELLOW = "\u001B[33m";
-    //private final String bYELLOW = "\u001B[93m";
-    //private final String bBLUE = "\u001B[94m";
-    //private final String bGREEN = "\u001B[92m";
-    //private final String bRED = "\u001B[91m";
+    private static final String RESET = "";//"\u001B[0m";
+    private static final String RED = "";//"\u001B[31m";
+    private static final String B_RED = "";//"\u001B[91m";
+    private static final String GREEN = "";//"\u001B[32m";
+    private static final String B_GREEN = "";//"\u001B[92m";
+    private static final String BLUE =  "";//"\u001B[34m";
+    private static final String B_BLUE = "";//"\u001B[94m";
+    private static final String CYAN = "";//"\u001B[36m";
+    private static final String B_CYAN = "";//"\u001B[96m";
+    private static final String MAGENTA = "";//"\u001B[35m";
+    private static final String B_MAGENTA = "";//"\u001B[95m";
+    private static final String YELLOW = "";//"\u001B[33m";
+    private static final String B_YELLOW = "";//"\u001B[93m";
 
 
     public final String[] tokenOutputStrings = {
@@ -201,7 +201,7 @@ public class Token
 
     public String getLocationStringCols()
     {
-        return GREEN+"(Line: "+bMAGENTA+line+GREEN+", Column: "+bCYAN+column+GREEN+")"+RESET;
+        return GREEN+"(Line: "+B_MAGENTA+line+GREEN+", Column: "+B_CYAN+column+GREEN+")"+RESET;
     }
 
     public String getLocationStringErr()

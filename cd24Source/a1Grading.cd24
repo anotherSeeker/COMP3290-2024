@@ -4,7 +4,7 @@ constants
     constantNum1 = 1,
     constantNum2 = 22212,
     constantNum3 = 22212.2,
-    arraySize = 3
+    numStudents = 6
 
 typedef
 
@@ -19,14 +19,14 @@ typedef
     /--arraytype def
 
     studentScores def 
-        array [arraySize] of studentScore 
+        array [numStudents] of studentScore 
     end
 
 arraydef /**beep
 **/
     scores : studentScores
 
-func calcScores(const scores : studentScores, numStudents : int) : float
+func calcScores(const scores : studentScores) : float
     total : float,
     i : int
 begin
@@ -37,7 +37,7 @@ begin
     return void;
 end
 
-func getScoreByID(ID : int, numStudents : int, const scores : studentScores) : float
+func getScoreByID(ID : int, const scores : studentScores) : float
     i : int,
     score : float
 begin
@@ -51,7 +51,7 @@ begin
     return score;
 end
 
-func getHighestScoreID(const scores : studentScores, numStudents : int) : int
+func getHighestScoreID(const scores : studentScores) : int
     i : int,
     highest : float,
     highestID : int
@@ -66,7 +66,7 @@ begin
 
     return highestID;
 end
-
+/--assignScore(newScore, newID, index, scores);
 func assignScore(score : float, studentID : int, arrayIndex : int, const scores : studentScores) : void
     /--nothing needed
 begin
@@ -76,7 +76,7 @@ begin
     return void;
 end
 
-func printAllScores(const scores : studentScores, numStudents : int) : void
+func printAllScores(const scores : studentScores) : void
     i : int
 begin
     for (i = 0; i < numStudents)
@@ -88,15 +88,13 @@ begin
 end
 
 main
-    numStudents : int,
     totalScore : float,
     newID : int,
     index : int,
     newScore : float,
+    workingID : int,
     a : int
 begin
-    numStudents = arraySize;
-
     for (index = 0; index < numStudents)
         print "input studentID";
         input newID;
@@ -108,14 +106,15 @@ begin
         index+=1;
     end
 
-    printAllScores(scores, numStudents);
+    printAllScores(scores);
 
 
     printline "The highest scoring student was";
     
-    print getHighestScoreID(scores, numStudents); 
+    print getHighestScoreID(scores); 
     print " : "; 
-    printline getScoreByID(getHighestScoreID(scores, numStudents), scores);
+    workingID = getHighestScoreID(scores);
+    printline getScoreByID(workingID, scores);
     
     a = 1;
 

@@ -158,18 +158,34 @@ public class PNodeTree
         return str;
     }
 
-    private void errorPrint()
+    private ArrayList<String> errorPrint()
     {
+        ArrayList<String> errList = new ArrayList<>();
         if (errorStrings.isEmpty())
         {
+            errList.add("No Parser Errors");
             System.out.println("No Parser Errors");
-            return;
+            return errList;
         }
 
         for (String err : errorStrings)
         {
+            errList.add(err);
             System.out.println(err);
         }
+        return errList;
+    }
+
+    public ArrayList<String> getErrorLog()
+    {
+        ArrayList<String> errList = new ArrayList<>();
+        if (errorStrings.isEmpty())
+        {
+            errList.add("No Parser Errors");
+            return errList;
+        }
+
+        return errorStrings;
     }
 
     private String errorStrings()
@@ -184,9 +200,9 @@ public class PNodeTree
         return out;
     }
 
-    public void printErrors()
+    public ArrayList<String> printErrors()
     {
-        errorPrint();
+        return errorPrint();
     }
 
     public boolean hasErrors()

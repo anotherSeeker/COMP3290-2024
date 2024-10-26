@@ -9,19 +9,19 @@ public class Symbol
         structID, typeID, typeVar, structVar, funcID, undf, programName
     }//struct/type ID is declaration of the "type" while var is a variable of that type
 
-    private static final String RESET = /*""//*/"\u001B[0m";
-    private static final String RED = /*""//*/"\u001B[31m";
-    private static final String B_RED = /*""//*/"\u001B[91m";
-    private static final String GREEN = /*""//*/"\u001B[32m";
-    private static final String B_GREEN = /*""//*/"\u001B[92m";
-    private static final String BLUE =  /*""//*/"\u001B[34m";
-    private static final String B_BLUE = /*""//*/"\u001B[94m";
-    private static final String CYAN = /*""//*/"\u001B[36m";
-    private static final String B_CYAN = /*""//*/"\u001B[96m";
-    private static final String MAGENTA = /*""//*/"\u001B[35m";
-    private static final String B_MAGENTA = /*""//*/"\u001B[95m";
-    private static final String YELLOW = /*""//*/"\u001B[33m";
-    private static final String B_YELLOW = /*""//*/"\u001B[93m";
+    private static final String RESET = "";//"\u001B[0m";
+    private static final String RED = "";//"\u001B[31m";
+    private static final String B_RED = "";//"\u001B[91m";
+    private static final String GREEN = "";//"\u001B[32m";
+    private static final String B_GREEN = "";//"\u001B[92m";
+    private static final String BLUE =  "";//"\u001B[34m";
+    private static final String B_BLUE = "";//"\u001B[94m";
+    private static final String CYAN = "";//"\u001B[36m";
+    private static final String B_CYAN = "";//"\u001B[96m";
+    private static final String MAGENTA = "";//"\u001B[35m";
+    private static final String B_MAGENTA = "";//"\u001B[95m";
+    private static final String YELLOW = "";//"\u001B[33m";
+    private static final String B_YELLOW = "";//"\u001B[93m";
     
 
     private final Token firstToken;
@@ -401,8 +401,6 @@ public class Symbol
                 }
             }
         }
-        else
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
         return typeNameTok;
     }

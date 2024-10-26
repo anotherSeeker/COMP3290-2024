@@ -10,14 +10,12 @@ public final class SemanticChecker
     private final ArrayList<String> errorLog = new ArrayList<>();
     private final SymbolTable symt;
     //private int listIndex = 0;
-    private boolean errorFree = true;
+    private boolean errorFree = false;
 
     public SemanticChecker(ArrayList<Token> _tokenList, SymbolTable _symt) 
     {
         tokenList = _tokenList;
         symt = _symt;
-
-        errorFree = runSemCheck();
     }
 
 
@@ -36,7 +34,7 @@ public final class SemanticChecker
                         if (validateFunctions())
                         {
                             isValid = true; 
-                    
+                            errorFree = true;
                         }
                 
                     }
@@ -141,5 +139,22 @@ public final class SemanticChecker
         {
             System.out.println(error);
         }
+    }
+
+    public ArrayList<String> getErrorLog()
+    {
+        ArrayList<String> List = new ArrayList<>(); 
+        if (errorFree == true)
+        {
+            List.add("No Semantic Checker Errors");
+            return List;
+        }
+
+        for (String error : errorLog)
+        {
+            List.add(error);
+        }
+
+        return List;
     }
 }
