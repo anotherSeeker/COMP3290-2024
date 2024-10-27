@@ -19,7 +19,7 @@ typedef
     /--arraytype def
 
     studentScores def 
-        array [numStudents] of studentScore 
+        array [numStudents+1] of studentScore 
     end
 
 arraydef /**beep

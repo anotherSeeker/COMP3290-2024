@@ -13,7 +13,7 @@ cd24Source/a1Grading.cd24
 16: TIDEN watermelons TCOLN TINTG TCOMA TIDEN exists      TCOLN TBOOL 
 17: TTEND 
 21: TIDEN studentScores     TTDEF 
-22: TARAY TLBRK TIDEN numStudents TRBRK TTTOF TIDEN studentScore      
+22: TARAY TLBRK TIDEN numStudents TPLUS TILIT 1     TRBRK TTTOF TIDEN studentScore      
 23: TTEND 
 25: TARRD 
 27: TIDEN scores      TCOLN TIDEN studentScores     
